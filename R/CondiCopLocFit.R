@@ -30,17 +30,9 @@ CondiCopLocFit <- function(u1, u2, family, X, x, nx = 100,
   nx <- length(x)
   # default eta and nu
   degree <- match.arg(degree)
-  if(missing(eta) || missing(nu)) {
-    res <-  VineCopula::BiCopEst(u1,u2,family)
-    if(missing(eta)) {
-      eta <- BiCopPar2Eta(family=family, par = res$par, par2 =res$par2)
-      if(degree == "linear") eta <- c(eta, 0)
-    }
-    if(missing(nu)) {
-      nu <- res$par2
-    }
-  }
-  # detect parallel
+  en <- .get_etaNu(u1, u2, family, degree, eta, nu)
+  eta <- en$eta
+  nu <- en$nu
   fun <- function(xi) {
     wgt <- KernWeight(X = X, x = xi, band = band,
                       kernel = kernel, band.method = "constant")
@@ -48,6 +40,7 @@ CondiCopLocFit <- function(u1, u2, family, X, x, nx = 100,
                     z = X-xi, wgt = wgt, degree = degree,
                     eta = eta, nu = nu)$eta[1]
   }
+  # detect parallel
   if(anyNA(cl)) {
     eta.hat <- sapply(x, fun)
   } else {
@@ -58,4 +51,20 @@ CondiCopLocFit <- function(u1, u2, family, X, x, nx = 100,
     eta.hat <- parSapply(cl, X = x, FUN = fun)
   }
   return(list(eta = eta.hat, nu = nu))
+}
+
+#--- helper functions ----------------------------------------------------------
+
+.get_etaNu <- function(u1, u2, family, degree, eta, nu) {
+  if(missing(eta) || missing(nu)) {
+    res <-  VineCopula::BiCopEst(u1,u2,family)
+    if(missing(eta)) {
+      eta <- BiCopPar2Eta(family=family, par = res$par, par2 =res$par2)
+      if(degree == "linear") eta <- c(eta, 0)
+    }
+    if(missing(nu)) {
+      nu <- res$par2
+    }
+  }
+  list(eta = eta, nu = nu)
 }

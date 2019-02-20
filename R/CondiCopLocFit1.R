@@ -13,17 +13,6 @@
 CondiCopLocFit1 <- function(u1, u2, family,
                             z, wgt, degree = c("linear", "constant"),
                             eta, nu) {
-  ## wpos <- wgt > 0 # index of positive weights
-  ## # convert degree to TMB::map
-  ## degree <- .format_degree(degree)
-  ## # create TBM function
-  ## odata <- list(u1 = u1[wpos], u2 = u2[wpos],
-  ##               wgt = wgt[wpos], z = z[wpos]) # TODO: family, nu
-  ## oparam <- list(beta = eta)
-  ## omap <- list(beta = factor(c(1, 2)))
-  ## if(degree == 0) omap$beta[2] <- NA
-  ## obj <- TMB::MakeADFun(data = odata, parameters = oparam,
-  ##                       map = omap, DLL = "tsVine", silent = TRUE)
   obj <- CondiCopLocFun(u1 = u1, u2 = u2, family = family,
                         z = z, wgt = wgt, degree = degree, eta = eta, nu = nu)
   opt <- optim(par = obj$par, fn = obj$fn, gr = obj$gr,
