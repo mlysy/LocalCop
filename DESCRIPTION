@@ -1,0 +1,23 @@
+Package: tsVine
+Title: What the Package Does (One Line, Title Case)
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "First",
+           family = "Last",
+           role = c("aut", "cre"),
+           email = "first.last@example.com")
+Description: What the package does (one paragraph).
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+LinkingTo: 
+    TMB,
+    RcppEigen,
+    Rcpp,
+    VineCopula
+Imports: 
+    TMB,
+    Rcpp
+RoxygenNote: 6.1.0
+Suggests: 
+    testthat
