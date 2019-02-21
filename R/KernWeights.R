@@ -6,7 +6,17 @@
 #'
 #' @template param-X
 #' @template param-x0
+#' @param kernel Kernel function to use.  See \code{\link{KernFun}}.
 #' @param band Bandwidth parameter (positive scalar).
+#' @param band.method Type of bandwith: a character string "constant" or "variable".  See \strong{Details}.
+#' @details For the constant bandwidth of size \code{band = h}, the weights are calculated as
+#' \preformatted{
+#' wgt = kernel((X-x) / h) / h
+#' }
+#' where \code{kernel} is the kernel function.  For bandwidth type "variable", a fixed fraction \code{band} of observations is used, i.e,
+#' \preformatted{
+#' h = sort( abs(X-x) )[ floor(band*length(X)) ]
+#' }
 #' @export
 KernWeight <- function(X, x, band, kernel = KernEpa, band.method ="constant"){
 

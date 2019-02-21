@@ -55,11 +55,11 @@ CondiCopLocFit <- function(u1, u2, family, X, x, nx = 100,
       eeta <- sapply(x, fun)
     } else {
       # run in parallel
-      clusterExport(cl,
-                    varlist = c("fun", "u1", "u2", "family", "X",
-                                "band", "kernel", "ieta", "inu"),
-                    envir = environment())
-      eeta <- parSapply(cl, X = x, FUN = fun)
+      parallel::clusterExport(cl,
+                              varlist = c("fun", "u1", "u2", "family", "X",
+                                          "band", "kernel", "ieta", "inu"),
+                              envir = environment())
+      eeta <- parallel::parSapply(cl, X = x, FUN = fun)
     }
   }
   return(list(eta = eeta, nu = inu))

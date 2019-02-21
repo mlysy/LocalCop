@@ -44,11 +44,11 @@ CondiCopLikCV <- function(u1, u2, family, X, xind,
     cveta <- sapply(xind, fun)
   } else {
     # run in parallel
-    clusterExport(cl,
-                  varlist = c("fun", "u1", "u2", "family", "X",
-                              "band", "kernel", "ieta", "inu"),
-                  envir = environment())
-    cveta <- parSapply(cl, X = xind, FUN = fun)
+    parallel::clusterExport(cl,
+                            varlist = c("fun", "u1", "u2", "family", "X",
+                                        "band", "kernel", "ieta", "inu"),
+                            envir = environment())
+    cveta <- parallel::parSapply(cl, X = xind, FUN = fun)
   }
   # validation step
   cveta <- approx(X[xind],

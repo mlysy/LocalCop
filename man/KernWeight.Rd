@@ -12,7 +12,21 @@ KernWeight(X, x, band, kernel = KernEpa, band.method = "constant")
 \item{x}{Scalar covariate value at which local likelihood estimation is performed.}
 
 \item{band}{Bandwidth parameter (positive scalar).}
+
+\item{kernel}{Kernel function to use.  See \code{\link{KernFun}}.}
+
+\item{band.method}{Type of bandwith: a character string "constant" or "variable".  See \strong{Details}.}
 }
 \description{
 Calculate local likelihood kernel weights.
+}
+\details{
+For the constant bandwidth of size \code{band = h}, the weights are calculated as
+\preformatted{
+wgt = kernel((X-x) / h) / h
+}
+where \code{kernel} is the kernel function.  For bandwidth type "variable", a fixed fraction \code{band} of observations is used, i.e,
+\preformatted{
+h = sort( abs(X-x) )[ floor(band*length(X)) ]
+}
 }
