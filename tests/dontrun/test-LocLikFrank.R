@@ -8,7 +8,7 @@ source(devtools::package_file("tests", "testthat", "loclik-functions.R"))
 # generate data
 set.seed(180219)
 
-n <- 1000 # number of time points
+n <- 2500 # number of time points
 X <- (1:n)/n  # time points in  (0,1] interval
 family <- 5   # Frank copula
 eta.fnc <- function(t) 2*cos(12*pi*t)  # oscillating calibration function

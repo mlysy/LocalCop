@@ -19,33 +19,42 @@ CondiCopLikCV <- function(u1, u2, family, X, xind,
     xind <- unique(round(seq(1, length(X), len = nx)))
   }
   nx <- length(xind)
-  # default eta and nu
-  degree <- match.arg(degree)
-  en <- .get_etaNu(u1, u2, family, degree, eta, nu)
-  eta <- en$eta
-  nu <- en$nu
+  # initialize eta and nu
+  etaNu <- .get_etaNu(u1, u2, family, degree, eta, nu)
+  ieta <- etaNu$eta
+  inu <- etaNu$nu
   # cross validation: estimation step
   fun <- function(ii) {
     wgt <- KernWeight(X = X[-ii], x = X[ii], band = band,
                       kernel = kernel, band.method = "constant")
-    CondiCopLocFit1(u1 = u1[-ii], u2 = u2[-ii], family = family,
-                    z = X[-ii]-X[ii], wgt = wgt, degree = degree,
-                    eta = eta, nu = nu)$eta[1]
+    ## CondiCopLocFit1(u1 = u1[-ii], u2 = u2[-ii], family = family,
+    ##                 z = X[-ii]-X[ii], wgt = wgt, degree = degree,
+    ##                 eta = eta, nu = nu)$eta[1]
+    obj <- CondiCopLocFun(u1 = u1[-ii], u2 = u2[-ii], family = family,
+                          X = X[-ii], x = X[ii],
+                          wgt = wgt, degree = degree, eta = ieta, nu = inu)
+    # quasi-newton (gradient-based) optimization
+    opt <- optim(par = obj$par, fn = obj$fn, gr = obj$gr,
+                 method = "BFGS")
+    return(opt$par[1]) # only need constant term since xc = 0 at x = X[ii]
   }
-  if(anyNA(cl)) {
+  pareval <- .get_pareval(cl) # check if we can run in parallel
+  if(!pareval) {
+    # run serially
     cveta <- sapply(xind, fun)
   } else {
+    # run in parallel
     clusterExport(cl,
                   varlist = c("fun", "u1", "u2", "family", "X",
-                              "band", "kernel", "eta", "nu"),
+                              "band", "kernel", "ieta", "inu"),
                   envir = environment())
     cveta <- parSapply(cl, X = xind, FUN = fun)
   }
   # validation step
-  # interpolate cveta to all observations
-  cveta <- approx(X[xind], cveta, xout=X)$y
+  cveta <- approx(X[xind],
+                  y = cveta, xout = X)$y # interpolate cveta to all observations
   obj <- CondiCopLocFun(u1 = u1, u2 = u2, family = family,
-                        z = cveta, eta = c(0,1), nu = nu,
+                        X = cveta, x = 0, eta = c(0,1), nu = nu,
                         wgt = rep(1, length(u1)), degree = "linear")
   return(-obj$fn(c(0,1)))
 }

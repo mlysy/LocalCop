@@ -6,18 +6,19 @@
 
 #' Local likelihood kernel functions.
 #'
-#' @name kernel
+#' @name KernFun
 #' @aliases KernEpa KernGaus KernBeta KernBiQuad KernTriAng
 #' @param t Vector of distances from mode of kernel.
-#' @param par ...
+#' @param par Shape parameter for Beta kernel (positive scalar).
 #' @return Vector of kernel weights.
 #' @details Describe kernels here.
+NULL
 
 #################################
 # Epanechnikov kernel
 #################################
 
-#' @rdname kernel
+#' @rdname KernFun
 #' @export
 KernEpa <-function(t){
   return(pmax(3/4 * (1-t^2), 0))
@@ -28,7 +29,7 @@ KernEpa <-function(t){
 # Gaussian kernel
 #################################
 
-#' @rdname kernel
+#' @rdname KernFun
 #' @export
 KernGaus <- function(t){
   return(dnorm(t))
@@ -39,10 +40,10 @@ KernGaus <- function(t){
 # Beta kernel
 #################################
 
-#' @rdname kernel
+#' @rdname KernFun
 #' @export
-KernBeta <- function(t,par){
-  return(pmax((1-t^2)^par/beta(.5,par+1), 0))
+KernBeta <- function(t,par=.5){
+  return(pmax(1-t^2, 0)^par/beta(.5,par+1))
 }
 
 
@@ -51,10 +52,10 @@ KernBeta <- function(t,par){
 # BiQuadratic kernel
 #################################
 
-#' @rdname kernel
+#' @rdname KernFun
 #' @export
 KernBiQuad <- function(t){
-  return(pmax(15/16 * (1-t^2)^2, 0))
+  return(15/16 * pmax(1-t^2, 0)^2)
 }
 
 
@@ -62,7 +63,7 @@ KernBiQuad <- function(t){
 # Triangular kernel
 #################################
 
-#' @rdname kernel
+#' @rdname KernFun
 #' @export
 KernTriAng <- function(t){
   return(pmax(1-abs(t), 0))

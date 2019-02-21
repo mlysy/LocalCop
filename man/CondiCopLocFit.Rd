@@ -22,11 +22,11 @@ CondiCopLocFit(u1, u2, family, X, x, nx = 100, degree = c("linear",
 
 \item{degree}{Character vector specifying degree of local polynomial.  Either "constant" or "linear".}
 
-\item{eta}{Optional initial value of the copula dependence parameter (scalar).}
+\item{eta}{Optional initial value of the copula dependence parameter (scalar).  If missing will be estimated unconditionally by \code{VineCopula::BiCopEst}.}
 
-\item{nu}{Optional initial value of other copula parameters (scalar or vector).}
+\item{nu}{Optional initial value of other copula parameters (if they exist).  If missing will be estimated unconditionally by \code{VineCopula::BiCopEst}.}
 
-\item{kernel}{Kernel function.  See \code{\link{kernel}}.}
+\item{kernel}{Kernel function.  See \code{\link{KernFun}}.}
 
 \item{band}{Bandwidth parameter (positive scalar).}
 
