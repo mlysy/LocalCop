@@ -29,7 +29,9 @@ CondiCopLocFit <- function(u1, u2, family, X, x, nx = 100,
   }
   nx <- length(x)
   # initialize eta and nu
-  etaNu <- .get_etaNu(u1, u2, family, degree, eta, nu)
+  degree <- match.arg(degree)
+  etaNu <- .get_etaNu(u1 = u1, u2 = u2, family = family,
+                      degree = degree, eta = eta, nu = nu)
   ieta <- etaNu$eta
   inu <- etaNu$nu
   fun <- function(xi) {
@@ -44,7 +46,7 @@ CondiCopLocFit <- function(u1, u2, family, X, x, nx = 100,
     # quasi-newton (gradient-based) optimization
     opt <- optim(par = obj$par, fn = obj$fn, gr = obj$gr,
                  method = "BFGS")
-    return(opt$par[1]) # only need constant term since xc = 0 at x = xi
+    return(as.numeric(opt$par[1])) # only need constant term since xc = 0 at x = xi
   }
   if(nx == 1) {
     eeta <- fun(x)

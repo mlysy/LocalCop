@@ -4,8 +4,8 @@
 \alias{CondiCopLikCV}
 \title{Cross-validated likelihood.}
 \usage{
-CondiCopLikCV(u1, u2, family, X, xind, degree = c("linear", "constant"),
-  eta, nu, kernel = KernEpa, band, cl = NA)
+CondiCopLikCV(u1, u2, family, X, xind = 100, degree = c("linear",
+  "constant"), eta, nu, kernel = KernEpa, band, cl = NA)
 }
 \arguments{
 \item{u1}{Vector of first uniform response.}
