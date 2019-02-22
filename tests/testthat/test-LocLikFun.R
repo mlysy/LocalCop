@@ -8,7 +8,7 @@ test_that("LocLikFun is same in VineCopula and TMB", {
     # generate data
     n <- sample(10:50, 1) # number of time points
     X <- sort(runif(n))  # time points in  (0,1] interval
-    family <- sample(c(1,2,5), 1)
+    family <- sample(1:5, 1)
     eta.fnc <- function(t) 2*cos(12*pi*t)  # oscillating calibration function
     tpar <- BiCopEta2Par(family = family, eta.fnc(X))$par
     tpar2 <- 10 + runif(1)
@@ -38,6 +38,11 @@ test_that("LocLikFun is same in VineCopula and TMB", {
       # didn't include factor of nu in TMB as we don't optimize wrt it
       cst <- lgamma(.5*(epar2+2)) + lgamma(.5*epar2) - 2*lgamma(.5*(epar2+1))
       ll_tmb <-  ll_tmb + sum(cst * wgt)
+    }
+    if(family == 4) {
+      # extra factor of log(u1) and log(u2)
+      cst <- -(log(udata[,1]) + log(udata[,2]))
+      ll_tmb <- ll_tmb + sum(cst * wgt)
     }
     expect_equal(ll_r, ll_tmb)
   }

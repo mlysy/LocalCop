@@ -16,8 +16,8 @@
 CondiCopLocFun <- function(u1, u2, family,
                            X, x, wgt, degree = c("linear", "constant"),
                            eta, nu) {
-  if(!family %in% c(1,2,5)) {
-    stop("family must be of type Gaussian (=1), Student-t (=2), or Frank (=5).")
+  if(!family %in% 1:5) {
+    stop("Unsupported copula family (must be integer between 1-5).")
   }
   wpos <- wgt > 0 # index of positive weights
   # create TMB function
@@ -28,12 +28,24 @@ CondiCopLocFun <- function(u1, u2, family,
                 family = family, nu = nu)
   # pre-transform data to correct scale
   if(family == 1) {
+    # Gaussian copula
     odata$y1 <- qnorm(odata$y1)
     odata$y2 <- qnorm(odata$y2)
   }
   if(family == 2) {
+    # Student-t copula
     odata$y1 <- qt(odata$y1, df = nu)
     odata$y2 <- qt(odata$y2, df = nu)
+  }
+  if(family == 3) {
+    # Clayton copula
+    odata$y1 <- log(odata$y1)
+    odata$y2 <- log(odata$y2)
+  }
+  if(family == 4) {
+    # Gumbel copula
+    odata$y1 <- log(-log(odata$y1))
+    odata$y2 <- log(-log(odata$y2))
   }
   # 2nd copula parameter
   if(family != 2) odata$nu <- 0

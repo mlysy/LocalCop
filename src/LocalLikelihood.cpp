@@ -52,7 +52,7 @@ Type GaussNLL(vector<Type> z1, vector<Type> z2,
   return .5 * ll.sum();
 }
 
-/// Local likelihood for the Gaussian copula.
+/// Local likelihood for the Student-t copula.
 ///
 /// @param[in] y1 First t-scale response vector.
 /// @param[in] y2 Second t-scale response vector.
@@ -80,25 +80,73 @@ Type StudentNLL(vector<Type> y1, vector<Type> y2,
   return .5 * ll.sum();
 }
 
+/// Local likelihood for the Clayton copula.
+///
+/// @param[in] lu1 First log-uniform response vector.
+/// @param[in] lu2 Second log-uniform response vector.
+/// @param[in] xc Covariate vector in centered form `xc = X-x`.
+/// @param[in] beta Length-two vector of dependence parameters, such that `eta(xc) = beta[0] + beta[1] * xc`.
+/// @param[in] wgt Local likelihood weights.
+/// @return Negative local loglikelihood (scalar). 
+template<class Type>
+Type ClaytonNLL(vector<Type> lu1, vector<Type> lu2,
+	      vector<Type> xc, vector<Type> beta, vector<Type> wgt) {
+  // parameter on regular scale
+  vector<Type> theta = (beta[0] + beta[1] * xc).exp();
+  vector<Type> ll = (1.0 + theta).log() - (1.0 + theta) * (lu1 + lu2);
+  ll -= (2.0 + 1.0/theta) * ((-theta * lu1).exp() + (-theta * lu2).exp() - 1.0).log();
+  ll *= wgt;
+  return -ll.sum();
+}
+
+/// Local likelihood for the Gumbel copula.
+///
+/// @param[in] lu1 First loglog-uniform response vector, i.e., 'lu1 = log(-log(u1))'.
+/// @param[in] lu2 Second loglog-uniform response vector.
+/// @param[in] xc Covariate vector in centered form `xc = X-x`.
+/// @param[in] beta Length-two vector of dependence parameters, such that `eta(xc) = beta[0] + beta[1] * xc`.
+/// @param[in] wgt Local likelihood weights.
+/// @return Negative local loglikelihood (scalar). 
+template<class Type>
+Type GumbelNLL(vector<Type> lu1, vector<Type> lu2,
+	       vector<Type> xc, vector<Type> beta, vector<Type> wgt) {
+  // parameter on regular scale
+  vector<Type> theta = 1.0 + (beta[0] + beta[1] * xc).exp();
+  // pre-computations
+  vector<Type> logA = ((theta * lu1).exp() + (theta * lu2).exp()).log();
+  vector<Type> thA = (logA/theta).exp();
+  // loglikelihood
+  vector<Type> ll = (theta-1.0) * (lu1 + lu2) - thA + (2.0/theta - 2.0) * logA;
+  ll += (1 + (theta - 1.0)/thA).log();
+  ll *= wgt;
+  return -ll.sum();
+}
+
 template<class Type>
 Type objective_function<Type>::operator() () {
   DATA_VECTOR(y1); // first response vector
   DATA_VECTOR(y2); // second response vector
   DATA_VECTOR(wgt); // weights
   DATA_VECTOR(xc); // centered covariates, i.e., X - x
-  DATA_INTEGER(family); // copula family: 1, 2, or 5.
+  DATA_INTEGER(family); // copula family: 1-5.
   PARAMETER_VECTOR(beta); // dependence parameter: eta = beta[0] + beta[1] * xc
   DATA_VECTOR(nu); // other parameter for family 2.
   Type nll = 0.0;
-  if(family == 5) {
-    // Frank copula
-    nll = FrankNLL(y1, y2, xc, beta, wgt);
-  } else if(family == 1) {
+  if(family == 1) {
     // Gaussian copula
     nll = GaussNLL(y1, y2, xc, beta, wgt);
   } else if(family == 2) {
     // Student-t copula
     nll = StudentNLL(y1, y2, xc, beta, nu[0], wgt);
+  } else if(family == 3) {
+    // Clayton copula
+    nll = ClaytonNLL(y1, y2, xc, beta, wgt);
+  } else if(family == 4) {
+    // Gumbel copula
+    nll = GumbelNLL(y1, y2, xc, beta, wgt);
+  } else if(family == 5) {
+    // Frank copula
+    nll = FrankNLL(y1, y2, xc, beta, wgt);
   }
   return nll;
 }
