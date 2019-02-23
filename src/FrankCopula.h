@@ -1,4 +1,4 @@
-/// @file FrankCopula.hpp
+/// @file FrankCopula.h
 
 /// Local likelihood for the Frank copula.
 ///

@@ -4,11 +4,11 @@
 
 #define TMB_LIB_INIT R_init_tsVine
 #include <TMB.hpp> 
-#include "FrankCopula.hpp"
-#include "GaussCopula.hpp"
-#include "GumbelCopula.hpp"
-#include "StudentCopula.hpp"
-#include "ClaytonCopula.hpp"
+#include "FrankCopula.h"
+#include "GaussCopula.h"
+#include "GumbelCopula.h"
+#include "StudentCopula.h"
+#include "ClaytonCopula.h"
 
 template<class Type>
 Type objective_function<Type>::operator() () {

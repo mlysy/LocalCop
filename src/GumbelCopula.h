@@ -1,4 +1,4 @@
-/// @file GumbelCopula.hpp
+/// @file GumbelCopula.h
 
 /// Local likelihood for the Gumbel copula.
 ///

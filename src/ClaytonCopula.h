@@ -1,4 +1,4 @@
-/// @file ClaytonCopula.hpp
+/// @file ClaytonCopula.h
 
 /// Local likelihood for the Clayton copula.
 ///
