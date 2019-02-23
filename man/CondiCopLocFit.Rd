@@ -2,10 +2,10 @@
 % Please edit documentation in R/CondiCopLocFit.R
 \name{CondiCopLocFit}
 \alias{CondiCopLocFit}
-\title{Local likelihood estimation at a single covariate value.}
+\title{Local likelihood estimation.}
 \usage{
 CondiCopLocFit(u1, u2, family, X, x, nx = 100, degree = c("linear",
-  "constant"), eta, nu, kernel = KernEpa, band, cl = NA)
+  "constant"), eta, nu, kernel = KernEpa, band, optim_fun, cl = NA)
 }
 \arguments{
 \item{u1}{Vector of first uniform response.}
@@ -30,14 +30,13 @@ CondiCopLocFit(u1, u2, family, X, x, nx = 100, degree = c("linear",
 
 \item{band}{Bandwidth parameter (positive scalar).}
 
+\item{optim_fun}{Optional optimization function to replace the default.  If provided, \code{optim_fun} should take a single argument corresponding the output of \code{\link{CondiCopLocFun}}, and return a scalar value corresponding to the estimate of \code{eta} at a given covariate value in \code{x}.}
+
 \item{cl}{Optional parallel cluster created with \code{parallel::makeCluster}.  If \code{NA} runs serially.}
 }
 \value{
 Vector of estimated dependence parameter \code{eta} at each value of \code{x}.
 }
 \description{
-Optionally performs bandwidth and family selection.
-}
-\note{
-FIXME: \code{parallel} requirement.
+Local likelihood estimation.
 }

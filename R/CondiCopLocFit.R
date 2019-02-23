@@ -1,6 +1,4 @@
-#' Local likelihood estimation at a single covariate value.
-#'
-#' Optionally performs bandwidth and family selection.
+#' Local likelihood estimation.
 #'
 #' @param u1 Vector of first uniform response.
 #' @param u2 Vector of second uniform response.
@@ -13,14 +11,14 @@
 #' @param nu Optional initial value of other copula parameters (if they exist).  If missing will be estimated unconditionally by \code{VineCopula::BiCopEst}.
 #' @param kernel Kernel function.  See \code{\link{KernFun}}.
 #' @param band Bandwidth parameter (positive scalar).
+#' @param optim_fun Optional optimization function to replace the default.  If provided, \code{optim_fun} should take a single argument corresponding the output of \code{\link{CondiCopLocFun}}, and return a scalar value corresponding to the estimate of \code{eta} at a given covariate value in \code{x}.
 #' @param cl Optional parallel cluster created with \code{parallel::makeCluster}.  If \code{NA} runs serially.
 #' @return Vector of estimated dependence parameter \code{eta} at each value of \code{x}.
-#' @note FIXME: \code{parallel} requirement.
 #' @export
 CondiCopLocFit <- function(u1, u2, family, X, x, nx = 100,
                            degree = c("linear", "constant"),
-                           eta, nu,
-                           kernel = KernEpa, band, cl = NA) {
+                           eta, nu, kernel = KernEpa, band,
+                           optim_fun, cl = NA) {
   # default x
   if(missing(x)) {
     x <- seq(min(X), max(X), len = nx)
@@ -34,19 +32,17 @@ CondiCopLocFit <- function(u1, u2, family, X, x, nx = 100,
                       degree = degree, eta = eta, nu = nu)
   ieta <- etaNu$eta
   inu <- etaNu$nu
+  # optimization function
+  if(missing(optim_fun)) {
+    optim_fun <- .optim_default
+  }
   fun <- function(xi) {
     wgt <- KernWeight(X = X, x = xi, band = band,
                       kernel = kernel, band.method = "constant")
-    ## CondiCopLocFit1(u1 = u1, u2 = u2, family = family,
-    ##                 z = X-xi, wgt = wgt, degree = degree,
-    ##                 eta = ieta, nu = inu)$eta[1]
     obj <- CondiCopLocFun(u1 = u1, u2 = u2, family = family,
                           X = X, x = xi,
                           wgt = wgt, degree = degree, eta = ieta, nu = inu)
-    # quasi-newton (gradient-based) optimization
-    opt <- optim(par = obj$par, fn = obj$fn, gr = obj$gr,
-                 method = "BFGS")
-    return(as.numeric(opt$par[1])) # only need constant term since xc = 0 at x = xi
+    return(optim_fun(obj))
   }
   if(nx == 1) {
     eeta <- fun(x)
@@ -59,15 +55,29 @@ CondiCopLocFit <- function(u1, u2, family, X, x, nx = 100,
       # run in parallel
       parallel::clusterExport(cl,
                               varlist = c("fun", "u1", "u2", "family", "X",
-                                          "band", "kernel", "ieta", "inu"),
+                                          "band", "kernel", "optim_fun",
+                                          "ieta", "inu"),
                               envir = environment())
       eeta <- parallel::parSapply(cl, X = x, FUN = fun)
     }
   }
-  return(list(eta = eeta, nu = inu))
+  return(list(eta = as.numeric(eeta), nu = as.numeric(inu)))
 }
 
 #--- helper functions ----------------------------------------------------------
+
+# default optimization function
+.optim_default <- function(obj) {
+  # coarse optimization: gradient-free
+  opt <- optim(par = obj$par, fn = obj$fn, gr = obj$gr,
+               method = "Nelder-Mead",
+               control = list(maxit = 50, reltol = 1e-2))
+  # fine optimization: quasi-newton (gradient-based)
+  opt <- optim(par = opt$par, fn = obj$fn, gr = obj$gr,
+               method = "BFGS")
+  # only need constant term since xc = 0 at x = X[ii]
+  return(opt$par[1])
+}
 
 # estimate eta and/or nu if required
 .get_etaNu <- function(u1, u2, family, degree, eta, nu) {
