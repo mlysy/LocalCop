@@ -47,8 +47,7 @@ CondiCopLocFit <- function(u1, u2, family, X, x, nx = 100,
   if(nx == 1) {
     eeta <- fun(x)
   } else {
-    pareval <- .get_pareval(cl)
-    if(!pareval) {
+    if(!.check_parallel(cl)) {
       # run serially
       eeta <- sapply(x, fun)
     } else {
@@ -66,40 +65,3 @@ CondiCopLocFit <- function(u1, u2, family, X, x, nx = 100,
 
 #--- helper functions ----------------------------------------------------------
 
-# default optimization function
-.optim_default <- function(obj) {
-  # coarse optimization: gradient-free
-  opt <- optim(par = obj$par, fn = obj$fn, gr = obj$gr,
-               method = "Nelder-Mead",
-               control = list(maxit = 50, reltol = 1e-2))
-  # fine optimization: quasi-newton (gradient-based)
-  opt <- optim(par = opt$par, fn = obj$fn, gr = obj$gr,
-               method = "BFGS")
-  # only need constant term since xc = 0 at x = X[ii]
-  return(opt$par[1])
-}
-
-# estimate eta and/or nu if required
-.get_etaNu <- function(u1, u2, family, degree, eta, nu) {
-  if(missing(eta) || (missing(nu) && family == 2)) {
-    res <-  VineCopula::BiCopEst(u1 = u1, u2 = u2, family = family)
-  }
-  if(missing(eta)) {
-    eta <- BiCopPar2Eta(family = family, par = res$par, par2 =res$par2)
-    if(degree == "linear") eta <- c(eta, 0)
-  }
-  if(missing(nu)) {
-    nu <- res$par2
-  }
-  list(eta = eta, nu = nu)
-}
-
-# determine whether to run code in parallel.
-.get_pareval <- function(cl) {
-  pareval <- !anyNA(cl)
-  if (!requireNamespace("parallel", quietly = TRUE)) {
-    message("Package \"parallel\" needed for parallel evaluation.  Running serially instead.")
-    pareval <- FALSE
-  }
-  pareval
-}

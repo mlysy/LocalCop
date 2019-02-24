@@ -6,9 +6,9 @@
 #' @details Explain exactly what this does...
 #' @export
 CondiCopLikCV <- function(u1, u2, family, X, xind = 100,
-                       degree = c("linear", "constant"),
-                       eta, nu, kernel = KernEpa, band,
-                       optim_fun, cl = NA) {
+                          degree = c("linear", "constant"),
+                          eta, nu, kernel = KernEpa, band,
+                          optim_fun, cl = NA) {
   # sort observations
   ix <- order(X)
   X <- X[ix]
@@ -38,8 +38,7 @@ CondiCopLikCV <- function(u1, u2, family, X, xind = 100,
                           wgt = wgt, degree = degree, eta = ieta, nu = inu)
     return(optim_fun(obj))
   }
-  pareval <- .get_pareval(cl) # check if we can run in parallel
-  if(!pareval) {
+  if(!.check_parallel(cl)) {
     # run serially
     cveta <- sapply(xind, fun)
   } else {
