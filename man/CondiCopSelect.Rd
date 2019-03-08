@@ -5,7 +5,8 @@
 \title{Local likelihood bandwidth and/or family selection.}
 \usage{
 CondiCopSelect(u1, u2, family, X, xind = 100, degree = 1, nu,
-  kernel = KernEpa, band, nband = 6, optim_fun, cl = NA)
+  kernel = KernEpa, band, nband = 6, optim_fun, all_out = TRUE,
+  cl = NA)
 }
 \arguments{
 \item{u1}{Vector of first uniform response.}
@@ -27,9 +28,17 @@ CondiCopSelect(u1, u2, family, X, xind = 100, degree = 1, nu,
 \item{band}{Vector of positive numbers specifying the bandwidth value set.}
 
 \item{nband}{If \code{band} is missing, automatically choose \code{nband} bandwidth values spanning the range of \code{X}.}
+
+\item{all_out}{Logical; whether or not to output all fitted models or just the selected family/bandwidth combination.  See \strong{Value}.}
 }
 \value{
-A data frame with \code{length(band) x length(family)} rows and columns named \code{family}, \code{band}, and \code{cv} containing the cross-validated likelihood evaluated at each combination of bandwidth and family value.
+If \code{all_out = TRUE}, a list with elements \code{family} and \code{bandwidth} containing the selected value of each.  Otherwise, a list with the following elements:
+\describe{
+  \item{\code{cv}}{A data frame with \code{nBF = length(band) x length(family)} rows and columns named \code{family}, \code{band}, and \code{cv} containing the cross-validated likelihood evaluated at each combination of bandwidth and family values.}
+  \item{\code{x}}{The sorted values of \code{X}.}
+  \item{\code{eta}}{A \code{length(X) x nBF} matrix of eta estimates, the columns of which are in the same order as the rows of \code{cv}.}
+  \item{\code{nu}}{A vector of length \code{nBF} second copula parameters, with zero if they don't exist.}
+}
 }
 \description{
 Selects among a set of bandwidths and/or copula families the one which maximizes the cross-validated local likelihood.  See \code{\link{CondiCopLikCV}} for details.

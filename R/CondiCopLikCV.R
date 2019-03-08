@@ -10,8 +10,8 @@
 #' @template param-degree
 #' @param eta,nu,kernel,band,optim_fun,cl See \code{\link{CondiCopLocFit}}.
 #' @param cveta_out If \code{TRUE}, the CV estimate of eta at each point in \code{X} in addition to the CV log-likelihood.
-#' @return Scalar value of the cross-validated log-likelihood, or a list with elements \code{eta}, \code{nu} and \code{loglik} if \code{cveta_out = TRUE}.
-#' @example examples/CondiCopLikCV.R
+#' @return Scalar value of the cross-validated log-likelihood, or a list with elements \code{x}, \code{eta}, \code{nu}, and \code{loglik} if \code{cveta_out = TRUE}, the first three being the same as for \code{\link{CondiCopLocFit}}.
+#' @seealso This function is typically used in conjunction with \code{\link{CondiCopSelect}}; see examples there.
 #' @export
 CondiCopLikCV <- function(u1, u2, family, X, xind = 100,
                           degree = 1,
@@ -78,7 +78,7 @@ CondiCopLikCV <- function(u1, u2, family, X, xind = 100,
   if(!cveta_out) {
     return(cvll)
   } else {
-    return(list(eta = cveta, nu = inu, loglik = cvll))
+    return(list(x = X, eta = cveta, nu = inu, loglik = cvll))
   }
 }
 

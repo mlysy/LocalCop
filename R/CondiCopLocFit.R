@@ -15,7 +15,12 @@
 #' @template param-band
 #' @param optim_fun Optional specification of local likelihood optimization algorithm.  See \strong{Details}.
 #' @param cl Optional parallel cluster created with \code{parallel::makeCluster}, in which case optimization for each element of \code{x} will be done in parallel on separate cores.  If \code{cl == NA}, computations are run serially.
-#' @return List with elements \code{eta} and \code{nu}, the former being a vector of estimated dependence parameters the same length as \code{x}, and the latter, the scalar value of the estimated (or provided) second copula parameter.
+#' @return List with the following elements:
+#' \describe{
+#'   \item{\code{x}}{The vector of covariate values at which the local likelihood is fit.}
+#'   \item{\code{eta}}{The vector of estimated dependence parameters of the same length as \code{x}.}
+#'   \item{\code{nu}}{The scalar value of the estimated (or provided) second copula parameter.}
+#' }
 #' @details By default, optimization is performed by taking a few steps with the gradient-free simplex algorithm \code{optim(method = "Nelder-Mead")} for stability, then continuing with the quasi-Newton algorithm \code{optim(method = "BFGS")}, which uses gradient information provided by automatic differentiation (AD) as implemented by \pkg{TMB}.
 #'
 #' If the default method is to be overridden, \code{optim_fun} should be provided as a function taking a single argument corresponding to the output of \code{\link{CondiCopLocFun}}, and return a scalar value corresponding to the estimate of \code{eta} at a given covariate value in \code{x}.  Note that \pkg{TMB} calculates the \emph{negative} local (log)likelihood, such that the objective function is to be minimized.  See \strong{Examples}.
@@ -67,8 +72,6 @@ CondiCopLocFit <- function(u1, u2, family, X, x, nx = 100,
       eeta <- parallel::parSapply(cl, X = x, FUN = fun)
     }
   }
-  return(list(eta = as.numeric(eeta), nu = as.numeric(inu)))
+  return(list(x = x, eta = as.numeric(eeta), nu = as.numeric(inu)))
 }
-
-#--- helper functions ----------------------------------------------------------
 

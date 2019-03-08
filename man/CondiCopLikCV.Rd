@@ -25,28 +25,11 @@ CondiCopLikCV(u1, u2, family, X, xind = 100, degree = 1, eta, nu,
 \item{cveta_out}{If \code{TRUE}, the CV estimate of eta at each point in \code{X} in addition to the CV log-likelihood.}
 }
 \value{
-Scalar value of the cross-validated log-likelihood, or a list with elements \code{eta}, \code{nu} and \code{loglik} if \code{cveta_out = TRUE}.
+Scalar value of the cross-validated log-likelihood, or a list with elements \code{x}, \code{eta}, \code{nu}, and \code{loglik} if \code{cveta_out = TRUE}, the first three being the same as for \code{\link{CondiCopLocFit}}.
 }
 \description{
 Leave-one-out local likelihood copula parameter estimates are interpolated, then used to calculate the conditional copula likelihood function.
 }
-\examples{
-# simulate data
-family <- 5 # Frank copula
-n <- 1000
-X <- runif(n) # covariate values
-eta_true <- 2*cos(12*pi*X) # copula dependence parameter
-par_true <- BiCopEta2Par(family, eta = eta_true)
-udata <- VineCopula::BiCopSim(n, family=family,
-                              par = par_true$par)
-
-# cross-validation
-band <- .1
-ieta <- c(1,1)
-inu <- 2.5
-by <- 10
-cv <- CondiCopLikCV(u1= udata[,1], u2= udata[,2],
-                    family=family, X=X, eta = ieta, nu = inu,
-                    xind = c(seq(1, n, by = by), n), band = band,
-                    cveta_out = TRUE)
+\seealso{
+This function is typically used in conjunction with \code{\link{CondiCopSelect}}; see examples there.
 }

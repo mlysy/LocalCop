@@ -12,6 +12,7 @@
 #' @param eta Value of the copula dependence parameter.  Scalar or vector of length two, depending on whether \code{degree} is 0 or 1.
 #' @param nu Value of the other copula parameter.  Needn't be supplied if it doesn't exist.
 #' @return A list as returned by a call to \code{TMB::MakeADFun}.  In particular, this contains elements \code{fun} and \code{gr} for the *negative* local likelihood and its gradient with respect to \code{eta}.
+#' @example examples/CondiCopLocFun.R
 #' @export
 CondiCopLocFun <- function(u1, u2, family,
                            X, x, wgt, degree = 1,
@@ -62,6 +63,15 @@ CondiCopLocFun <- function(u1, u2, family,
                  map = omap, DLL = "LocalCop", silent = TRUE)
 }
 
+#--- helper function (not exported) --------------------------------------------
+
+# convert degree to integer
+.format_degree <- function(degree) {
+  if(!degree %in% 0:1) stop("degree must be 0 or 1.")
+  ## degree <- match.arg(degree)
+  ## return(as.numeric(degree == "linear"))
+}
+
 ## #' Local likelihood estimation at a single covariate value.
 ## #'
 ## #' @inheritParams CondiCopLocFun
@@ -76,12 +86,3 @@ CondiCopLocFun <- function(u1, u2, family,
 ##                method = "BFGS")
 ##   return(list(eta = as.numeric(opt$par), loglik = -opt$value))
 ## }
-
-#--- helper function (not exported) --------------------------------------------
-
-# convert degree to integer
-.format_degree <- function(degree) {
-  if(!degree %in% 0:1) stop("degree must be 0 or 1.")
-  ## degree <- match.arg(degree)
-  ## return(as.numeric(degree == "linear"))
-}
