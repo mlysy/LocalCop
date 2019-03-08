@@ -1,5 +1,5 @@
-Package: tsVine
-Title: What the Package Does (One Line, Title Case)
+Package: LocalCop
+Title: Local Likelihood Inference for Conditional Copula Models
 Version: 0.0.0.9000
 Authors@R: 
     c(person(given = "Elif",
@@ -10,19 +10,17 @@ Authors@R:
              family = "Lysy",
 	     role = c("aut", "cre"),
 	     email = "mlysy@uwaterloo.ca"))
-Description: What the package does (one paragraph).
+Description: Implements a local likelihood estimator for the dependence parameter in bivariate conditional copula models.  Copula family and local likelihood bandwidth parameters are selected by leave-one-out cross-validation.  The models are implemented in 'TMB', meaning that the local score function is efficiently calculated via automated differentiation (AD), such that quasi-Newton algorithms may be used for parameter estimation.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
 LinkingTo: 
     TMB,
-    RcppEigen,
-    Rcpp,
+    RcppEigen
 Imports: 
     TMB,
-    Rcpp,
     VineCopula
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 Suggests: 
     testthat,
     parallel

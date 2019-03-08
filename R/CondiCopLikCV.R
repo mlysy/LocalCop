@@ -1,14 +1,22 @@
 #' Cross-validated likelihood.
 #'
-#' @inheritParams CondiCopLocFit
+#' Leave-one-out local likelihood copula parameter estimates are interpolated, then used to calculate the conditional copula likelihood function.
+#'
+#' @template param-u1
+#' @template param-u2
+#' @template param-family
+#' @template param-X
 #' @param xind Vector of indices in \code{X} at which to calculate leave-one-out parameter estimates.  Can also be supplied as a single integer, in which case \code{xind} equally spaced observations are taken from \code{X}.
-#' @return Scalar value of the cross-validated log-likelihood.
-#' @details Explain exactly what this does...
+#' @template param-degree
+#' @param eta,nu,kernel,band,optim_fun,cl See \code{\link{CondiCopLocFit}}.
+#' @param cveta_out If \code{TRUE}, the CV estimate of eta at each point in \code{X} in addition to the CV log-likelihood.
+#' @return Scalar value of the cross-validated log-likelihood, or a list with elements \code{eta}, \code{nu} and \code{loglik} if \code{cveta_out = TRUE}.
+#' @example examples/CondiCopLikCV.R
 #' @export
 CondiCopLikCV <- function(u1, u2, family, X, xind = 100,
-                          degree = c("linear", "constant"),
+                          degree = 1,
                           eta, nu, kernel = KernEpa, band,
-                          optim_fun, cl = NA) {
+                          optim_fun, cveta_out = FALSE, cl = NA) {
   # sort observations
   ix <- order(X)
   X <- X[ix]
@@ -20,7 +28,8 @@ CondiCopLikCV <- function(u1, u2, family, X, xind = 100,
   }
   nx <- length(xind)
   # initialize eta and nu
-  degree <- match.arg(degree)
+  if(!degree %in% 0:1) stop("degree must be 0 or 1.")
+  ## degree <- match.arg(degree)
   etaNu <- .get_etaNu(u1 = u1, u2 = u2, family = family,
                       degree = degree, eta = eta, nu = nu)
   ieta <- etaNu$eta
@@ -32,7 +41,7 @@ CondiCopLikCV <- function(u1, u2, family, X, xind = 100,
   }
   fun <- function(ii) {
     wgt <- KernWeight(X = X[-ii], x = X[ii], band = band,
-                      kernel = kernel, band.method = "constant")
+                      kernel = kernel, band_type = "constant")
     obj <- CondiCopLocFun(u1 = u1[-ii], u2 = u2[-ii], family = family,
                           X = X[-ii], x = X[ii],
                           wgt = wgt, degree = degree, eta = ieta, nu = inu)
@@ -55,7 +64,7 @@ CondiCopLikCV <- function(u1, u2, family, X, xind = 100,
                   y = cveta, xout = X)$y # interpolate cveta to all observations
   obj <- CondiCopLocFun(u1 = u1, u2 = u2, family = family,
                         X = cveta, x = 0, eta = c(0,1), nu = inu,
-                        wgt = rep(1, length(u1)), degree = "linear")
+                        wgt = rep(1, length(u1)), degree = 1)
   cvll <- -obj$fn(c(0,1))
   # correct for likelihood constants
   if(family == 2) {
@@ -66,7 +75,11 @@ CondiCopLikCV <- function(u1, u2, family, X, xind = 100,
   if(family == 4) {
     cvll <- cvll - sum(log(u1) + log(u2))
   }
-  return(cvll)
+  if(!cveta_out) {
+    return(cvll)
+  } else {
+    return(list(eta = cveta, nu = inu, loglik = cvll))
+  }
 }
 
 #--- scratch -------------------------------------------------------------------

@@ -1,4 +1,4 @@
 library(testthat)
-library(tsVine)
+library(LocalCop)
 
-test_check("tsVine")
+test_check("LocalCop")

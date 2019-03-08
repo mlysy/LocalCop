@@ -4,40 +4,49 @@
 \alias{CondiCopLikCV}
 \title{Cross-validated likelihood.}
 \usage{
-CondiCopLikCV(u1, u2, family, X, xind = 100, degree = c("linear",
-  "constant"), eta, nu, kernel = KernEpa, band, optim_fun, cl = NA)
+CondiCopLikCV(u1, u2, family, X, xind = 100, degree = 1, eta, nu,
+  kernel = KernEpa, band, optim_fun, cveta_out = FALSE, cl = NA)
 }
 \arguments{
 \item{u1}{Vector of first uniform response.}
 
 \item{u2}{Vector of second uniform response.}
 
-\item{family}{The copula family to use.  See \code{\link{ConvertPar}}.}
+\item{family}{An integer defining the bivariate copula family to use.  See \code{\link{ConvertPar}}.}
 
 \item{X}{Vector of observed covariate values.}
 
 \item{xind}{Vector of indices in \code{X} at which to calculate leave-one-out parameter estimates.  Can also be supplied as a single integer, in which case \code{xind} equally spaced observations are taken from \code{X}.}
 
-\item{degree}{Character vector specifying degree of local polynomial.  Either "constant" or "linear".}
+\item{degree}{Integer specifying the polynomial order of the local likelihood function.  Currently only 0 and 1 are supported.}
 
-\item{eta}{Optional initial value of the copula dependence parameter (scalar).  If missing will be estimated unconditionally by \code{VineCopula::BiCopEst}.}
+\item{eta, nu, kernel, band, optim_fun, cl}{See \code{\link{CondiCopLocFit}}.}
 
-\item{nu}{Optional initial value of other copula parameters (if they exist).  If missing will be estimated unconditionally by \code{VineCopula::BiCopEst}.}
-
-\item{kernel}{Kernel function.  See \code{\link{KernFun}}.}
-
-\item{band}{Bandwidth parameter (positive scalar).}
-
-\item{optim_fun}{Optional optimization function to replace the default.  If provided, \code{optim_fun} should take a single argument corresponding the output of \code{\link{CondiCopLocFun}}, and return a scalar value corresponding to the estimate of \code{eta} at a given covariate value in \code{x}.}
-
-\item{cl}{Optional parallel cluster created with \code{parallel::makeCluster}.  If \code{NA} runs serially.}
+\item{cveta_out}{If \code{TRUE}, the CV estimate of eta at each point in \code{X} in addition to the CV log-likelihood.}
 }
 \value{
-Scalar value of the cross-validated log-likelihood.
+Scalar value of the cross-validated log-likelihood, or a list with elements \code{eta}, \code{nu} and \code{loglik} if \code{cveta_out = TRUE}.
 }
 \description{
-Cross-validated likelihood.
+Leave-one-out local likelihood copula parameter estimates are interpolated, then used to calculate the conditional copula likelihood function.
 }
-\details{
-Explain exactly what this does...
+\examples{
+# simulate data
+family <- 5 # Frank copula
+n <- 1000
+X <- runif(n) # covariate values
+eta_true <- 2*cos(12*pi*X) # copula dependence parameter
+par_true <- BiCopEta2Par(family, eta = eta_true)
+udata <- VineCopula::BiCopSim(n, family=family,
+                              par = par_true$par)
+
+# cross-validation
+band <- .1
+ieta <- c(1,1)
+inu <- 2.5
+by <- 10
+cv <- CondiCopLikCV(u1= udata[,1], u2= udata[,2],
+                    family=family, X=X, eta = ieta, nu = inu,
+                    xind = c(seq(1, n, by = by), n), band = band,
+                    cveta_out = TRUE)
 }

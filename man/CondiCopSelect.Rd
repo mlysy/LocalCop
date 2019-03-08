@@ -2,40 +2,35 @@
 % Please edit documentation in R/CondiCopSelect.R
 \name{CondiCopSelect}
 \alias{CondiCopSelect}
-\title{Bandwidth and/or family selection.}
+\title{Local likelihood bandwidth and/or family selection.}
 \usage{
-CondiCopSelect(u1, u2, family, X, xind = 100, degree = c("linear",
-  "constant"), nu, kernel = KernEpa, band, nband = 6, optim_fun,
-  cl = NA)
+CondiCopSelect(u1, u2, family, X, xind = 100, degree = 1, nu,
+  kernel = KernEpa, band, nband = 6, optim_fun, cl = NA)
 }
 \arguments{
 \item{u1}{Vector of first uniform response.}
 
 \item{u2}{Vector of second uniform response.}
 
-\item{family}{The copula family to use.  See \code{\link{ConvertPar}}.}
+\item{family}{Vector of integers specifying the family set.  See \code{\link{ConvertPar}}.}
 
 \item{X}{Vector of observed covariate values.}
 
 \item{xind}{Specification of \code{xind} for each bandwidth.  Can be a scalar integer, a vector of \code{nband} integers, or a list of \code{nband} vectors of integers.}
 
-\item{degree}{Character vector specifying degree of local polynomial.  Either "constant" or "linear".}
+\item{degree}{Integer specifying the polynomial order of the local likelihood function.  Currently only 0 and 1 are supported.}
 
-\item{nu}{Optional vector of fixed \code{nu} parameter for each family.  If missing or \code{NA} get estimated from the data.}
+\item{nu}{Optional vector of fixed \code{nu} parameter for each family.  If missing or \code{NA} get estimated from the data (if required)}
 
-\item{kernel}{Kernel function.  See \code{\link{KernFun}}.}
+\item{kernel, optim_fun, cl}{See \code{\link{CondiCopLocFit}}.}
 
-\item{band}{Bandwidth parameter (positive scalar).}
+\item{band}{Vector of positive numbers specifying the bandwidth value set.}
 
-\item{nband}{Number of pilot bandwidth values used in selection.}
-
-\item{optim_fun}{Optional optimization function to replace the default.  If provided, \code{optim_fun} should take a single argument corresponding the output of \code{\link{CondiCopLocFun}}, and return a scalar value corresponding to the estimate of \code{eta} at a given covariate value in \code{x}.}
-
-\item{cl}{Optional parallel cluster created with \code{parallel::makeCluster}.  If \code{NA} runs serially.}
+\item{nband}{If \code{band} is missing, automatically choose \code{nband} bandwidth values spanning the range of \code{X}.}
 }
 \value{
-A list with elements \code{band} and \code{family} with their optimal values.
+A data frame with \code{length(band) x length(family)} rows and columns named \code{family}, \code{band}, and \code{cv} containing the cross-validated likelihood evaluated at each combination of bandwidth and family value.
 }
 \description{
-Selects among a set of bandwidths and/or copula families the one which maximizes the cross-validated local likelihood.
+Selects among a set of bandwidths and/or copula families the one which maximizes the cross-validated local likelihood.  See \code{\link{CondiCopLikCV}} for details.
 }

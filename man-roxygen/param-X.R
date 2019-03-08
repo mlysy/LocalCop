@@ -1,1 +1,1 @@
-#' @param X Vector of covariate values.
+#' @param X Vector of observed covariate values.

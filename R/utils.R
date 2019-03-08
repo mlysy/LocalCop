@@ -57,8 +57,8 @@
     res <-  VineCopula::BiCopEst(u1 = u1, u2 = u2, family = family)
   }
   if(anyNA(eta)) {
-    eta <- BiCopPar2Eta(family = family, par = res$par, par2 =res$par2)
-    if(degree == "linear") eta <- c(eta, 0)
+    eta <- BiCopPar2Eta(family = family, par = res$par, par2 =res$par2)$eta
+    if(degree == 1) eta <- c(eta, 0)
   }
   if(anyNA(nu)) {
     nu <- if(family == 2) res$par2 else 0

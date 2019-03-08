@@ -42,7 +42,7 @@ studentll <- function(u1, u2, rho, nu) {
   rho <- 1 - rho*rho
   ll <- (nu + 2) * log(1.0 + (y1 + y2 - ll) / (nu * rho)) + log(rho)
   ll <- ll - ((nu + 1) * log((1.0 + y1/nu) * (1.0 + y2/nu)))
-  -.5 * ll
+  -.5 * ll + lgamma(.5*(nu+2)) + lgamma(.5*nu) - 2*lgamma(.5*(nu+1))
   ##StableGammaDivision((*nu+2.0)/2.0,*nu/2.0)
   ## pow <- function(x,y) x^y
   ## ll <- 1/(nu*pi*sqrt(1.0-pow(rho,2.0))*dt(y1,nu,0)*dt(y2,nu,0))*pow(1.0+(pow(y1,2.0)+pow(y2,2.0)-2.0*rho*y1*y2)/(nu*(1.0-pow(rho,2.0))),-(nu+2.0)/2.0)

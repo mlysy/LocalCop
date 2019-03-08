@@ -4,15 +4,15 @@
 \alias{CondiCopLocFit}
 \title{Local likelihood estimation.}
 \usage{
-CondiCopLocFit(u1, u2, family, X, x, nx = 100, degree = c("linear",
-  "constant"), eta, nu, kernel = KernEpa, band, optim_fun, cl = NA)
+CondiCopLocFit(u1, u2, family, X, x, nx = 100, degree = 1, eta, nu,
+  kernel = KernEpa, band, optim_fun, cl = NA)
 }
 \arguments{
 \item{u1}{Vector of first uniform response.}
 
 \item{u2}{Vector of second uniform response.}
 
-\item{family}{The copula family to use.  See \code{\link{ConvertPar}}.}
+\item{family}{An integer defining the bivariate copula family to use.  See \code{\link{ConvertPar}}.}
 
 \item{X}{Vector of observed covariate values.}
 
@@ -20,23 +20,61 @@ CondiCopLocFit(u1, u2, family, X, x, nx = 100, degree = c("linear",
 
 \item{nx}{If \code{x} is missing, defaults to \code{nx} equally spaced values in \code{range(X)}.}
 
-\item{degree}{Character vector specifying degree of local polynomial.  Either "constant" or "linear".}
+\item{degree}{Integer specifying the polynomial order of the local likelihood function.  Currently only 0 and 1 are supported.}
 
 \item{eta}{Optional initial value of the copula dependence parameter (scalar).  If missing will be estimated unconditionally by \code{VineCopula::BiCopEst}.}
 
-\item{nu}{Optional initial value of other copula parameters (if they exist).  If missing will be estimated unconditionally by \code{VineCopula::BiCopEst}.}
+\item{nu}{Optional initial value of second copula parameter, if it exists.  If missing and required, will be estimated unconditionally by \code{VineCopula::BiCopEst}.  If provided and required, will not be estimated.}
 
-\item{kernel}{Kernel function.  See \code{\link{KernFun}}.}
+\item{kernel}{Kernel function to use.  Should accept a numeric vector parameter and return a non-negative numeric vector of the same length.  See \code{\link{KernFun}}.}
 
-\item{band}{Bandwidth parameter (positive scalar).}
+\item{band}{Kernal bandwidth parameter (positive scalar).  See \code{\link{KernWeight}}.}
 
-\item{optim_fun}{Optional optimization function to replace the default.  If provided, \code{optim_fun} should take a single argument corresponding the output of \code{\link{CondiCopLocFun}}, and return a scalar value corresponding to the estimate of \code{eta} at a given covariate value in \code{x}.}
+\item{optim_fun}{Optional specification of local likelihood optimization algorithm.  See \strong{Details}.}
 
-\item{cl}{Optional parallel cluster created with \code{parallel::makeCluster}.  If \code{NA} runs serially.}
+\item{cl}{Optional parallel cluster created with \code{parallel::makeCluster}, in which case optimization for each element of \code{x} will be done in parallel on separate cores.  If \code{cl == NA}, computations are run serially.}
 }
 \value{
-Vector of estimated dependence parameter \code{eta} at each value of \code{x}.
+List with elements \code{eta} and \code{nu}, the former being a vector of estimated dependence parameters the same length as \code{x}, and the latter, the scalar value of the estimated (or provided) second copula parameter.
 }
 \description{
-Local likelihood estimation.
+Estimate the bivariate copula dependence parameter \code{eta} at multiple covariate values.
+}
+\details{
+By default, optimization is performed by taking a few steps with the gradient-free simplex algorithm \code{optim(method = "Nelder-Mead")} for stability, then continuing with the quasi-Newton algorithm \code{optim(method = "BFGS")}, which uses gradient information provided by automatic differentiation (AD) as implemented by \pkg{TMB}.
+
+If the default method is to be overridden, \code{optim_fun} should be provided as a function taking a single argument corresponding to the output of \code{\link{CondiCopLocFun}}, and return a scalar value corresponding to the estimate of \code{eta} at a given covariate value in \code{x}.  Note that \pkg{TMB} calculates the \emph{negative} local (log)likelihood, such that the objective function is to be minimized.  See \strong{Examples}.
+}
+\examples{
+# simulate data
+family <- 5 # Frank copula
+n <- 1000
+X <- runif(n) # covariate values
+eta_true <- 2*cos(12*pi*X) # copula dependence parameter
+par_true <- BiCopEta2Par(family, eta = eta_true)
+udata <- VineCopula::BiCopSim(n, family=family,
+                              par = par_true$par)
+
+# local likelihood estimation
+x <- runif(20)
+system.time({
+  eta_hat <- CondiCopLocFit(u1 = udata[,1], u2 = udata[,2],
+                            family = family, X = X, x = x, band = .1)
+})
+
+# custom optimization routine using stats::nlminb
+# (somewhat faster but less stable/accurate than default)
+optim_fun <- function(obj) {
+  opt <- stats::nlminb(start = obj$par, objective = obj$fn,
+                       gradient = obj$gr)
+  return(opt$par[1]) # always return constant term even if degree == 1
+}
+system.time({
+  eta_hat2 <- CondiCopLocFit(u1 = udata[,1], u2 = udata[,2],
+                             family = family, X = X, x = x, band = .1,
+                             optim_fun = optim_fun)
+})
+
+# relative difference
+range(abs((eta_hat$eta - eta_hat2$eta)/eta_hat$eta))
 }

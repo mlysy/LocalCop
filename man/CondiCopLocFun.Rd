@@ -2,29 +2,28 @@
 % Please edit documentation in R/CondiCopLocFun.R
 \name{CondiCopLocFun}
 \alias{CondiCopLocFun}
-\title{Create a TMB local likelihood function.}
+\title{Create a \pkg{TMB} local likelihood function.}
 \usage{
-CondiCopLocFun(u1, u2, family, X, x, wgt, degree = c("linear",
-  "constant"), eta, nu)
+CondiCopLocFun(u1, u2, family, X, x, wgt, degree = 1, eta, nu)
 }
 \arguments{
 \item{u1}{Vector of first uniform response.}
 
 \item{u2}{Vector of second uniform response.}
 
-\item{family}{The copula family to use.  See \code{\link{ConvertPar}}.}
+\item{family}{An integer defining the bivariate copula family to use.  See \code{\link{ConvertPar}}.}
 
 \item{X}{Vector of observed covariate values.}
 
 \item{x}{Scalar covariate value at which to evaluate the local likelihood.  Does not have to be a subset of \code{X}.}
 
-\item{wgt}{Vector of kernel weights.}
+\item{wgt}{Vector of positive kernel weights.}
 
-\item{degree}{Character vector "constant" or "linear" specifying the type of local likelihood fit.}
+\item{degree}{Integer specifying the polynomial order of the local likelihood function.  Currently only 0 and 1 are supported.}
 
-\item{eta}{Initial value of the copula dependence parameter.}
+\item{eta}{Value of the copula dependence parameter.  Scalar or vector of length two, depending on whether \code{degree} is 0 or 1.}
 
-\item{nu}{Value of other copula parameters (if they exist).}
+\item{nu}{Value of the other copula parameter.  Needn't be supplied if it doesn't exist.}
 }
 \value{
 A list as returned by a call to \code{TMB::MakeADFun}.  In particular, this contains elements \code{fun} and \code{gr} for the *negative* local likelihood and its gradient with respect to \code{eta}.

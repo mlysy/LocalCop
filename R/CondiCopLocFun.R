@@ -1,20 +1,20 @@
-#' Create a TMB local likelihood function.
+#' Create a \pkg{TMB} local likelihood function.
 #'
 #' Wraps a call to \code{TMB::MakeADFun}.
 #'
-#' @param u1 Vector of first uniform response.
-#' @param u2 Vector of second uniform response.
+#' @template param-u1
+#' @template param-u2
 #' @template param-family
-#' @param X Vector of observed covariate values.
+#' @template param-X
 #' @param x Scalar covariate value at which to evaluate the local likelihood.  Does not have to be a subset of \code{X}.
-#' @param wgt Vector of kernel weights.
-#' @param degree Character vector "constant" or "linear" specifying the type of local likelihood fit.
-#' @param eta Initial value of the copula dependence parameter.
-#' @param nu Value of other copula parameters (if they exist).
+#' @param wgt Vector of positive kernel weights.
+#' @template param-degree
+#' @param eta Value of the copula dependence parameter.  Scalar or vector of length two, depending on whether \code{degree} is 0 or 1.
+#' @param nu Value of the other copula parameter.  Needn't be supplied if it doesn't exist.
 #' @return A list as returned by a call to \code{TMB::MakeADFun}.  In particular, this contains elements \code{fun} and \code{gr} for the *negative* local likelihood and its gradient with respect to \code{eta}.
 #' @export
 CondiCopLocFun <- function(u1, u2, family,
-                           X, x, wgt, degree = c("linear", "constant"),
+                           X, x, wgt, degree = 1,
                            eta, nu) {
   if(!family %in% 1:5) {
     stop("Unsupported copula family (must be integer between 1-5).")
@@ -22,7 +22,7 @@ CondiCopLocFun <- function(u1, u2, family,
   wpos <- wgt > 0 # index of positive weights
   # create TMB function
   # data input
-  if(missing(nu)) nu <- 0
+  if(family != 2) nu <- 0 # second copula parameter
   odata <- list(y1 = u1[wpos], y2 = u2[wpos],
                 wgt = wgt[wpos], xc = X[wpos]-x,
                 family = family, nu = nu)
@@ -48,13 +48,18 @@ CondiCopLocFun <- function(u1, u2, family,
     odata$y2 <- log(-log(odata$y2))
   }
   # 2nd copula parameter
-  if(family != 2) odata$nu <- 0
+  ## if(family != 2) odata$nu <- 0
   oparam <- list(beta = eta)
-  degree <- .format_degree(degree) # convert degree to TMB::map
+  # convert degree to TMB::map
+  ## degree <- .format_degree(degree)
+  if(!degree %in% 0:1) stop("degree must be 0 or 1.")
   omap <- list(beta = factor(c(1, 2)))
-  if(degree == 0) omap$beta[2] <- NA
+  if(degree == 0) {
+    oparam$beta[2] <- 0
+    omap$beta[2] <- NA
+  }
   TMB::MakeADFun(data = odata, parameters = oparam,
-                 map = omap, DLL = "tsVine", silent = TRUE)
+                 map = omap, DLL = "LocalCop", silent = TRUE)
 }
 
 ## #' Local likelihood estimation at a single covariate value.
@@ -75,7 +80,8 @@ CondiCopLocFun <- function(u1, u2, family,
 #--- helper function (not exported) --------------------------------------------
 
 # convert degree to integer
-.format_degree <- function(degree = c("linear", "constant")) {
-  degree <- match.arg(degree)
-  return(as.numeric(degree == "linear"))
+.format_degree <- function(degree) {
+  if(!degree %in% 0:1) stop("degree must be 0 or 1.")
+  ## degree <- match.arg(degree)
+  ## return(as.numeric(degree == "linear"))
 }
