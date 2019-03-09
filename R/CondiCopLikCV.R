@@ -6,17 +6,25 @@
 #' @template param-u2
 #' @template param-family
 #' @template param-X
-#' @param xind Vector of indices in \code{X} at which to calculate leave-one-out parameter estimates.  Can also be supplied as a single integer, in which case \code{xind} equally spaced observations are taken from \code{X}.
+#' @param xind Vector of indices in \code{sort(X)} at which to calculate leave-one-out parameter estimates.  Can also be supplied as a single integer, in which case \code{xind} equally spaced observations are taken from \code{X}.
 #' @template param-degree
 #' @param eta,nu,kernel,band,optim_fun,cl See \code{\link{CondiCopLocFit}}.
-#' @param cveta_out If \code{TRUE}, the CV estimate of eta at each point in \code{X} in addition to the CV log-likelihood.
-#' @return Scalar value of the cross-validated log-likelihood, or a list with elements \code{x}, \code{eta}, \code{nu}, and \code{loglik} if \code{cveta_out = TRUE}, the first three being the same as for \code{\link{CondiCopLocFit}}.
-#' @seealso This function is typically used in conjunction with \code{\link{CondiCopSelect}}; see examples there.
+#' @template param-cv_all
+#' @param cveta_out If \code{TRUE}, return the CV estimate of eta at each point in \code{X} in addition to the CV log-likelihood.
+#' @return If \code{cveta_out = FALSE}, scalar value of the cross-validated log-likelihood.  Otherwise, a list with elements:
+#' \describe{
+#'   \item{\code{x}}{The sorted values of \code{X}.}
+#'   \item{\code{eta}}{The leave-one-out estimates interpolated from the values in \code{xind} to all of those in \code{X}.}
+#'   \item{\code{nu}}{The scalar value of the estimated (or provided) second copula parameter.}
+#'   \item{\code{loglik}}{The cross-validated log-likelihood.}
+#' }
+#' @seealso This function is typically used in conjunction with \code{\link{CondiCopSelect}}; see example there.
 #' @export
 CondiCopLikCV <- function(u1, u2, family, X, xind = 100,
                           degree = 1,
                           eta, nu, kernel = KernEpa, band,
-                          optim_fun, cveta_out = FALSE, cl = NA) {
+                          optim_fun, cveta_out = FALSE,
+                          cv_all = FALSE, cl = NA) {
   # sort observations
   ix <- order(X)
   X <- X[ix]
@@ -26,7 +34,6 @@ CondiCopLikCV <- function(u1, u2, family, X, xind = 100,
   if(length(xind) == 1) {
     xind <- unique(round(seq(1, length(X), len = xind)))
   }
-  nx <- length(xind)
   # initialize eta and nu
   if(!degree %in% 0:1) stop("degree must be 0 or 1.")
   ## degree <- match.arg(degree)
@@ -60,20 +67,22 @@ CondiCopLikCV <- function(u1, u2, family, X, xind = 100,
     cveta <- parallel::parSapply(cl, X = xind, FUN = fun)
   }
   # validation step
-  cveta <- approx(X[xind],
-                  y = cveta, xout = X)$y # interpolate cveta to all observations
-  obj <- CondiCopLocFun(u1 = u1, u2 = u2, family = family,
-                        X = cveta, x = 0, eta = c(0,1), nu = inu,
-                        wgt = rep(1, length(u1)), degree = 1)
+  # interpolate cveta to all observations
+  cveta <- approx(X[xind], y = cveta, xout = X)$y
+  if(cv_all) xind <- 1:length(u1)
+  nx <- length(xind)
+  obj <- CondiCopLocFun(u1 = u1[xind], u2 = u2[xind], family = family,
+                        X = cveta[xind], x = 0, eta = c(0,1), nu = inu,
+                        wgt = rep(1, nx), degree = 1)
   cvll <- -obj$fn(c(0,1))
   # correct for likelihood constants
   if(family == 2) {
     # Student-t
     cst <- lgamma(.5*(inu+2)) + lgamma(.5*inu) - 2*lgamma(.5*(inu+1))
-    cvll <- cvll + length(X) * cst
+    cvll <- cvll + nx * cst
   }
   if(family == 4) {
-    cvll <- cvll - sum(log(u1) + log(u2))
+    cvll <- cvll - sum(log(u1[xind]) + log(u2[xind]))
   }
   if(!cveta_out) {
     return(cvll)

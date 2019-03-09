@@ -1,0 +1,1 @@
+#' @param cv_all If \code{FALSE}, evaluate the CV likelihood at only the leave-one-out observations specified by \code{xind}.  Otherwise, interpolate the leave-one-out estimates of eta to all values in \code{X}, and evaluate the CV likelihood at all observations.

@@ -5,7 +5,8 @@
 \title{Cross-validated likelihood.}
 \usage{
 CondiCopLikCV(u1, u2, family, X, xind = 100, degree = 1, eta, nu,
-  kernel = KernEpa, band, optim_fun, cveta_out = FALSE, cl = NA)
+  kernel = KernEpa, band, optim_fun, cveta_out = FALSE,
+  cv_all = FALSE, cl = NA)
 }
 \arguments{
 \item{u1}{Vector of first uniform response.}
@@ -16,20 +17,28 @@ CondiCopLikCV(u1, u2, family, X, xind = 100, degree = 1, eta, nu,
 
 \item{X}{Vector of observed covariate values.}
 
-\item{xind}{Vector of indices in \code{X} at which to calculate leave-one-out parameter estimates.  Can also be supplied as a single integer, in which case \code{xind} equally spaced observations are taken from \code{X}.}
+\item{xind}{Vector of indices in \code{sort(X)} at which to calculate leave-one-out parameter estimates.  Can also be supplied as a single integer, in which case \code{xind} equally spaced observations are taken from \code{X}.}
 
 \item{degree}{Integer specifying the polynomial order of the local likelihood function.  Currently only 0 and 1 are supported.}
 
 \item{eta, nu, kernel, band, optim_fun, cl}{See \code{\link{CondiCopLocFit}}.}
 
-\item{cveta_out}{If \code{TRUE}, the CV estimate of eta at each point in \code{X} in addition to the CV log-likelihood.}
+\item{cveta_out}{If \code{TRUE}, return the CV estimate of eta at each point in \code{X} in addition to the CV log-likelihood.}
+
+\item{cv_all}{If \code{FALSE}, evaluate the CV likelihood at only the leave-one-out observations specified by \code{xind}.  Otherwise, interpolate the leave-one-out estimates of eta to all values in \code{X}, and evaluate the CV likelihood at all observations.}
 }
 \value{
-Scalar value of the cross-validated log-likelihood, or a list with elements \code{x}, \code{eta}, \code{nu}, and \code{loglik} if \code{cveta_out = TRUE}, the first three being the same as for \code{\link{CondiCopLocFit}}.
+If \code{cveta_out = FALSE}, scalar value of the cross-validated log-likelihood.  Otherwise, a list with elements:
+\describe{
+  \item{\code{x}}{The sorted values of \code{X}.}
+  \item{\code{eta}}{The leave-one-out estimates interpolated from the values in \code{xind} to all of those in \code{X}.}
+  \item{\code{nu}}{The scalar value of the estimated (or provided) second copula parameter.}
+  \item{\code{loglik}}{The cross-validated log-likelihood.}
+}
 }
 \description{
 Leave-one-out local likelihood copula parameter estimates are interpolated, then used to calculate the conditional copula likelihood function.
 }
 \seealso{
-This function is typically used in conjunction with \code{\link{CondiCopSelect}}; see examples there.
+This function is typically used in conjunction with \code{\link{CondiCopSelect}}; see example there.
 }
