@@ -16,3 +16,7 @@ Install the **R** [**`devtools`**](https://CRAN.R-project.org/package=devtools) 
 ```{r}
 devtools::install_github("mlysy/LocalCop")
 ```
+
+### Examples
+
+After installing and loading the package, please see `?CondiCopSelect`.
