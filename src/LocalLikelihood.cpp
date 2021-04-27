@@ -2,7 +2,7 @@
 ///
 /// Local Likelihood functions.
 
-#define TMB_LIB_INIT R_init_tsVine
+#define TMB_LIB_INIT R_init_LocalCop
 #include <TMB.hpp> 
 #include "FrankCopula.h"
 #include "GaussCopula.h"
