@@ -18,9 +18,9 @@ LinkingTo:
     TMB,
     RcppEigen
 Imports: 
-    TMB,
+    TMB (>= 1.7.20),
     VineCopula
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
 Suggests: 
     testthat,
     parallel

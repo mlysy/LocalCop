@@ -1,0 +1,15 @@
+# template .gitignore for R packages
+
+# R
+*.Rhistory
+*.Rapp.history
+inst/doc # comment out to link to vignette html on github
+vignettes/.build.timestamp
+
+# C++
+*.o
+*.so
+*.dll
+
+# osx
+*.DS_Store

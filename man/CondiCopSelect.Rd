@@ -4,9 +4,22 @@
 \alias{CondiCopSelect}
 \title{Local likelihood bandwidth and/or family selection.}
 \usage{
-CondiCopSelect(u1, u2, family, X, xind = 100, degree = 1, nu,
-  kernel = KernEpa, band, nband = 6, optim_fun, cv_all = FALSE,
-  full_out = TRUE, cl = NA)
+CondiCopSelect(
+  u1,
+  u2,
+  family,
+  X,
+  xind = 100,
+  degree = 1,
+  nu,
+  kernel = KernEpa,
+  band,
+  nband = 6,
+  optim_fun,
+  cv_all = FALSE,
+  full_out = TRUE,
+  cl = NA
+)
 }
 \arguments{
 \item{u1}{Vector of first uniform response.}

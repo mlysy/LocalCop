@@ -4,9 +4,22 @@
 \alias{CondiCopLikCV}
 \title{Cross-validated likelihood.}
 \usage{
-CondiCopLikCV(u1, u2, family, X, xind = 100, degree = 1, eta, nu,
-  kernel = KernEpa, band, optim_fun, cveta_out = FALSE,
-  cv_all = FALSE, cl = NA)
+CondiCopLikCV(
+  u1,
+  u2,
+  family,
+  X,
+  xind = 100,
+  degree = 1,
+  eta,
+  nu,
+  kernel = KernEpa,
+  band,
+  optim_fun,
+  cveta_out = FALSE,
+  cv_all = FALSE,
+  cl = NA
+)
 }
 \arguments{
 \item{u1}{Vector of first uniform response.}

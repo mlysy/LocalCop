@@ -4,8 +4,21 @@
 \alias{CondiCopLocFit}
 \title{Local likelihood estimation.}
 \usage{
-CondiCopLocFit(u1, u2, family, X, x, nx = 100, degree = 1, eta, nu,
-  kernel = KernEpa, band, optim_fun, cl = NA)
+CondiCopLocFit(
+  u1,
+  u2,
+  family,
+  X,
+  x,
+  nx = 100,
+  degree = 1,
+  eta,
+  nu,
+  kernel = KernEpa,
+  band,
+  optim_fun,
+  cl = NA
+)
 }
 \arguments{
 \item{u1}{Vector of first uniform response.}
