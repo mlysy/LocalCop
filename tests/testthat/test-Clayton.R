@@ -31,26 +31,33 @@ data_sim <- function(family) {
 
 test_that("dclayton is same in VineCopula and TMB", {
   nreps <- 20
-  for(ii in 1:nreps) {
-    # generate data
-    family <- 3 # clayton
-    args <- data_sim(family = family)
-    # in R
-    ll_r <- VineCopula::BiCopPDF(u1 = args$udata[,1], u2 = args$udata[,2],
-                                 family = family, par = args$epar, par2 = args$epar2)
-    ll_r <- -sum(args$wgt * log(ll_r))
-    # in TMB
-    cop_adf <- TMB::MakeADFun(
-      data = list(
-        model = "dclayton",
-        u1 = args$udata[,1],
-        u2 = args$udata[,2],
-        weights = args$wgt
-      ),
-      parameters = list(theta = args$epar),
-      silent = TRUE, DLL = "LocalCop_TMBExports")
-    ll_tmb <- cop_adf$fn(args$epar)
-    expect_equal(ll_r, ll_tmb)
+  test_descr <- expand.grid(family = c(3),
+                            stringsAsFactors = FALSE)
+  n_test <- nrow(test_descr)
+  for(ii in 1:n_test) {
+    for(jj in 1:nreps) {
+      # generate data
+      family <- test_descr$family[ii]
+      model <- c("3" = "dclayton", "5" = "dfrank")
+      model <- model[as.character(family)]
+      args <- data_sim(family = family)
+      # in R
+      ll_r <- VineCopula::BiCopPDF(u1 = args$udata[,1], u2 = args$udata[,2],
+                                   family = family, par = args$epar, par2 = args$epar2)
+      ll_r <- -sum(args$wgt * log(ll_r))
+      # in TMB
+      cop_adf <- TMB::MakeADFun(
+        data = list(
+          model = model,
+          u1 = args$udata[,1],
+          u2 = args$udata[,2],
+          weights = args$wgt
+        ),
+        parameters = list(theta = args$epar),
+        silent = TRUE, DLL = "LocalCop_TMBExports")
+      ll_tmb <- cop_adf$fn(args$epar)
+      expect_equal(ll_r, ll_tmb)
+    }
   }
 })
 
@@ -60,26 +67,33 @@ test_that("dclayton is same in VineCopula and TMB", {
 
 test_that("pclayton is same in VineCopula and TMB", {
   nreps <- 20
-  for(ii in 1:nreps) {
-    # generate data
-    family <- 3 # clayton
-    args <- data_sim(family = family)
-    # in R
-    ll_r <- VineCopula::BiCopCDF(u1 = args$udata[,1], u2 = args$udata[,2],
-                                 family = family, par = args$epar, par2 = args$epar2)
-    ll_r <- -sum(args$wgt * log(ll_r))
-    # in TMB
-    cop_adf <- TMB::MakeADFun(
-      data = list(
-        model = "pclayton",
-        u1 = args$udata[,1],
-        u2 = args$udata[,2],
-        weights = args$wgt
-      ),
-      parameters = list(theta = args$epar),
-      silent = TRUE, DLL = "LocalCop_TMBExports")
-    ll_tmb <- cop_adf$fn(args$epar)
-    expect_equal(ll_r, ll_tmb)
+  test_descr <- expand.grid(family = c(3, 5),
+                            stringsAsFactors = FALSE)
+  n_test <- nrow(test_descr)
+  for(ii in 1:n_test) {
+    for(jj in 1:nreps) {
+      # generate data
+      family <- test_descr$family[ii]
+      model <- c("3" = "pclayton", "5" = "pfrank")
+      model <- model[as.character(family)]
+      args <- data_sim(family = family)
+      # in R
+      ll_r <- VineCopula::BiCopCDF(u1 = args$udata[,1], u2 = args$udata[,2],
+                                   family = family, par = args$epar, par2 = args$epar2)
+      ll_r <- -sum(args$wgt * log(ll_r))
+      # in TMB
+      cop_adf <- TMB::MakeADFun(
+        data = list(
+          model = model,
+          u1 = args$udata[,1],
+          u2 = args$udata[,2],
+          weights = args$wgt
+        ),
+        parameters = list(theta = args$epar),
+        silent = TRUE, DLL = "LocalCop_TMBExports")
+      ll_tmb <- cop_adf$fn(args$epar)
+      expect_equal(ll_r, ll_tmb)
+    }
   }
 })
 

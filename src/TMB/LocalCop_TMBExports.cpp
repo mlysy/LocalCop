@@ -2,28 +2,22 @@
 
 #define TMB_LIB_INIT R_init_LocalCop_TMBExports
 #include <TMB.hpp>
-#include "ClaytonCDF.hpp"
-#include "ClaytonNLL.hpp"
-#include "ClaytonPartial.hpp"
 #include "dclayton.hpp"
 #include "hclayton.hpp"
 #include "pclayton.hpp"
+#include "pfrank.hpp"
 
 template<class Type>
 Type objective_function<Type>::operator() () {
   DATA_STRING(model);
-  if(model == "ClaytonCDF") {
-    return ClaytonCDF(this);
-  } else if(model == "ClaytonNLL") {
-    return ClaytonNLL(this);
-  } else if(model == "ClaytonPartial") {
-    return ClaytonPartial(this);
-  } else if(model == "dclayton") {
+  if(model == "dclayton") {
     return dclayton(this);
   } else if(model == "hclayton") {
     return hclayton(this);
   } else if(model == "pclayton") {
     return pclayton(this);
+  } else if(model == "pfrank") {
+    return pfrank(this);
   } else {
     Rf_error("Unknown model.");
   }
