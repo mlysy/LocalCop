@@ -4,6 +4,7 @@
 #include <TMB.hpp>
 #include "ClaytonCDF.hpp"
 #include "ClaytonNLL.hpp"
+#include "ClaytonPartial.hpp"
 #include "dclayton.hpp"
 #include "hclayton.hpp"
 #include "pclayton.hpp"
@@ -15,6 +16,8 @@ Type objective_function<Type>::operator() () {
     return ClaytonCDF(this);
   } else if(model == "ClaytonNLL") {
     return ClaytonNLL(this);
+  } else if(model == "ClaytonPartial") {
+    return ClaytonPartial(this);
   } else if(model == "dclayton") {
     return dclayton(this);
   } else if(model == "hclayton") {

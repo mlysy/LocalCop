@@ -1,99 +1,123 @@
 #--- Clayton copula tests ------------------------------------------------------
 
+data_sim <- function(family) {
+  # generate data
+  nobs <- sample(10:50, 1) # number of observations
+  X <- sort(runif(nobs))  # values in  (0,1] interval
+  ## family <- sample(1:5, 1)
+  eta_fun <- function(t) 2*cos(12*pi*t)  # oscillating calibration function
+  tpar <- BiCopEta2Par(family = family, eta_fun(X))$par # true copula parameter
+  tpar2 <- 10 + runif(1) # not relevant for Clayton
+  udata <- VineCopula::BiCopSim(N=nobs, family=family,
+                                par = tpar, par2=tpar2)
+  # local likelihood
+  x0 <- runif(1, min(X), max(X)) # evaluation point
+  # weight specification
+  kern <- sample(c(KernEpa, KernGaus, KernBeta,
+                   KernBiQuad, KernTriAng), 1)[[1]]
+  band <- runif(1, .025, .5)
+  wgt <- KernWeight(X = X, x = x0, band = band, kernel = kern)
+  ## wgt <- rep(1, nobs)
+  # local likelihood calculation
+  eeta <- rnorm(2) # evaluation parameter
+  epar <- pmin(BiCopEta2Par(family = family, eta = eeta[1] + eeta[2] * (X-x0))$par, 27.9)
+  epar2 <- 10 + runif(1) # not relevant for Clayton
+  list(udata = udata, epar = epar, epar2 = epar2, wgt = wgt)
+}
+
 ##############
 # PDF TEST
 ##############
-test_that("ClaytonNLL is same in VineCopula and TMB", {
-  nreps <- 100
+
+test_that("dclayton is same in VineCopula and TMB", {
+  nreps <- 20
   for(ii in 1:nreps) {
     # generate data
-    nobs <- sample(10:50, 1) # number of observations
-    X <- sort(runif(nobs))  # values in  (0,1] interval
-    ## family <- sample(1:5, 1)
-    family <- 3 # Clayton copula
-    eta_fun <- function(t) 2*cos(12*pi*t)  # oscillating calibration function
-    tpar <- BiCopEta2Par(family = family, eta_fun(X))$par # true copula parameter
-    tpar2 <- 10 + runif(1) # not relevant for Clayton
-    udata <- VineCopula::BiCopSim(N=nobs, family=family,
-                                  par = tpar, par2=tpar2)
-    # local likelihood
-    x0 <- runif(1, min(X), max(X)) # evaluation point
-    # weight specification
-    kern <- sample(c(KernEpa, KernGaus, KernBeta,
-                     KernBiQuad, KernTriAng), 1)[[1]]
-    band <- runif(1, .025, .5)
-    wgt <- KernWeight(X = X, x = x0, band = band, kernel = kern)
-    ## wgt <- rep(1, nobs)
-    # local likelihood calculation
-    eeta <- rnorm(2) # evaluation parameter
-    epar <- BiCopEta2Par(family = family, eta = eeta[1] + eeta[2] * (X-x0))$par
-    epar2 <- 10 + runif(1) # not relevant for Clayton
+    family <- 3 # clayton
+    args <- data_sim(family = family)
     # in R
-    ll_r <- VineCopula::BiCopPDF(u1 = udata[,1], u2 = udata[,2],
-                                 family = family, par = epar, par2 = epar2)
-    ll_r <- -sum(wgt * log(ll_r))
+    ll_r <- VineCopula::BiCopPDF(u1 = args$udata[,1], u2 = args$udata[,2],
+                                 family = family, par = args$epar, par2 = args$epar2)
+    ll_r <- -sum(args$wgt * log(ll_r))
     # in TMB
     cop_adf <- TMB::MakeADFun(
-           data = list(
-             model = "ClaytonNLL",
-             u1 = udata[,1],
-             u2 = udata[,2],
-             weights = wgt
-            ),
-           parameters = list(theta = epar),
-           silent = TRUE, DLL = "LocalCop_TMBExports")
-    ll_tmb <- cop_adf$fn(epar)
+      data = list(
+        model = "dclayton",
+        u1 = args$udata[,1],
+        u2 = args$udata[,2],
+        weights = args$wgt
+      ),
+      parameters = list(theta = args$epar),
+      silent = TRUE, DLL = "LocalCop_TMBExports")
+    ll_tmb <- cop_adf$fn(args$epar)
     expect_equal(ll_r, ll_tmb)
   }
 })
-
 
 ##############
 # CDF TEST
 ##############
-test_that("ClaytonCDF is same in VineCopula and TMB", {
-  nreps <- 100
+
+test_that("pclayton is same in VineCopula and TMB", {
+  nreps <- 20
   for(ii in 1:nreps) {
     # generate data
-    nobs <- sample(10:50, 1) # number of observations
-    X <- sort(runif(nobs))  # values in  (0,1] interval
-    ## family <- sample(1:5, 1)
-    family <- 3 # Clayton copula
-    eta_fun <- function(t) 2*cos(12*pi*t)  # oscillating calibration function
-    tpar <- BiCopEta2Par(family = family, eta_fun(X))$par # true copula parameter
-    tpar2 <- 10 + runif(1) # not relevant for Clayton
-    udata <- VineCopula::BiCopSim(N=nobs, family=family,
-                                  par = tpar, par2=tpar2)
-    # local likelihood
-    x0 <- runif(1, min(X), max(X)) # evaluation point
-    # weight specification
-    kern <- sample(c(KernEpa, KernGaus, KernBeta,
-                     KernBiQuad, KernTriAng), 1)[[1]]
-    band <- runif(1, .025, .5)
-    wgt <- KernWeight(X = X, x = x0, band = band, kernel = kern)
-    ## wgt <- rep(1, nobs)
-    # local likelihood calculation
-    eeta <- rnorm(2) # evaluation parameter
-    epar <- BiCopEta2Par(family = family, eta = eeta[1] + eeta[2] * (X-x0))$par
-    epar2 <- 10 + runif(1) # not relevant for Clayton
+    family <- 3 # clayton
+    args <- data_sim(family = family)
     # in R
-    ll_r <- VineCopula::BiCopCDF(u1 = udata[,1], u2 = udata[,2],
-                                 family = family, par = epar, par2 = epar2)
-    ll_r <- -sum(wgt * log(ll_r))
+    ll_r <- VineCopula::BiCopCDF(u1 = args$udata[,1], u2 = args$udata[,2],
+                                 family = family, par = args$epar, par2 = args$epar2)
+    ll_r <- -sum(args$wgt * log(ll_r))
     # in TMB
     cop_adf <- TMB::MakeADFun(
       data = list(
-        model = "ClaytonCDF",
-        u1 = udata[,1],
-        u2 = udata[,2],
-        weights = wgt
+        model = "pclayton",
+        u1 = args$udata[,1],
+        u2 = args$udata[,2],
+        weights = args$wgt
       ),
-      parameters = list(theta = epar),
+      parameters = list(theta = args$epar),
       silent = TRUE, DLL = "LocalCop_TMBExports")
-    ll_tmb <- cop_adf$fn(epar)
+    ll_tmb <- cop_adf$fn(args$epar)
     expect_equal(ll_r, ll_tmb)
   }
 })
 
+############################
+# PARTIAL TEST
+############################
 
+
+test_that("hclayton is same in VineCopula and TMB", {
+  nreps <- 20
+  for(ii in 1:nreps) {
+    # generate data
+    family <- 3 # clayton
+    args <- data_sim(family = family)
+    # in R - VineCopula
+    ll_r <- VineCopula::BiCopHfunc1(u1 = args$udata[,1], u2 = args$udata[,2], 
+                                    family = family, par = args$epar, par2 = args$epar2)
+    ll_r <- log(ll_r)
+    ind <- ll_r > -20  # control the extremely small values in the log scale.
+    ll_r <- -sum(args$wgt[ind] * ll_r[ind])
+    # in R - direct
+    partial1 <- function(u1,u2,par) {u1^(-(par+1)) * (u1^(-par)+u2^(-par)-1)^(-(1+1/par))}
+    ll_d <- partial1(u1 = args$udata[,1], u2 = args$udata[,2], par = args$epar)
+    ll_d <- -sum(args$wgt[ind] * log(ll_d[ind]))
+    # in TMB
+    cop_adf <- TMB::MakeADFun(
+      data = list(
+        model = "hclayton",
+        u1 = args$udata[ind,1],
+        u2 = args$udata[ind,2],
+        weights = args$wgt[ind]
+      ),
+      parameters = list(theta = args$epar[ind]),
+      silent = TRUE, DLL = "LocalCop_TMBExports")
+    ll_tmb <- cop_adf$fn(args$epar[ind])
+    expect_equal(ll_r, ll_d)
+    expect_equal(ll_r, ll_tmb)
+    stopifnot(all.equal(ll_r, ll_tmb))
+  }
+})
 
