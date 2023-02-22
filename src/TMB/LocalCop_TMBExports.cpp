@@ -4,6 +4,9 @@
 #include <TMB.hpp>
 #include "ClaytonCDF.hpp"
 #include "ClaytonNLL.hpp"
+#include "dclayton.hpp"
+#include "hclayton.hpp"
+#include "pclayton.hpp"
 
 template<class Type>
 Type objective_function<Type>::operator() () {
@@ -12,8 +15,14 @@ Type objective_function<Type>::operator() () {
     return ClaytonCDF(this);
   } else if(model == "ClaytonNLL") {
     return ClaytonNLL(this);
+  } else if(model == "dclayton") {
+    return dclayton(this);
+  } else if(model == "hclayton") {
+    return hclayton(this);
+  } else if(model == "pclayton") {
+    return pclayton(this);
   } else {
-    error("Unknown model.");
+    Rf_error("Unknown model.");
   }
   return 0;
 }

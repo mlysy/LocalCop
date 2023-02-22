@@ -20,7 +20,7 @@ LinkingTo:
 Imports: 
     TMB (>= 1.7.20),
     VineCopula
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
 Suggests: 
     testthat,
     parallel
