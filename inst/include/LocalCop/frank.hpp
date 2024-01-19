@@ -10,11 +10,12 @@ namespace LocalCop {
 
   /// Calculate Frank copula CDF.
   ///
-  /// Usage:
-  /// ```
-  /// lcdf = pfrank<Type>(u1, u2, theta, 1); // 
-  /// ```
-
+  /// @param[in] u1 First uniform variable.
+  /// @param[in] u2 Second uniform variable.
+  /// @param[in] theta Parameter of the Frank copula.  {details...}
+  /// @param give_log Whether or not to return on the log scale.
+  ///
+  /// @return Value of the copula CDF.
   template <class Type>
   Type pfrank(Type u1, Type u2, Type theta, int give_log=0) {
     Type ans = log(Type(1.0) + ((exp(-theta*u1) - Type(1.0)) * (exp(-theta*u2)- Type(1.0))) / (exp(-theta)- Type(1.0)));
