@@ -10,10 +10,12 @@ namespace LocalCop {
   
   /// Calculate Clayton copula CDF.
   ///
-  /// Usage:
-  /// ```
-  /// lcdf = pclayton<Type>(u1, u2, theta, 1); // 
-  /// ```
+  /// @param[in] u1 First uniform variable.
+  /// @param[in] u2 Second uniform variable.
+  /// @param[in] theta Parameter of the Clayton copula with the range $[0,\infty]$.
+  /// @param give_log Whether or not to return on the log scale.
+  ///
+  /// @return Value of the copula CDF.
   template <class Type>
   Type pclayton(Type u1, Type u2, Type theta, int give_log=0) {
     Type logans = -Type(1.0)/theta * log(pow(u1, -theta) + pow(u2, -theta) - Type(1.0));
@@ -24,10 +26,12 @@ namespace LocalCop {
     
   /// Calculate Clayton copula partial derivative wrt u1.
   ///
-  /// Usage:
-  /// ```
-  /// lpart = hclayton<Type>(u1, u2, theta, 1); // 
-  /// ```
+  /// @param[in] u1 First uniform variable.
+  /// @param[in] u2 Second uniform variable.
+  /// @param[in] theta Parameter of the Clayton copula with the range $[0,\infty]$.
+  /// @param give_log Whether or not to return on the log scale.
+  ///
+  /// @return Value of the h-function.
   template <class Type>
   Type hclayton(Type u1, Type u2, Type theta, int give_log=0) {
     Type logans = -(Type(1.0)+theta) * log(u1);
@@ -38,11 +42,12 @@ namespace LocalCop {
       
   /// Calculate Clayton copula PDF.
   ///
-  /// Usage:
-  /// ```
-  /// lpdf = dclayton<Type>(u1, u2, theta, 1); // 
-  /// ```
-      
+  /// @param[in] u1 First uniform variable.
+  /// @param[in] u2 Second uniform variable.
+  /// @param[in] theta Parameter of the Clayton copula with the range $[0,\infty]$.
+  /// @param give_log Whether or not to return on the log scale.
+  ///
+  /// @return Value of the copula PDF.
   template <class Type>
   Type dclayton(Type u1, Type u2, Type theta, int give_log=0) {
     Type logans = log(Type(1.0) + theta) - (Type(1.0) + theta) * (log(u1) + log(u2));
@@ -51,7 +56,7 @@ namespace LocalCop {
   }
   VECTORIZE4_ttti(dclayton)
         
-      
+     
       
 } // end namespace LocalCop
 

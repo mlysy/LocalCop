@@ -12,7 +12,7 @@ namespace LocalCop {
   ///
   /// @param[in] u1 First uniform variable.
   /// @param[in] u2 Second uniform variable.
-  /// @param[in] theta Parameter of the Frank copula.  {details...}
+  /// @param[in] theta Parameter of the Frank copula with the range $R \{0}$.
   /// @param give_log Whether or not to return on the log scale.
   ///
   /// @return Value of the copula CDF.
@@ -24,13 +24,14 @@ namespace LocalCop {
   }
   VECTORIZE4_ttti(pfrank)
 
-  /// Calculate Frank copula partial derivative wrt u1.
+  /// Calculate Frank copula partial derivative with respect to u1.
   ///
-  /// Usage:
-  /// ```
-  /// lpart = hfrank<Type>(u1, u2, theta, 1); // 
-  /// ```
-    
+  /// @param[in] u1 First uniform variable.
+  /// @param[in] u2 Second uniform variable. 
+  /// @param[in] theta Parameter of the Frank copula with the range $R \{0}$.
+  /// @ param give_log Whether or not to return on the log scale. 
+  ///
+  /// @return Value of the h-function.  
   template <class Type>
   Type hfrank(Type u1, Type u2, Type theta, int give_log=0) {
     Type term1 =  exp(-theta*u1) - Type(1.0) ;
@@ -44,11 +45,12 @@ namespace LocalCop {
       
   /// Calculate Frank copula PDF.
   ///
-  /// Usage:
-  /// ```
-  /// lpdf = dfrank<Type>(u1, u2, theta, 1); // 
-  /// ```
-    
+  /// @param[in] u1 First uniform variable.
+  /// @param[in] u2 Second uniform variable. 
+  /// @param[in] theta Parameter of the Frank copula with the range $R \{0}$.
+  /// @ param give_log Whether or not to return on the log scale. 
+  ///
+  /// @return Value of the copula PDF. 
   template <class Type>
   Type dfrank(Type u1, Type u2, Type theta, int give_log=0) {
     Type term1 =  exp(-theta*u1) - Type(1.0) ;
@@ -65,10 +67,6 @@ namespace LocalCop {
   }
   VECTORIZE4_ttti(dfrank)    
     
-  
-    
-  
-  
   
 
 } // end namespace LocalCop

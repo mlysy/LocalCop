@@ -10,11 +10,12 @@ namespace LocalCop {
 
   /// Calculate Gumbel copula CDF.
   ///
-  /// Usage:
-  /// ```
-  /// lcdf = pgumbel<Type>(u1, u2, theta, 1); // 
-  /// ```
-
+  /// @param[in] u1 First uniform variable.
+  /// @param[in] u2 Second uniform variable.
+  /// @param[in] theta Parameter of the Gumbel copula with the range $[1,\infty]$.
+  /// @param give_log Whether or not to return on the log scale.
+  ///
+  /// @return Value of the copula CDF.
   template <class Type>
   Type pgumbel(Type u1, Type u2, Type theta, int give_log=0) {
     Type term1 =  pow(-log(u1), theta) ;
@@ -26,11 +27,12 @@ namespace LocalCop {
 
   /// Calculate Gumbel copula partial derivative wrt u1.
   ///
-  /// Usage:
-  /// ```
-  /// lpart = hgumbel<Type>(u1, u2, theta, 1); // 
-  /// ```
-    
+  /// @param[in] u1 First uniform variable.
+  /// @param[in] u2 Second uniform variable.
+  /// @param[in] theta Parameter of the Gumbel copula with the range $[1,\infty]$.
+  /// @param give_log Whether or not to return on the log scale.
+  ///
+  /// @return Value of the h-function.
   template <class Type>
   Type hgumbel(Type u1, Type u2, Type theta, int give_log=0) {
     Type term1 =  pow(-log(u1), theta) ;
@@ -44,12 +46,13 @@ namespace LocalCop {
   VECTORIZE4_ttti(hgumbel)
       
   /// Calculate Gumbel copula PDF.
+  //
+  /// @param[in] u1 First uniform variable.
+  /// @param[in] u2 Second uniform variable.
+  /// @param[in] theta Parameter of the Gumbel copula with the range $[1,\infty]$.
+  /// @param give_log Whether or not to return on the log scale.
   ///
-  /// Usage:
-  /// ```
-  /// lpdf = dgumbel<Type>(u1, u2, theta, 1); // 
-  /// ```
-    
+  /// @return Value of the copula PDF.
   template <class Type>
   Type dgumbel(Type u1, Type u2, Type theta, int give_log=0) {
     Type term1 =  pow(-log(u1), theta) ;
@@ -62,12 +65,7 @@ namespace LocalCop {
     if(give_log) return log(ans); else return ans;
   }
   VECTORIZE4_ttti(dgumbel)    
-    
-  
-    
-  
-  
-  
+
 
 } // end namespace LocalCop
 
