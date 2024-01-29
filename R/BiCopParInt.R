@@ -1,8 +1,8 @@
 ################################################
-# Permisible Intervals for Copula Parameter
+# Permissible Range for Copula Parameter
 ################################################
 
-BiCopParInt = function(family) {
+BiCopParInt <- function(family) {
   if(family==1 || family==2){ intv  <-  c(-1,1)}
   if(family==3 || family==13){ intv  <-  c(0,100)}
   if(family==4 || family==14 || family== 6){ intv  <-  c(1,100)}
