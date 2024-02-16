@@ -1,29 +1,29 @@
 #' Local likelihood estimation.
 #'
-#' Estimate the bivariate copula dependence parameter \code{eta} at multiple covariate values.
+#' Estimate the bivariate copula dependence parameter `eta` at multiple covariate values.
 #'
 #' @template param-u1
 #' @template param-u2
 #' @template param-family
 #' @template param-X
 #' @template param-xseq
-#' @param nx If \code{x} is missing, defaults to \code{nx} equally spaced values in \code{range(X)}.
+#' @param nx If `x` is missing, defaults to `nx` equally spaced values in `range(X)`.
 #' @template param-degree
-#' @param eta Optional initial value of the copula dependence parameter (scalar).  If missing will be estimated unconditionally by \code{VineCopula::BiCopEst}.
-#' @param nu Optional initial value of second copula parameter, if it exists.  If missing and required, will be estimated unconditionally by \code{VineCopula::BiCopEst}.  If provided and required, will not be estimated.
+#' @param eta Optional initial value of the copula dependence parameter (scalar).  If missing will be estimated unconditionally by [VineCopula::BiCopEst()].
+#' @param nu Optional initial value of second copula parameter, if it exists.  If missing and required, will be estimated unconditionally by [VineCopula::BiCopEst()].  If provided and required, will not be estimated.
 #' @template param-kernel
 #' @template param-band
-#' @param optim_fun Optional specification of local likelihood optimization algorithm.  See \strong{Details}.
-#' @param cl Optional parallel cluster created with \code{parallel::makeCluster}, in which case optimization for each element of \code{x} will be done in parallel on separate cores.  If \code{cl == NA}, computations are run serially.
+#' @param optim_fun Optional specification of local likelihood optimization algorithm.  See **Details**.
+#' @param cl Optional parallel cluster created with [parallel::makeCluster()], in which case optimization for each element of `x` will be done in parallel on separate cores.  If `cl == NA`, computations are run serially.
 #' @return List with the following elements:
 #' \describe{
-#'   \item{\code{x}}{The vector of covariate values at which the local likelihood is fit.}
-#'   \item{\code{eta}}{The vector of estimated dependence parameters of the same length as \code{x}.}
-#'   \item{\code{nu}}{The scalar value of the estimated (or provided) second copula parameter.}
+#'   \item{`x`}{The vector of covariate values at which the local likelihood is fit.}
+#'   \item{`eta`}{The vector of estimated dependence parameters of the same length as `x`.}
+#'   \item{`nu`}{The scalar value of the estimated (or provided) second copula parameter.}
 #' }
-#' @details By default, optimization is performed by taking a few steps with the gradient-free simplex algorithm \code{optim(method = "Nelder-Mead")} for stability, then continuing with the quasi-Newton algorithm \code{optim(method = "BFGS")}, which uses gradient information provided by automatic differentiation (AD) as implemented by \pkg{TMB}.
+#' @details By default, optimization is performed by taking a few steps with the gradient-free simplex algorithm `stats::optim(method = "Nelder-Mead")` for stability, then continuing with the quasi-Newton algorithm `stats::optim(method = "BFGS")`, which uses gradient information provided by automatic differentiation (AD) as implemented by \pkg{TMB}.
 #'
-#' If the default method is to be overridden, \code{optim_fun} should be provided as a function taking a single argument corresponding to the output of \code{\link{CondiCopLocFun}}, and return a scalar value corresponding to the estimate of \code{eta} at a given covariate value in \code{x}.  Note that \pkg{TMB} calculates the \emph{negative} local (log)likelihood, such that the objective function is to be minimized.  See \strong{Examples}.
+#' If the default method is to be overridden, `optim_fun` should be provided as a function taking a single argument corresponding to the output of [CondiCopLocFun()], and return a scalar value corresponding to the estimate of `eta` at a given covariate value in `x`.  Note that \pkg{TMB} calculates the *negative* local (log)likelihood, such that the objective function is to be minimized.  See **Examples**.
 #' @example examples/CondiCopLocFit.R
 #' @export
 CondiCopLocFit <- function(u1, u2, family, X, x, nx = 100,

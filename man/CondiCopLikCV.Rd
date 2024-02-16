@@ -34,7 +34,7 @@ CondiCopLikCV(
 
 \item{degree}{Integer specifying the polynomial order of the local likelihood function.  Currently only 0 and 1 are supported.}
 
-\item{eta, nu, kernel, band, optim_fun, cl}{See \code{\link{CondiCopLocFit}}.}
+\item{eta, nu, kernel, band, optim_fun, cl}{See \code{\link[=CondiCopLocFit]{CondiCopLocFit()}}.}
 
 \item{cveta_out}{If \code{TRUE}, return the CV estimate of eta at each point in \code{X} in addition to the CV log-likelihood.}
 
@@ -43,15 +43,15 @@ CondiCopLikCV(
 \value{
 If \code{cveta_out = FALSE}, scalar value of the cross-validated log-likelihood.  Otherwise, a list with elements:
 \describe{
-  \item{\code{x}}{The sorted values of \code{X}.}
-  \item{\code{eta}}{The leave-one-out estimates interpolated from the values in \code{xind} to all of those in \code{X}.}
-  \item{\code{nu}}{The scalar value of the estimated (or provided) second copula parameter.}
-  \item{\code{loglik}}{The cross-validated log-likelihood.}
+\item{\code{x}}{The sorted values of \code{X}.}
+\item{\code{eta}}{The leave-one-out estimates interpolated from the values in \code{xind} to all of those in \code{X}.}
+\item{\code{nu}}{The scalar value of the estimated (or provided) second copula parameter.}
+\item{\code{loglik}}{The cross-validated log-likelihood.}
 }
 }
 \description{
 Leave-one-out local likelihood copula parameter estimates are interpolated, then used to calculate the conditional copula likelihood function.
 }
 \seealso{
-This function is typically used in conjunction with \code{\link{CondiCopSelect}}; see example there.
+This function is typically used in conjunction with \code{\link[=CondiCopSelect]{CondiCopSelect()}}; see example there.
 }

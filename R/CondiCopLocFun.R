@@ -1,17 +1,17 @@
 #' Create a \pkg{TMB} local likelihood function.
 #'
-#' Wraps a call to \code{TMB::MakeADFun}.
+#' Wraps a call to [TMB::MakeADFun()].
 #'
 #' @template param-u1
 #' @template param-u2
 #' @template param-family
 #' @template param-X
-#' @param x Scalar covariate value at which to evaluate the local likelihood.  Does not have to be a subset of \code{X}.
+#' @param x Scalar covariate value at which to evaluate the local likelihood.  Does not have to be a subset of `X`.
 #' @param wgt Vector of positive kernel weights.
 #' @template param-degree
-#' @param eta Value of the copula dependence parameter.  Scalar or vector of length two, depending on whether \code{degree} is 0 or 1.
+#' @param eta Value of the copula dependence parameter.  Scalar or vector of length two, depending on whether `degree` is 0 or 1.
 #' @param nu Value of the other copula parameter.  Needn't be supplied if it doesn't exist.
-#' @return A list as returned by a call to \code{TMB::MakeADFun}.  In particular, this contains elements \code{fun} and \code{gr} for the *negative* local likelihood and its gradient with respect to \code{eta}.
+#' @return A list as returned by a call to [TMB::MakeADFun()].  In particular, this contains elements `fun` and `gr` for the *negative* local likelihood and its gradient with respect to `eta`.
 #' @example examples/CondiCopLocFun.R
 #' @export
 CondiCopLocFun <- function(u1, u2, family,

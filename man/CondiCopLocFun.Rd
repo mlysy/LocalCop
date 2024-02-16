@@ -26,10 +26,10 @@ CondiCopLocFun(u1, u2, family, X, x, wgt, degree = 1, eta, nu)
 \item{nu}{Value of the other copula parameter.  Needn't be supplied if it doesn't exist.}
 }
 \value{
-A list as returned by a call to \code{TMB::MakeADFun}.  In particular, this contains elements \code{fun} and \code{gr} for the *negative* local likelihood and its gradient with respect to \code{eta}.
+A list as returned by a call to \code{\link[TMB:MakeADFun]{TMB::MakeADFun()}}.  In particular, this contains elements \code{fun} and \code{gr} for the \emph{negative} local likelihood and its gradient with respect to \code{eta}.
 }
 \description{
-Wraps a call to \code{TMB::MakeADFun}.
+Wraps a call to \code{\link[TMB:MakeADFun]{TMB::MakeADFun()}}.
 }
 \examples{
 # the following example shows how to create

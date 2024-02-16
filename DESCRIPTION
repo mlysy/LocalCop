@@ -27,3 +27,4 @@ RoxygenNote: 7.2.3
 Suggests: 
     testthat,
     parallel
+Roxygen: list(markdown = TRUE)

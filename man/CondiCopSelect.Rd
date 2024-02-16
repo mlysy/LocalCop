@@ -26,7 +26,7 @@ CondiCopSelect(
 
 \item{u2}{Vector of second uniform response.}
 
-\item{family}{Vector of integers specifying the family set.  See \code{\link{ConvertPar}}.}
+\item{family}{Vector of integers specifying the family set.  See \code{\link[=ConvertPar]{ConvertPar()}}.}
 
 \item{X}{Vector of observed covariate values.}
 
@@ -36,7 +36,7 @@ CondiCopSelect(
 
 \item{nu}{Optional vector of fixed \code{nu} parameter for each family.  If missing or \code{NA} get estimated from the data (if required)}
 
-\item{kernel, optim_fun, cl}{See \code{\link{CondiCopLocFit}}.}
+\item{kernel, optim_fun, cl}{See \code{\link[=CondiCopLocFit]{CondiCopLocFit()}}.}
 
 \item{band}{Vector of positive numbers specifying the bandwidth value set.}
 
@@ -49,14 +49,14 @@ CondiCopSelect(
 \value{
 If \code{full_out = FALSE}, a list with elements \code{family} and \code{bandwidth} containing the selected value of each.  Otherwise, a list with the following elements:
 \describe{
-  \item{\code{cv}}{A data frame with \code{nBF = length(band) x length(family)} rows and columns named \code{family}, \code{band}, and \code{cv} containing the cross-validated likelihood evaluated at each combination of bandwidth and family values.}
-  \item{\code{x}}{The sorted values of \code{X}.}
-  \item{\code{eta}}{A \code{length(X) x nBF} matrix of eta estimates, the columns of which are in the same order as the rows of \code{cv}.}
-  \item{\code{nu}}{A vector of length \code{nBF} second copula parameters, with zero if they don't exist.}
+\item{\code{cv}}{A data frame with \verb{nBF = length(band) x length(family)} rows and columns named \code{family}, \code{band}, and \code{cv} containing the cross-validated likelihood evaluated at each combination of bandwidth and family values.}
+\item{\code{x}}{The sorted values of \code{X}.}
+\item{\code{eta}}{A \verb{length(X) x nBF} matrix of eta estimates, the columns of which are in the same order as the rows of \code{cv}.}
+\item{\code{nu}}{A vector of length \code{nBF} second copula parameters, with zero if they don't exist.}
 }
 }
 \description{
-Selects among a set of bandwidths and/or copula families the one which maximizes the cross-validated local likelihood.  See \code{\link{CondiCopLikCV}} for details.
+Selects among a set of bandwidths and/or copula families the one which maximizes the cross-validated local likelihood.  See \code{\link[=CondiCopLikCV]{CondiCopLikCV()}} for details.
 }
 \examples{
 # simulate data

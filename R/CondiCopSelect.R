@@ -1,25 +1,25 @@
 #' Local likelihood bandwidth and/or family selection.
 #'
-#' Selects among a set of bandwidths and/or copula families the one which maximizes the cross-validated local likelihood.  See \code{\link{CondiCopLikCV}} for details.
+#' Selects among a set of bandwidths and/or copula families the one which maximizes the cross-validated local likelihood.  See [CondiCopLikCV()] for details.
 #'
 #' @template param-u1
 #' @template param-u2
-#' @param family Vector of integers specifying the family set.  See \code{\link{ConvertPar}}.
+#' @param family Vector of integers specifying the family set.  See [ConvertPar()].
 #' @template param-X
-#' @param xind Specification of \code{xind} for each bandwidth.  Can be a scalar integer, a vector of \code{nband} integers, or a list of \code{nband} vectors of integers.
+#' @param xind Specification of `xind` for each bandwidth.  Can be a scalar integer, a vector of `nband` integers, or a list of `nband` vectors of integers.
 #' @template param-degree
-#' @param nu Optional vector of fixed \code{nu} parameter for each family.  If missing or \code{NA} get estimated from the data (if required)
-#' @param kernel,optim_fun,cl See \code{\link{CondiCopLocFit}}.
+#' @param nu Optional vector of fixed `nu` parameter for each family.  If missing or `NA` get estimated from the data (if required)
+#' @param kernel,optim_fun,cl See [CondiCopLocFit()].
 #' @template param-cv_all
 #' @param band Vector of positive numbers specifying the bandwidth value set.
-#' @param nband If \code{band} is missing, automatically choose \code{nband} bandwidth values spanning the range of \code{X}.
-#' @param full_out Logical; whether or not to output all fitted models or just the selected family/bandwidth combination.  See \strong{Value}.
-#' @return If \code{full_out = FALSE}, a list with elements \code{family} and \code{bandwidth} containing the selected value of each.  Otherwise, a list with the following elements:
+#' @param nband If `band` is missing, automatically choose `nband` bandwidth values spanning the range of `X`.
+#' @param full_out Logical; whether or not to output all fitted models or just the selected family/bandwidth combination.  See **Value**.
+#' @return If `full_out = FALSE`, a list with elements `family` and `bandwidth` containing the selected value of each.  Otherwise, a list with the following elements:
 #' \describe{
-#'   \item{\code{cv}}{A data frame with \code{nBF = length(band) x length(family)} rows and columns named \code{family}, \code{band}, and \code{cv} containing the cross-validated likelihood evaluated at each combination of bandwidth and family values.}
-#'   \item{\code{x}}{The sorted values of \code{X}.}
-#'   \item{\code{eta}}{A \code{length(X) x nBF} matrix of eta estimates, the columns of which are in the same order as the rows of \code{cv}.}
-#'   \item{\code{nu}}{A vector of length \code{nBF} second copula parameters, with zero if they don't exist.}
+#'   \item{`cv`}{A data frame with `nBF = length(band) x length(family)` rows and columns named `family`, `band`, and `cv` containing the cross-validated likelihood evaluated at each combination of bandwidth and family values.}
+#'   \item{`x`}{The sorted values of `X`.}
+#'   \item{`eta`}{A `length(X) x nBF` matrix of eta estimates, the columns of which are in the same order as the rows of `cv`.}
+#'   \item{`nu`}{A vector of length `nBF` second copula parameters, with zero if they don't exist.}
 #' }
 #' @example examples/CondiCopSelect.R
 #' @export

@@ -35,9 +35,9 @@ CondiCopLocFit(
 
 \item{degree}{Integer specifying the polynomial order of the local likelihood function.  Currently only 0 and 1 are supported.}
 
-\item{eta}{Optional initial value of the copula dependence parameter (scalar).  If missing will be estimated unconditionally by \code{VineCopula::BiCopEst}.}
+\item{eta}{Optional initial value of the copula dependence parameter (scalar).  If missing will be estimated unconditionally by \code{\link[VineCopula:BiCopEst]{VineCopula::BiCopEst()}}.}
 
-\item{nu}{Optional initial value of second copula parameter, if it exists.  If missing and required, will be estimated unconditionally by \code{VineCopula::BiCopEst}.  If provided and required, will not be estimated.}
+\item{nu}{Optional initial value of second copula parameter, if it exists.  If missing and required, will be estimated unconditionally by \code{\link[VineCopula:BiCopEst]{VineCopula::BiCopEst()}}.  If provided and required, will not be estimated.}
 
 \item{kernel}{Kernel function to use.  Should accept a numeric vector parameter and return a non-negative numeric vector of the same length.  See \code{\link{KernFun}}.}
 
@@ -45,23 +45,23 @@ CondiCopLocFit(
 
 \item{optim_fun}{Optional specification of local likelihood optimization algorithm.  See \strong{Details}.}
 
-\item{cl}{Optional parallel cluster created with \code{parallel::makeCluster}, in which case optimization for each element of \code{x} will be done in parallel on separate cores.  If \code{cl == NA}, computations are run serially.}
+\item{cl}{Optional parallel cluster created with \code{\link[parallel:makeCluster]{parallel::makeCluster()}}, in which case optimization for each element of \code{x} will be done in parallel on separate cores.  If \code{cl == NA}, computations are run serially.}
 }
 \value{
 List with the following elements:
 \describe{
-  \item{\code{x}}{The vector of covariate values at which the local likelihood is fit.}
-  \item{\code{eta}}{The vector of estimated dependence parameters of the same length as \code{x}.}
-  \item{\code{nu}}{The scalar value of the estimated (or provided) second copula parameter.}
+\item{\code{x}}{The vector of covariate values at which the local likelihood is fit.}
+\item{\code{eta}}{The vector of estimated dependence parameters of the same length as \code{x}.}
+\item{\code{nu}}{The scalar value of the estimated (or provided) second copula parameter.}
 }
 }
 \description{
 Estimate the bivariate copula dependence parameter \code{eta} at multiple covariate values.
 }
 \details{
-By default, optimization is performed by taking a few steps with the gradient-free simplex algorithm \code{optim(method = "Nelder-Mead")} for stability, then continuing with the quasi-Newton algorithm \code{optim(method = "BFGS")}, which uses gradient information provided by automatic differentiation (AD) as implemented by \pkg{TMB}.
+By default, optimization is performed by taking a few steps with the gradient-free simplex algorithm \code{stats::optim(method = "Nelder-Mead")} for stability, then continuing with the quasi-Newton algorithm \code{stats::optim(method = "BFGS")}, which uses gradient information provided by automatic differentiation (AD) as implemented by \pkg{TMB}.
 
-If the default method is to be overridden, \code{optim_fun} should be provided as a function taking a single argument corresponding to the output of \code{\link{CondiCopLocFun}}, and return a scalar value corresponding to the estimate of \code{eta} at a given covariate value in \code{x}.  Note that \pkg{TMB} calculates the \emph{negative} local (log)likelihood, such that the objective function is to be minimized.  See \strong{Examples}.
+If the default method is to be overridden, \code{optim_fun} should be provided as a function taking a single argument corresponding to the output of \code{\link[=CondiCopLocFun]{CondiCopLocFun()}}, and return a scalar value corresponding to the estimate of \code{eta} at a given covariate value in \code{x}.  Note that \pkg{TMB} calculates the \emph{negative} local (log)likelihood, such that the objective function is to be minimized.  See \strong{Examples}.
 }
 \examples{
 # simulate data

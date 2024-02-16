@@ -7,16 +7,16 @@
 #' @template param-X
 #' @template param-x0
 #' @template param-kernel
-#' @param band Kernel bandwidth parameter (positive scalar).  See \strong{Details.}
-#' @param band_type  A character string specifying the type of bandwidth: either "constant" or "variable".  See \strong{Details}.
-#' @details For the constant bandwidth of size \code{band = h}, the weights are calculated as
-#' \preformatted{
+#' @param band Kernel bandwidth parameter (positive scalar).  See **Details.**
+#' @param band_type  A character string specifying the type of bandwidth: either "constant" or "variable".  See **Details**.
+#' @details For the constant bandwidth of size `band = h`, the weights are calculated as
+#' ```
 #' wgt = kernel((X-x) / h) / h
-#' }
-#' where \code{kernel} is the kernel function.  For bandwidth type "variable", a fixed fraction \code{band} of observations is used, i.e,
-#' \preformatted{
+#' ```
+#' where `kernel` is the kernel function.  For bandwidth type "variable", a fixed fraction `band` of observations is used, i.e,
+#' ```
 #' h = sort( abs(X-x) )[ floor(band*length(X)) ]
-#' }
+#' ```
 #' @example examples/KernWeight.R
 #' @export
 KernWeight <- function(X, x, band, kernel = KernEpa, band_type = "constant") {

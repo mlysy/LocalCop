@@ -12,10 +12,10 @@
 #'
 #' @name ConvertPar
 #' @aliases BiCopEta2Par BiCopPar2Eta BiCopEta2Tau BiCopTau2Eta
-#' @param family An integer defining the bivariate copula family to use.  See \strong{Details}.
-#' @param eta,eta2 Vector of parameters on the \code{eta} scale.  See \strong{Details}.
-#' @param par,par2 Vector of parameters on the \code{par} scale.
-#' @param tau Vector of parameters on the \code{tau} scale.
+#' @param family An integer defining the bivariate copula family to use.  See **Details**.
+#' @param eta,eta2 Vector of parameters on the `eta` scale.  See **Details**.
+#' @param par,par2 Vector of parameters on the `par` scale.
+#' @param tau Vector of parameters on the `tau` scale.
 #' @details The copula family integer codes are identical to those of the \pkg{VineCopula} package. Currently, the only the following families are implemented:
 #' \describe{
 #'   \item{1}{Gaussian copula.}
