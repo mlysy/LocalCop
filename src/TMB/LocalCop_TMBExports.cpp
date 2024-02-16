@@ -8,6 +8,7 @@
 #include "hclayton.hpp"
 #include "hfrank.hpp"
 #include "hgumbel.hpp"
+#include "LocalLikelihood.hpp"
 #include "pclayton.hpp"
 #include "pfrank.hpp"
 #include "pgumbel.hpp"
@@ -27,6 +28,8 @@ Type objective_function<Type>::operator() () {
     return hfrank(this);
   } else if(model == "hgumbel") {
     return hgumbel(this);
+  } else if(model == "LocalLikelihood") {
+    return LocalLikelihood(this);
   } else if(model == "pclayton") {
     return pclayton(this);
   } else if(model == "pfrank") {

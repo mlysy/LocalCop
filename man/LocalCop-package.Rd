@@ -63,6 +63,14 @@ par(mfrow = c(1,2))
 plot_fun(2)
 plot_fun(5)
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/mlysy/LocalCop}
+  \item Report bugs at \url{https://github.com/mlysy/LocalCop/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Martin Lysy \email{mlysy@uwaterloo.ca}
 
