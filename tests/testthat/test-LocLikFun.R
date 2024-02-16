@@ -22,7 +22,12 @@ test_that("LocLikFun is same in VineCopula and TMB", {
     band <- runif(1, .025, .5)
     wgt <- KernWeight(X = X, x = x0, band = band, kernel = kern)
     # local likelihood calculation
-    eeta <- rnorm(2)
+    eeta <- rnorm(2)/2
+    ## eta <- eeta[1] + eeta[2] * (X-x0)
+    ## if(family == 4) {
+    ##   # gumbel parameter must be between [1, 17]
+    ##   eta <- pmin(pmax(eta, 1), 17)
+    ## }
     epar <- BiCopEta2Par(family = family, eta = eeta[1] + eeta[2] * (X-x0))$par
     epar2 <- 10 + runif(1)
     # in R

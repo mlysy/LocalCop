@@ -1,17 +1,17 @@
 #' Create a \pkg{TMB} local likelihood function.
 #'
-#' Wraps a call to \code{TMB::MakeADFun}.
+#' Wraps a call to [TMB::MakeADFun()].
 #'
 #' @template param-u1
 #' @template param-u2
 #' @template param-family
 #' @template param-X
-#' @param x Scalar covariate value at which to evaluate the local likelihood.  Does not have to be a subset of \code{X}.
+#' @param x Scalar covariate value at which to evaluate the local likelihood.  Does not have to be a subset of `X`.
 #' @param wgt Vector of positive kernel weights.
 #' @template param-degree
-#' @param eta Value of the copula dependence parameter.  Scalar or vector of length two, depending on whether \code{degree} is 0 or 1.
+#' @param eta Value of the copula dependence parameter.  Scalar or vector of length two, depending on whether `degree` is 0 or 1.
 #' @param nu Value of the other copula parameter.  Needn't be supplied if it doesn't exist.
-#' @return A list as returned by a call to \code{TMB::MakeADFun}.  In particular, this contains elements \code{fun} and \code{gr} for the *negative* local likelihood and its gradient with respect to \code{eta}.
+#' @return A list as returned by a call to [TMB::MakeADFun()].  In particular, this contains elements `fun` and `gr` for the *negative* local likelihood and its gradient with respect to `eta`.
 #' @example examples/CondiCopLocFun.R
 #' @export
 CondiCopLocFun <- function(u1, u2, family,
@@ -24,43 +24,49 @@ CondiCopLocFun <- function(u1, u2, family,
   # create TMB function
   # data input
   if(family != 2) nu <- 0 # second copula parameter
-  odata <- list(y1 = u1[wpos], y2 = u2[wpos],
-                wgt = wgt[wpos], xc = X[wpos]-x,
-                family = family, nu = nu)
+  data <- list(model = "LocalLikelihood",
+               y1 = u1[wpos], y2 = u2[wpos],
+               wgt = wgt[wpos], xc = X[wpos]-x,
+               family = family, nu = nu)
   # pre-transform data to correct scale
   if(family == 1) {
     # Gaussian copula
-    odata$y1 <- qnorm(odata$y1)
-    odata$y2 <- qnorm(odata$y2)
+    data$y1 <- qnorm(data$y1)
+    data$y2 <- qnorm(data$y2)
   }
   if(family == 2) {
     # Student-t copula
-    odata$y1 <- qt(odata$y1, df = nu)
-    odata$y2 <- qt(odata$y2, df = nu)
+    data$y1 <- qt(data$y1, df = nu)
+    data$y2 <- qt(data$y2, df = nu)
   }
   if(family == 3) {
     # Clayton copula
-    odata$y1 <- log(odata$y1)
-    odata$y2 <- log(odata$y2)
+    data$y1 <- log(data$y1)
+    data$y2 <- log(data$y2)
   }
   if(family == 4) {
     # Gumbel copula
-    odata$y1 <- log(-log(odata$y1))
-    odata$y2 <- log(-log(odata$y2))
+    data$y1 <- log(-log(data$y1))
+    data$y2 <- log(-log(data$y2))
   }
   # 2nd copula parameter
-  ## if(family != 2) odata$nu <- 0
-  oparam <- list(beta = eta)
+  ## if(family != 2) data$nu <- 0
+  parameters <- list(beta = eta)
   # convert degree to TMB::map
   ## degree <- .format_degree(degree)
   if(!degree %in% 0:1) stop("degree must be 0 or 1.")
-  omap <- list(beta = factor(c(1, 2)))
+  map <- list(beta = factor(c(1, 2)))
   if(degree == 0) {
-    oparam$beta[2] <- 0
-    omap$beta[2] <- NA
+    parameters$beta[2] <- 0
+    map$beta[2] <- NA
   }
-  TMB::MakeADFun(data = odata, parameters = oparam,
-                 map = omap, DLL = "LocalCop", silent = TRUE)
+  TMB::MakeADFun(
+    data = data,
+    parameters = parameters,
+    map = map,
+    DLL = "LocalCop_TMBExports",
+    silent = TRUE
+  )
 }
 
 #--- helper function (not exported) --------------------------------------------

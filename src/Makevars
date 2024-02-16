@@ -9,8 +9,8 @@
 # Flags specifically for the TMB compilation can also be set
 # through the 'TMB_FLAGS' argument below, e.g.,
 
-TMB_FLAGS = -std=gnu++11
-TMB_FLAGS += -I"../../inst/include"
+# TMB_FLAGS = -std=gnu++11
+TMB_FLAGS = -I"../../inst/include"
 
 # --- TMB-specific compiling directives below ---
 

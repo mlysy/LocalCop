@@ -6,19 +6,19 @@
 #' @template param-u2
 #' @template param-family
 #' @template param-X
-#' @param xind Vector of indices in \code{sort(X)} at which to calculate leave-one-out parameter estimates.  Can also be supplied as a single integer, in which case \code{xind} equally spaced observations are taken from \code{X}.
+#' @param xind Vector of indices in `sort(X)` at which to calculate leave-one-out parameter estimates.  Can also be supplied as a single integer, in which case `xind` equally spaced observations are taken from `X`.
 #' @template param-degree
-#' @param eta,nu,kernel,band,optim_fun,cl See \code{\link{CondiCopLocFit}}.
+#' @param eta,nu,kernel,band,optim_fun,cl See [CondiCopLocFit()].
 #' @template param-cv_all
-#' @param cveta_out If \code{TRUE}, return the CV estimate of eta at each point in \code{X} in addition to the CV log-likelihood.
-#' @return If \code{cveta_out = FALSE}, scalar value of the cross-validated log-likelihood.  Otherwise, a list with elements:
+#' @param cveta_out If `TRUE`, return the CV estimate of eta at each point in `X` in addition to the CV log-likelihood.
+#' @return If `cveta_out = FALSE`, scalar value of the cross-validated log-likelihood.  Otherwise, a list with elements:
 #' \describe{
-#'   \item{\code{x}}{The sorted values of \code{X}.}
-#'   \item{\code{eta}}{The leave-one-out estimates interpolated from the values in \code{xind} to all of those in \code{X}.}
-#'   \item{\code{nu}}{The scalar value of the estimated (or provided) second copula parameter.}
-#'   \item{\code{loglik}}{The cross-validated log-likelihood.}
+#'   \item{`x`}{The sorted values of `X`.}
+#'   \item{`eta`}{The leave-one-out estimates interpolated from the values in `xind` to all of those in `X`.}
+#'   \item{`nu`}{The scalar value of the estimated (or provided) second copula parameter.}
+#'   \item{`loglik`}{The cross-validated log-likelihood.}
 #' }
-#' @seealso This function is typically used in conjunction with \code{\link{CondiCopSelect}}; see example there.
+#' @seealso This function is typically used in conjunction with [CondiCopSelect()]; see example there.
 #' @export
 CondiCopLikCV <- function(u1, u2, family, X, xind = 100,
                           degree = 1,

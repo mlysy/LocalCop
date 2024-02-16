@@ -22,11 +22,18 @@ Calculate local likelihood kernel weights.
 }
 \details{
 For the constant bandwidth of size \code{band = h}, the weights are calculated as
-\preformatted{
-wgt = kernel((X-x) / h) / h
-}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{wgt = kernel((X-x) / h) / h
+}\if{html}{\out{</div>}}
+
 where \code{kernel} is the kernel function.  For bandwidth type "variable", a fixed fraction \code{band} of observations is used, i.e,
-\preformatted{
-h = sort( abs(X-x) )[ floor(band*length(X)) ]
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{h = sort( abs(X-x) )[ floor(band*length(X)) ]
+}\if{html}{\out{</div>}}
 }
+\examples{
+X <- sort(runif(20))
+x <- runif(1, min = min(X), max= max(X))
+KernWeight(X, x, band=0.3, kernel = KernEpa, band_type = "constant")
+KernWeight(X, x, band=0.3, kernel = KernEpa, band_type = "variable")
 }
