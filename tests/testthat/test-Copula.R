@@ -15,14 +15,14 @@ data_sim <- function(family) {
   # weight specification
   kern <- sample(c(KernEpa, KernGaus, KernBeta,
                    KernBiQuad, KernTriAng), 1)[[1]]
-  band <- runif(1, .025, .5)
+  band <- runif(1, .025, .5) 
   wgt <- KernWeight(X = X, x = x0, band = band, kernel = kern)
   ## wgt <- rep(1, nobs)
   # local likelihood calculation
   eeta <- rnorm(2)  # evaluation parameter
   epar <- BiCopEta2Par(family = family, eta = eeta[1] + eeta[2] * (X-x0))$par
-  if(family == "3"){epar <- pmin(epar, 27.9)}
-  if(family == "4"){epar <- pmin(epar, 16.9)}
+  if(family == "3"){epar <- pmin(epar, 27.9)} # restricted range in VineCopula package
+  if(family == "4"){epar <- pmin(epar, 16.9)} # restricted range in VineCopula package
   epar2 <- 10 + runif(1) # only relevant for two parameter copulas
   list(udata = udata, epar = epar, epar2 = epar2, wgt = wgt)
 }
@@ -35,7 +35,7 @@ data_sim <- function(family) {
 
 test_that("Copula density is same in VineCopula and TMB", {
   nreps <- 20
-  test_descr <- expand.grid(family = c(3, 4, 5),
+  test_descr <- expand.grid(family = c(3, 4, 5), # add copula families 
                             stringsAsFactors = FALSE)
   n_test <- nrow(test_descr)
   for(ii in 1:n_test) {
@@ -73,7 +73,7 @@ test_that("Copula density is same in VineCopula and TMB", {
 
 test_that("Copula cdf is same in VineCopula and TMB", {
   nreps <- 20
-  test_descr <- expand.grid(family = c(3, 4, 5),
+  test_descr <- expand.grid(family = c(3, 4, 5), # add copula families
                             stringsAsFactors = FALSE)
   n_test <- nrow(test_descr)
   for(ii in 1:n_test) {
@@ -112,7 +112,7 @@ test_that("Copula cdf is same in VineCopula and TMB", {
 
 test_that("Copula partial derivative is same in VineCopula and TMB", {
   nreps <- 20
-  test_descr <- expand.grid(family = c(3, 4, 5),
+  test_descr <- expand.grid(family = c(3, 4, 5), # add copula families
                             stringsAsFactors = FALSE)
   n_test <- nrow(test_descr)
   for(ii in 1:n_test) {

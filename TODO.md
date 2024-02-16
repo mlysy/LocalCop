@@ -1,3 +1,15 @@
+# 29/01/2024
+
+- [ ] Finish documentation for d/p/h of {gumbel/frank/clayton}.hpp follwing template.
+
+- [ ] Put all of these directly on the log scale, i.e., `if(giv_log) return ans else return exp(ans)`.
+
+- [ ] Write d/p/h for Gaussian copula in the style of the previous copulas.  This also involves checking that R and C++ version agree.  See `test/testthat` for how it was done on previous copulas.
+
+- [ ] Write `pt()` and `qt()` in preparation for student t copula.  Note: this will be done by Martin.
+
+- [ ] Write d/p/h for Student-t copula in style of the others.
+
 # 27/04/2021
 
 ## Compile TMB code
