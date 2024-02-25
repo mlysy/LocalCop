@@ -1,5 +1,7 @@
 ^README\.md$
 ^LICENSE$
+^TODO\.md$
 ^tests/dontrun$
 ^man-roxygen$
 ^examples$
+^\.github$
