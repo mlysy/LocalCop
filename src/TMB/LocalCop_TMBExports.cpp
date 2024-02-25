@@ -12,6 +12,8 @@
 #include "pclayton.hpp"
 #include "pfrank.hpp"
 #include "pgumbel.hpp"
+#include "pt.hpp"
+#include "qt.hpp"
 
 template<class Type>
 Type objective_function<Type>::operator() () {
@@ -36,6 +38,10 @@ Type objective_function<Type>::operator() () {
     return pfrank(this);
   } else if(model == "pgumbel") {
     return pgumbel(this);
+  } else if(model == "pt") {
+    return pt(this);
+  } else if(model == "qt") {
+    return qt(this);
   } else {
     Rf_error("Unknown model.");
   }
