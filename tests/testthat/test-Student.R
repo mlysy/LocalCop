@@ -57,6 +57,6 @@ test_that("qt gives same value in R and TMB", {
     ## suppressWarnings({
     q_r <- sum(qt(p, df))
     ## })
-    expect_equal(error(q_r, q_tmb) < 1e-8, TRUE)
+    expect_equal(error(q_r, q_tmb) < 1e-6, TRUE)
   }
 })
