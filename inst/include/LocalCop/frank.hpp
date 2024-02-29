@@ -18,7 +18,10 @@ namespace LocalCop {
   /// @return Value of the copula CDF.
   template <class Type>
   Type pfrank(Type u1, Type u2, Type theta, int give_log=0) {
-    Type ans = log(Type(1.0) + ((exp(-theta*u1) - Type(1.0)) * (exp(-theta*u2)- Type(1.0))) / (exp(-theta)- Type(1.0)));
+    Type term1 =  exp(-theta*u1) - Type(1.0) ;
+    Type term2 =  exp(-theta*u2) - Type(1.0) ; 
+    Type term3 =  exp(-theta) - Type(1.0) ;
+    Type ans = log(Type(1.0) + (term1 * term2) / term3);
     ans /= Type(-1.0) * theta;
     if(give_log) return log(ans); else return ans;
   }

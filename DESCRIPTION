@@ -26,5 +26,8 @@ Imports:
 RoxygenNote: 7.2.3
 Suggests: 
     testthat,
-    parallel
+    parallel,
+    knitr,
+    rmarkdown
 Roxygen: list(markdown = TRUE)
+VignetteBuilder: knitr
