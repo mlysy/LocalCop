@@ -73,14 +73,14 @@ test_that("Copula density is same in VineCopula and TMB", {
 
 test_that("Copula cdf is same in VineCopula and TMB", {
   nreps <- 20
-  test_descr <- expand.grid(family = c(3, 4, 5), # add copula families
+  test_descr <- expand.grid(family = c(1, 3, 4, 5), # add copula families
                             stringsAsFactors = FALSE)
   n_test <- nrow(test_descr)
   for(ii in 1:n_test) {
     for(jj in 1:nreps) {
       # generate data
       family <- test_descr$family[ii]
-      model <- c("3" = "pclayton", "4" = "pgumbel", "5" = "pfrank")
+      model <- c("1" = "pgaussian", "3" = "pclayton", "4" = "pgumbel", "5" = "pfrank")
       model <- model[as.character(family)]
       args <- data_sim(family = family)
       # in R
@@ -112,14 +112,14 @@ test_that("Copula cdf is same in VineCopula and TMB", {
 
 test_that("Copula partial derivative is same in VineCopula and TMB", {
   nreps <- 20
-  test_descr <- expand.grid(family = c(3, 4, 5), # add copula families
+  test_descr <- expand.grid(family = c(1, 3, 4, 5), # add copula families
                             stringsAsFactors = FALSE)
   n_test <- nrow(test_descr)
   for(ii in 1:n_test) {
     for(jj in 1:nreps) {
       # generate data
       family <- test_descr$family[ii]
-      model <- c("3" = "hclayton", "4" = "hgumbel", "5" = "hfrank")
+      model <- c("1" = "hgaussian", "3" = "hclayton", "4" = "hgumbel", "5" = "hfrank")
       model <- model[as.character(family)]
       args <- data_sim(family = family)
       # in R - VineCopula
