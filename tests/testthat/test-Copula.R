@@ -15,15 +15,21 @@ data_sim <- function(family) {
   # weight specification
   kern <- sample(c(KernEpa, KernGaus, KernBeta,
                    KernBiQuad, KernTriAng), 1)[[1]]
-  band <- runif(1, .025, .5) 
+  band <- runif(1, .025, .5)
   wgt <- KernWeight(X = X, x = x0, band = band, kernel = kern)
   ## wgt <- rep(1, nobs)
   # local likelihood calculation
   eeta <- rnorm(2)  # evaluation parameter
   epar <- BiCopEta2Par(family = family, eta = eeta[1] + eeta[2] * (X-x0))$par
-  if(family == "3"){epar <- pmin(epar, 27.9)} # restricted range in VineCopula package
-  if(family == "4"){epar <- pmin(epar, 16.9)} # restricted range in VineCopula package
-  epar2 <- 10 + runif(1) # only relevant for two parameter copulas
+  if(family == "3") {
+    # restricted range in VineCopula package
+    epar <- pmin(epar, 27.9)
+  }
+  if(family == "4") {
+    # restricted range in VineCopula package
+    epar <- pmin(epar, 16.9)
+  }
+  epar2 <- 10 + runif(nobs) # only relevant for two parameter copulas
   list(udata = udata, epar = epar, epar2 = epar2, wgt = wgt)
 }
 
@@ -35,21 +41,31 @@ data_sim <- function(family) {
 
 test_that("Copula density is same in VineCopula and TMB", {
   nreps <- 20
-  test_descr <- expand.grid(family = c(3, 4, 5), # add copula families 
+  test_descr <- expand.grid(family = c(2, 3, 4, 5), # add copula families
                             stringsAsFactors = FALSE)
   n_test <- nrow(test_descr)
   for(ii in 1:n_test) {
     for(jj in 1:nreps) {
       # generate data
       family <- test_descr$family[ii]
-      model <- c("3" = "dclayton", "4" = "dgumbel", "5" = "dfrank")
+      model <- c(`2` = "dstudent", `3` = "dclayton",
+                 `4` = "dgumbel", `5` = "dfrank")
       model <- model[as.character(family)]
       args <- data_sim(family = family)
       # in R
-      ll_r <- VineCopula::BiCopPDF(u1 = args$udata[,1], u2 = args$udata[,2],
-                                   family = family, par = args$epar, par2 = args$epar2)
+      ll_r <- VineCopula::BiCopPDF(
+        u1 = args$udata[,1],
+        u2 = args$udata[,2],
+        family = family,
+        par = args$epar,
+        par2 = args$epar2
+      )
       ll_r <- -sum(args$wgt * log(ll_r))
       # in TMB
+      parameters <- list(theta = args$epar)
+      if(family == 2) {
+        parameters <- c(parameters, list(nu = args$epar2))
+      }
       cop_adf <- TMB::MakeADFun(
         data = list(
           model = model,
@@ -57,14 +73,13 @@ test_that("Copula density is same in VineCopula and TMB", {
           u2 = args$udata[,2],
           weights = args$wgt
         ),
-        parameters = list(theta = args$epar),
+        parameters = parameters,
         silent = TRUE, DLL = "LocalCop_TMBExports")
-      ll_tmb <- cop_adf$fn(args$epar)
+      ll_tmb <- cop_adf$fn()
       expect_equal(ll_r, ll_tmb)
     }
   }
 })
-
 
 
 ##############
@@ -109,7 +124,6 @@ test_that("Copula cdf is same in VineCopula and TMB", {
 # PARTIAL TEST
 ############################
 
-
 test_that("Copula partial derivative is same in VineCopula and TMB", {
   nreps <- 20
   test_descr <- expand.grid(family = c(3, 4, 5), # add copula families
@@ -123,7 +137,7 @@ test_that("Copula partial derivative is same in VineCopula and TMB", {
       model <- model[as.character(family)]
       args <- data_sim(family = family)
       # in R - VineCopula
-      ll_r <- VineCopula::BiCopHfunc1(u1 = args$udata[,1], u2 = args$udata[,2], 
+      ll_r <- VineCopula::BiCopHfunc1(u1 = args$udata[,1], u2 = args$udata[,2],
                                       family = family, par = args$epar, par2 = args$epar2)
       ll_r <- log(ll_r)
       ind <- ll_r > -20  # control the extremely small values in the log scale.

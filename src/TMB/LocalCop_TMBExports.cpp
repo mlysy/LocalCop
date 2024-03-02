@@ -5,6 +5,7 @@
 #include "dclayton.hpp"
 #include "dfrank.hpp"
 #include "dgumbel.hpp"
+#include "dstudent.hpp"
 #include "hclayton.hpp"
 #include "hfrank.hpp"
 #include "hgumbel.hpp"
@@ -24,6 +25,8 @@ Type objective_function<Type>::operator() () {
     return dfrank(this);
   } else if(model == "dgumbel") {
     return dgumbel(this);
+  } else if(model == "dstudent") {
+    return dstudent(this);
   } else if(model == "hclayton") {
     return hclayton(this);
   } else if(model == "hfrank") {
