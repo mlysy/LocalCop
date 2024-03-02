@@ -24,7 +24,7 @@ namespace LocalCop {
   VECTORIZE4_ttti(pclayton)    
     
     
-  /// Calculate Clayton copula partial derivative wrt u1.
+  /// Calculate Clayton copula partial derivative with respect to u1.
   ///
   /// @param[in] u1 First uniform variable.
   /// @param[in] u2 Second uniform variable.
@@ -55,9 +55,7 @@ namespace LocalCop {
     if(give_log) return logans; else return exp(logans);
   }
   VECTORIZE4_ttti(dclayton)
-        
-     
       
 } // end namespace LocalCop
 
-#endif
+#endif // LOCALCOP_CLAYTON_HPP
