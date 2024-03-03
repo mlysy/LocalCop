@@ -5,3 +5,5 @@
 ^man-roxygen$
 ^examples$
 ^\.github$
+^doc$
+^Meta$
