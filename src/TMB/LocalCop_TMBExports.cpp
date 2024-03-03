@@ -4,11 +4,14 @@
 #include <TMB.hpp>
 #include "dclayton.hpp"
 #include "dfrank.hpp"
+#include "dgaussian.hpp"
 #include "dgumbel.hpp"
 #include "dstudent.hpp"
 #include "hclayton.hpp"
 #include "hfrank.hpp"
+#include "hgaussian.hpp"
 #include "hgumbel.hpp"
+#include "hstudent.hpp"
 #include "LocalLikelihood.hpp"
 #include "pclayton.hpp"
 #include "pfrank.hpp"
@@ -23,6 +26,8 @@ Type objective_function<Type>::operator() () {
     return dclayton(this);
   } else if(model == "dfrank") {
     return dfrank(this);
+  } else if(model == "dgaussian") {
+    return dgaussian(this);
   } else if(model == "dgumbel") {
     return dgumbel(this);
   } else if(model == "dstudent") {
@@ -31,8 +36,12 @@ Type objective_function<Type>::operator() () {
     return hclayton(this);
   } else if(model == "hfrank") {
     return hfrank(this);
+  } else if(model == "hgaussian") {
+    return hgaussian(this);
   } else if(model == "hgumbel") {
     return hgumbel(this);
+  } else if(model == "hstudent") {
+    return hstudent(this);
   } else if(model == "LocalLikelihood") {
     return LocalLikelihood(this);
   } else if(model == "pclayton") {

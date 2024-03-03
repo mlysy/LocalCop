@@ -55,7 +55,6 @@ namespace LocalCop {
   /// @param[in] u2 Second uniform variable.
   /// @param[in] theta Correlation parameter of the Student-t copula with the range $(-1, 1)$.
   /// @param[in] nu Degrees of freedom parameter.
-  ///
   /// @param[in] give_log Whether or not to return on the log scale.
   ///
   /// @return Value of the copula PDF.
@@ -73,10 +72,33 @@ namespace LocalCop {
     ans -= dt(y1, nu, 1) + dt(y2, nu, 1);
     if(give_log) return ans; else return exp(ans);
   }
-  VECTORIZE5_tttti(dstudent)    
+  VECTORIZE5_tttti(dstudent)
+
+  /// Calculate Student-t copula partial derivative with respect to u1.
+  ///
+  /// @param[in] u1 First uniform variable.
+  /// @param[in] u2 Second uniform variable. 
+  /// @param[in] theta Correlation parameter of the Student-t copula with the range $(-1, 1)$.
+  /// @param[in] nu Degrees of freedom parameter.
+  /// @param[in] give_log Whether or not to return on the log scale.
+  ///
+  /// @return Value of the h-function.  
+  template <class Type>
+  Type hstudent(Type u1, Type u2, Type theta, Type nu, int give_log=0) {
+    // student-t quantiles
+    Type y1 = qt(u1, nu);
+    Type y2 = qt(u2, nu);
+    Type loc = theta * y2;
+    Type det = 1.0 - theta*theta;
+    Type nu1 = nu + 1.0;
+    Type scale = sqrt((nu + y2*y2)/nu1 * det);
+    Type z = (y1 - loc)/scale;
+    Type ans = pt(z, nu1);
+    if(give_log) return log(ans); else return ans;
+  }
+  VECTORIZE5_tttti(hstudent)
+
   
 } // end namespace LocalCop
-
-#undef M_LN_SQRT_2PI
 
 #endif

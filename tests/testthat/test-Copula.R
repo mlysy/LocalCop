@@ -1,5 +1,9 @@
 #--- Copula tests ------------------------------------------------------
 
+library(LocalCop)
+library(TMB)
+library(testthat)
+
 data_sim <- function(family) {
   # generate data
   nobs <- sample(10:50, 1)  # number of observations
@@ -41,14 +45,15 @@ data_sim <- function(family) {
 
 test_that("Copula density is same in VineCopula and TMB", {
   nreps <- 20
-  test_descr <- expand.grid(family = c(2, 3, 4, 5), # add copula families
+  test_descr <- expand.grid(family = c(1, 2, 3, 4, 5), # add copula families
                             stringsAsFactors = FALSE)
   n_test <- nrow(test_descr)
   for(ii in 1:n_test) {
     for(jj in 1:nreps) {
       # generate data
       family <- test_descr$family[ii]
-      model <- c(`2` = "dstudent", `3` = "dclayton",
+      model <- c(`1` = "dgaussian", `2` = "dstudent",
+                 `3` = "dclayton",
                  `4` = "dgumbel", `5` = "dfrank")
       model <- model[as.character(family)]
       args <- data_sim(family = family)
@@ -88,14 +93,16 @@ test_that("Copula density is same in VineCopula and TMB", {
 
 test_that("Copula cdf is same in VineCopula and TMB", {
   nreps <- 20
-  test_descr <- expand.grid(family = c(1, 3, 4, 5), # add copula families
+  test_descr <- expand.grid(family = c(3, 4, 5), # add copula families
                             stringsAsFactors = FALSE)
   n_test <- nrow(test_descr)
   for(ii in 1:n_test) {
     for(jj in 1:nreps) {
       # generate data
       family <- test_descr$family[ii]
-      model <- c("1" = "pgaussian", "3" = "pclayton", "4" = "pgumbel", "5" = "pfrank")
+      model <- c(`1` = "pgaussian", `2` = "pstudent",
+                 `3` = "pclayton",
+                 `4` = "pgumbel", `5` = "pfrank")
       model <- model[as.character(family)]
       args <- data_sim(family = family)
       # in R
@@ -133,7 +140,9 @@ test_that("Copula partial derivative is same in VineCopula and TMB", {
     for(jj in 1:nreps) {
       # generate data
       family <- test_descr$family[ii]
-      model <- c("1" = "hgaussian", "3" = "hclayton", "4" = "hgumbel", "5" = "hfrank")
+      model <- c(`1` = "hgaussian", `2` = "hstudent",
+                 `3` = "hclayton",
+                 `4` = "hgumbel", `5` = "hfrank")
       model <- model[as.character(family)]
       args <- data_sim(family = family)
       # in R - VineCopula
