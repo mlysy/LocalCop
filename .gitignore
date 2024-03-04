@@ -3,7 +3,6 @@
 # R
 *.Rhistory
 *.Rapp.history
-inst/doc # comment out to link to vignette html on github
 vignettes/.build.timestamp
 
 # C++
@@ -13,4 +12,7 @@ vignettes/.build.timestamp
 
 # osx
 *.DS_Store
+
 inst/doc
+/doc/
+/Meta/

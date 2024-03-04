@@ -10,7 +10,7 @@
 #' @param wgt Vector of positive kernel weights.
 #' @template param-degree
 #' @param eta Value of the copula dependence parameter.  Scalar or vector of length two, depending on whether `degree` is 0 or 1.
-#' @param nu Value of the other copula parameter.  Needn't be supplied if it doesn't exist.
+#' @param nu Value of the other copula parameter.  Scalar or vector of same length as `u1`.  Ignored if `family != 2`.
 #' @return A list as returned by a call to [TMB::MakeADFun()].  In particular, this contains elements `fun` and `gr` for the *negative* local likelihood and its gradient with respect to `eta`.
 #' @example examples/CondiCopLocFun.R
 #' @export
@@ -22,35 +22,17 @@ CondiCopLocFun <- function(u1, u2, family,
   }
   wpos <- wgt > 0 # index of positive weights
   # create TMB function
-  # data input
+  # format nu
   if(family != 2) nu <- 0 # second copula parameter
+  if(length(nu) == 1) nu <- rep(nu, length(wgt))
+  if(length(nu) != length(wgt)) {
+    stop("nu must be of length 1 or have same length as wgt.")
+  }
+  # data input
   data <- list(model = "LocalLikelihood",
                y1 = u1[wpos], y2 = u2[wpos],
                wgt = wgt[wpos], xc = X[wpos]-x,
-               family = family, nu = nu)
-  # pre-transform data to correct scale
-  if(family == 1) {
-    # Gaussian copula
-    data$y1 <- qnorm(data$y1)
-    data$y2 <- qnorm(data$y2)
-  }
-  if(family == 2) {
-    # Student-t copula
-    data$y1 <- qt(data$y1, df = nu)
-    data$y2 <- qt(data$y2, df = nu)
-  }
-  if(family == 3) {
-    # Clayton copula
-    data$y1 <- log(data$y1)
-    data$y2 <- log(data$y2)
-  }
-  if(family == 4) {
-    # Gumbel copula
-    data$y1 <- log(-log(data$y1))
-    data$y2 <- log(-log(data$y2))
-  }
-  # 2nd copula parameter
-  ## if(family != 2) data$nu <- 0
+               family = family, nu = nu[wpos])
   parameters <- list(beta = eta)
   # convert degree to TMB::map
   ## degree <- .format_degree(degree)

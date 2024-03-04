@@ -79,4 +79,9 @@ Authors:
   \item Elif Acar \email{elif.acar@umanitoba.ca}
 }
 
+Other contributors:
+\itemize{
+  \item Alan Kuchinsky [contributor]
+}
+
 }

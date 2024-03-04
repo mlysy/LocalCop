@@ -23,7 +23,7 @@ CondiCopLocFun(u1, u2, family, X, x, wgt, degree = 1, eta, nu)
 
 \item{eta}{Value of the copula dependence parameter.  Scalar or vector of length two, depending on whether \code{degree} is 0 or 1.}
 
-\item{nu}{Value of the other copula parameter.  Needn't be supplied if it doesn't exist.}
+\item{nu}{Value of the other copula parameter.  Scalar or vector of same length as \code{u1}.  Ignored if \code{family != 2}.}
 }
 \value{
 A list as returned by a call to \code{\link[TMB:MakeADFun]{TMB::MakeADFun()}}.  In particular, this contains elements \code{fun} and \code{gr} for the \emph{negative} local likelihood and its gradient with respect to \code{eta}.

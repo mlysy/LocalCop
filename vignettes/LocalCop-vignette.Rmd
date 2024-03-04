@@ -2,23 +2,17 @@
 title: "LocalCop-vignette"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{my-vignette}
+  %\VignetteIndexEntry{LocalCop-vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 ```
-
-```{r setup}
-library(LocalCop)
-```
-
-
 
 This vignette demonstrates local likelihood inference for the dependence parameters in conditional copula models.
 We consider the bivariate random vector $(Y_1, Y_2)$ whose joint distribution conditional on the covariate $X$ is characterized by 
@@ -28,8 +22,7 @@ F_X(y_1, y_2 \mid x) = C_X (F_{1\mid X} (y_1 \mid x),F_{2\mid X} (y_2 \mid x) )
 
 
 ```{r libs, message=FALSE}
-devtools::install_github("mlysy/LocalCop")
-# require(LocalCop)
+require(LocalCop)
 require(VineCopula) # for simulating copula data 
 ```
 
