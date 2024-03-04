@@ -1,43 +1,8 @@
 #--- Copula tests ------------------------------------------------------
 
-library(LocalCop)
-library(TMB)
-library(testthat)
-
-data_sim <- function(family) {
-  # generate data
-  nobs <- sample(10:50, 1)  # number of observations
-  X <- sort(runif(nobs))    # values in  (0,1] interval
-  # etafun <- function(t) 2*cos(12*pi*t)  # oscillating calibration function
-  etafun <- function(t) 2*t   # linear calibration function
-  tpar <- BiCopEta2Par(family = family, etafun(X))$par # true copula parameter
-  tpar2 <- 10 + runif(1) # only relevant for two-parameter copulas
-  udata <- VineCopula::BiCopSim(N=nobs, family=family,
-                                par = tpar, par2=tpar2)
-  # local likelihood
-  x0 <- runif(1, min(X), max(X)) # evaluation point
-  # weight specification
-  kern <- sample(c(KernEpa, KernGaus, KernBeta,
-                   KernBiQuad, KernTriAng), 1)[[1]]
-  band <- runif(1, .025, .5)
-  wgt <- KernWeight(X = X, x = x0, band = band, kernel = kern)
-  ## wgt <- rep(1, nobs)
-  # local likelihood calculation
-  eeta <- rnorm(2)  # evaluation parameter
-  epar <- BiCopEta2Par(family = family, eta = eeta[1] + eeta[2] * (X-x0))$par
-  if(family == "3") {
-    # restricted range in VineCopula package
-    epar <- pmin(epar, 27.9)
-  }
-  if(family == "4") {
-    # restricted range in VineCopula package
-    epar <- pmin(epar, 16.9)
-  }
-  epar2 <- 10 + runif(nobs) # only relevant for two parameter copulas
-  list(udata = udata, epar = epar, epar2 = epar2, wgt = wgt)
-}
-
-
+## library(LocalCop)
+## library(TMB)
+## library(testthat)
 
 ##############
 # PDF TEST
