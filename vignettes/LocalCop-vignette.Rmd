@@ -13,6 +13,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 header-includes:
   - \setmathfont{STIXTwoMath-Regular.otf}
+  - usepackage(xcolor)
 ---
 
 ```{r setup, include = FALSE}
@@ -26,7 +27,7 @@ knitr::opts_chunk$set(
 ```{r libs, message=FALSE}
 library(LocalCop)
 library(VineCopula) # for simulating copula data 
-library(tidyverse) # for data manipulations
+library(dplyr) # for data manipulations
 library(ggplot2) # for plots
 ```
 
@@ -96,7 +97,7 @@ band <- 0.1
 Repeating this procedure over a grid of covariate values allows to capture the underlying dependence parameter function. The function `CondiCopLocFit()` allows inputting a vector of fixed points for a given family and bandwidth. 
 
 
-```{r localseq, message=FALSE, fig.align='center', fig.width=7, fig.height=5, fig.cap="Conditional Kendall $\\tau$ for Gumbel copula under DGM."}
+```{r localseq, message=FALSE, fig.align='center', fig.width=7, fig.height=5, fig.cap="Conditional Kendall $\\tau$ estimates under the Gumbel copula using bandwidth $h=0.1$."}
 x0 <- seq(0, 1, by=0.02)
 fitseq <- CondiCopLocFit(u1 = udata[,1], u2 = udata[,2], 
                          family = family, X = X, x = x0, 
@@ -113,7 +114,7 @@ To reduce the computation time in model selection, we calculate the cross-valida
 
 ```{r select1, message=FALSE}
 bandset <- c(0.1, 0.2, 0.4, 0.8, 1) # bandwidth set
-famset <- c(3, 4, 5) # family set
+famset <- c(1, 2, 3, 4, 5) # family set
 xind <- 100  # number of leave-one-out observations in CV likelihood calculation
 system.time({
   cvselect <- CondiCopSelect(u1= udata[,1], u2 = udata[,2],
@@ -135,6 +136,7 @@ system.time({
 (cv_res2 <- cvselect$cv)
 
 ```
+
 In both cases, we select the Gumbel copula with the bandwidth parameter $h = 0.1$. This suggests that a subset based selection can be used to reduce the computation time. 
 
 ```{r cvplot, message=FALSE, fig.align='center', fig.width=8, fig.height=4, fig.cap="Cross-validated likelihood for copula and bandwidth selection based on a subset and the full sample."}
@@ -142,7 +144,7 @@ cv_res <- bind_rows(cv_res1, cv_res2) %>%
   mutate(n = factor(c(rep(paste0("n=",xind), nrow(cv_res1)), 
                       rep(paste0("n=",n), nrow(cv_res2)))),
          band = factor(band), 
-         family = factor(family, levels = c(3,4,5), labels = c("Clayton", "Gumbel", "Frank")))
+         family = factor(family, levels = c(1,2,3,4,5), labels = c("Gaussian", "Student", "Clayton", "Gumbel", "Frank")))
 p <- ggplot(data = cv_res, aes(x = family, y = cv, fill =  band))
 p <- p + geom_bar(stat="identity", position = "dodge") + facet_grid(~n) 
 p + scale_fill_brewer(palette="Greys", direction=-1) + theme_bw() + 
@@ -150,6 +152,19 @@ p + scale_fill_brewer(palette="Greys", direction=-1) + theme_bw() +
   theme(legend.position = "bottom", legend.direction = "horizontal")
 ```
 
+We further compare the fits under the five copula families using the bandwidth parameter $h = 0.1$. 
 
-
+```{r localseq2, message=FALSE, fig.align='center', fig.width=7, fig.height=5, fig.cap="Conditional Kendall $\\tau$ estimates under different copula families."}
+x0 <- seq(0, 1, by=0.01)
+copcol <- c(3,4,5,2,6)
+fitseq <- sapply(1:5, function(ii) CondiCopLocFit(u1 = udata[,1], u2 = udata[,2], 
+                         family = ii, X = X, x = x0, 
+                         degree = 1, band = band))
+plot(X, tau_true, type = "l", lwd=2, ylim=c(-0.5,1), ylab=expression(tau("x")))
+for(ii in 1:5){
+  tauest <- BiCopEta2Tau(fitseq[,ii]$eta, family=ii)
+  lines(x0[tauest>0.01], tauest[tauest>0.01], col=copcol[ii])
+}
+```
+The results suggest that misspecification of the copula family does not drastically affect the local likelihood estimates of the conditional Kendall's tau, except for the Clayton copula (in cyan) which shows the most departure from the data generating Gumbel copula.
 

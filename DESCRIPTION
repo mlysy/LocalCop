@@ -31,6 +31,9 @@ Suggests:
     testthat,
     parallel,
     knitr,
-    rmarkdown
+    rmarkdown,
+    bookdown,
+    dplyr, 
+    ggplot2
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
