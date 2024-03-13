@@ -37,13 +37,16 @@
 
 # default optimization function
 .optim_default <- function(obj) {
-  # coarse optimization: gradient-free
-  opt <- optim(par = obj$par, fn = obj$fn, gr = obj$gr,
-               method = "Nelder-Mead",
-               control = list(maxit = 50, reltol = 1e-2))
-  # fine optimization: quasi-newton (gradient-based)
-  opt <- optim(par = opt$par, fn = obj$fn, gr = obj$gr,
-               method = "BFGS")
+  ## # coarse optimization: gradient-free
+  ## opt <- optim(par = obj$par, fn = obj$fn, gr = obj$gr,
+  ##              method = "Nelder-Mead",
+  ##              control = list(maxit = 50, reltol = 1e-2))
+  ## # fine optimization: quasi-newton (gradient-based)
+  ## opt <- optim(par = opt$par, fn = obj$fn, gr = obj$gr,
+  ##              method = "BFGS")
+  opt <- stats::nlminb(start = obj$par,
+                       objective = obj$fn,
+                       gradient = obj$gr)
   # only need constant term since xc = 0 at x = X[ii]
   return(opt$par[1])
 }

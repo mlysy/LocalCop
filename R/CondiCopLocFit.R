@@ -21,7 +21,7 @@
 #'   \item{`eta`}{The vector of estimated dependence parameters of the same length as `x`.}
 #'   \item{`nu`}{The scalar value of the estimated (or provided) second copula parameter.}
 #' }
-#' @details By default, optimization is performed by taking a few steps with the gradient-free simplex algorithm `stats::optim(method = "Nelder-Mead")` for stability, then continuing with the quasi-Newton algorithm `stats::optim(method = "BFGS")`, which uses gradient information provided by automatic differentiation (AD) as implemented by \pkg{TMB}.
+#' @details By default, optimization is performed with the quasi-Newton algorithm provided by [stats::nlminb()], which uses gradient information provided by automatic differentiation (AD) as implemented by \pkg{TMB}.
 #'
 #' If the default method is to be overridden, `optim_fun` should be provided as a function taking a single argument corresponding to the output of [CondiCopLocFun()], and return a scalar value corresponding to the estimate of `eta` at a given covariate value in `x`.  Note that \pkg{TMB} calculates the *negative* local (log)likelihood, such that the objective function is to be minimized.  See **Examples**.
 #' @example examples/CondiCopLocFit.R

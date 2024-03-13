@@ -59,7 +59,7 @@ List with the following elements:
 Estimate the bivariate copula dependence parameter \code{eta} at multiple covariate values.
 }
 \details{
-By default, optimization is performed by taking a few steps with the gradient-free simplex algorithm \code{stats::optim(method = "Nelder-Mead")} for stability, then continuing with the quasi-Newton algorithm \code{stats::optim(method = "BFGS")}, which uses gradient information provided by automatic differentiation (AD) as implemented by \pkg{TMB}.
+By default, optimization is performed with the quasi-Newton algorithm provided by \code{\link[stats:nlminb]{stats::nlminb()}}, which uses gradient information provided by automatic differentiation (AD) as implemented by \pkg{TMB}.
 
 If the default method is to be overridden, \code{optim_fun} should be provided as a function taking a single argument corresponding to the output of \code{\link[=CondiCopLocFun]{CondiCopLocFun()}}, and return a scalar value corresponding to the estimate of \code{eta} at a given covariate value in \code{x}.  Note that \pkg{TMB} calculates the \emph{negative} local (log)likelihood, such that the objective function is to be minimized.  See \strong{Examples}.
 }
