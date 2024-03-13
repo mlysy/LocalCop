@@ -1,5 +1,7 @@
 ---
 title: "Local likelihood inference for conditional copulas"
+params:
+  do_calc: FALSE
 output: 
   bookdown::html_vignette2:
     toc: true
@@ -13,7 +15,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 header-includes:
   - \setmathfont{STIXTwoMath-Regular.otf}
-  - usepackage(xcolor)
+  - \usepackage{xcolor}
 ---
 
 ```{r setup, include = FALSE}
@@ -44,7 +46,7 @@ where $F_{1\mid X}\equiv U$ and $F_{2\mid X}\equiv V$ are conditional marginal d
 
 ## Data generating model
 
-We consider parametric copula families $C_X \in \mathscr{C}\{ C(\cdot, \cdot; \theta (X))\}$ to specify the conditional copula. Since most parametric copula families have a restricted parameter range, we describe the data generating model (DGM) in terms of the calibration function $\eta(x)$ and set $ \theta(x) = g^{-1}(\eta(x))$ where $g^{-1}: \mathbb{R} \to \Theta$ is the inverse link function that ensures that the copula parameter has the correct range. The choice of $g^{-1}$ is not unique and depends on the copula family. The canonical choices for the inverse link function are defined in `BiCopEta2Par()` for various families (see `ConvertPar()` for details). The results are typically presented in the Kendall tau scale for interpretability across different copula families. 
+We consider parametric copula families $C_X \in \mathscr{C}\{ C(\cdot, \cdot; \theta (X))\}$ to specify the conditional copula. Since most parametric copula families have a restricted parameter range, we describe the data generating model (DGM) in terms of the calibration function $\eta(x)$ and set $\theta(x) = g^{-1}(\eta(x))$ where $g^{-1}: \mathbb{R} \to \Theta$ is the inverse link function that ensures that the copula parameter has the correct range. The choice of $g^{-1}$ is not unique and depends on the copula family. The canonical choices for the inverse link function are defined in `BiCopEta2Par()` for various families (see `ConvertPar()` for details). The results are typically presented in the Kendall tau scale for interpretability across different copula families. 
 
 
 Below, we provide a walk-through example using the Gumbel family, where the Kendall $\tau$ changes as a function of the covariate in Figure \@ref(fig:dgm). 
@@ -112,29 +114,46 @@ points(x0, BiCopEta2Tau(fitseq$eta, family= family), col=2, pch = 20)
 
 To reduce the computation time in model selection, we calculate the cross-validated likelihood for a subset of the sample. 
 
-```{r select1, message=FALSE}
+```{r select1-precalc}
 bandset <- c(0.1, 0.2, 0.4, 0.8, 1) # bandwidth set
 famset <- c(1, 2, 3, 4, 5) # family set
 xind <- 100  # number of leave-one-out observations in CV likelihood calculation
+```
+```{r select1-calc, eval = params$do_calc, message=FALSE}
 system.time({
-  cvselect <- CondiCopSelect(u1= udata[,1], u2 = udata[,2],
+  cvselect1 <- CondiCopSelect(u1= udata[,1], u2 = udata[,2],
                              X = X, family = famset, band = bandset,
                              xind = xind)
 })
-(cv_res1 <- cvselect$cv)
-
 ```
+```{r select1-save, eval = params$do_calc, echo = FALSE}
+saveRDS(cvselect1, file = "cvselect1.rds")
+```
+```{r select1-load, eval = !params$do_calc, echo = FALSE}
+cvselect1 <- readRDS("cvselect1.rds")
+```
+```{r select1}
+(cv_res1 <- cvselect1$cv)
+```
+
 
 The leave-one-out cross-validation for the full sample is provided below for comparisons. 
 
-```{r select2, message=FALSE}
+```{r select2-calc, eval = params$do_calc, message=FALSE}
 system.time({
-  cvselect <- CondiCopSelect(u1= udata[,1], u2 = udata[,2],
-                             X = X, family = famset, band = bandset,
-                             xind = n)
+  cvselect2 <- CondiCopSelect(u1= udata[,1], u2 = udata[,2],
+                              X = X, family = famset, band = bandset,
+                              xind = n)
 })
-(cv_res2 <- cvselect$cv)
-
+```
+```{r select2-save, eval = params$do_calc, echo = FALSE}
+saveRDS(cvselect2, file = "cvselect2.rds")
+```
+```{r select2-load, eval = !params$do_calc, echo = FALSE}
+cvselect2 <- readRDS("cvselect2.rds")
+```
+```{r select2}
+(cv_res2 <- cvselect2$cv)
 ```
 
 In both cases, we select the Gumbel copula with the bandwidth parameter $h = 0.1$. This suggests that a subset based selection can be used to reduce the computation time. 
@@ -166,5 +185,7 @@ for(ii in 1:5){
   lines(x0[tauest>0.01], tauest[tauest>0.01], col=copcol[ii])
 }
 ```
+
 The results suggest that misspecification of the copula family does not drastically affect the local likelihood estimates of the conditional Kendall's tau, except for the Clayton copula (in cyan) which shows the most departure from the data generating Gumbel copula.
 
+## References
