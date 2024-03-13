@@ -75,15 +75,15 @@ CondiCopLikCV <- function(u1, u2, family, X, xind = 100,
                         X = cveta[xind], x = 0, eta = c(0,1), nu = inu,
                         wgt = rep(1, nx), degree = 1)
   cvll <- -obj$fn(c(0,1))
-  # correct for likelihood constants
-  if(family == 2) {
-    # Student-t
-    cst <- lgamma(.5*(inu+2)) + lgamma(.5*inu) - 2*lgamma(.5*(inu+1))
-    cvll <- cvll + nx * cst
-  }
-  if(family == 4) {
-    cvll <- cvll - sum(log(u1[xind]) + log(u2[xind]))
-  }
+  ## # correct for likelihood constants
+  ## if(family == 2) {
+  ##   # Student-t
+  ##   cst <- lgamma(.5*(inu+2)) + lgamma(.5*inu) - 2*lgamma(.5*(inu+1))
+  ##   cvll <- cvll + nx * cst
+  ## }
+  ## if(family == 4) {
+  ##   cvll <- cvll - sum(log(u1[xind]) + log(u2[xind]))
+  ## }
   if(!cveta_out) {
     return(cvll)
   } else {
