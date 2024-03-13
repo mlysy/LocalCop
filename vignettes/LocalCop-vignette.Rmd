@@ -1,10 +1,19 @@
 ---
-title: "LocalCop-vignette"
-output: rmarkdown::html_vignette
+title: "Local likelihood inference for conditional copulas"
+output: 
+  bookdown::html_vignette2:
+    toc: true
+author: Elif F. Acar, Martin Lysy
+date: 2024-03-11
+bibliography: references.bib 
+link-citations: true 
 vignette: >
-  %\VignetteIndexEntry{LocalCop-vignette}
+  %\VignetteIndexEntry{Local likelihood inference for conditional copulas}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+header-includes:
+  - \setmathfont{STIXTwoMath-Regular.otf}
+  - usepackage(xcolor)
 ---
 
 ```{r setup, include = FALSE}
@@ -14,48 +23,148 @@ knitr::opts_chunk$set(
 )
 ```
 
-This vignette demonstrates local likelihood inference for the dependence parameters in conditional copula models.
-We consider the bivariate random vector $(Y_1, Y_2)$ whose joint distribution conditional on the covariate $X$ is characterized by 
-\begin{equation}
-F_X(y_1, y_2 \mid x) = C_X (F_{1\mid X} (y_1 \mid x),F_{2\mid X} (y_2 \mid x) )
-\end{equation}
-
 
 ```{r libs, message=FALSE}
-require(LocalCop)
-require(VineCopula) # for simulating copula data 
+library(LocalCop)
+library(VineCopula) # for simulating copula data 
+library(dplyr) # for data manipulations
+library(ggplot2) # for plots
 ```
 
 
+This vignette demonstrates the local likelihood inference for the dependence parameters in conditional copula models based on the works @ACY2011, @ACY2013 and @ACL2019.
+We consider the bivariate random vector $(Y_1, Y_2)$ whose conditional joint distribution given a covariate $X$ is characterized by 
+\begin{equation}
+F_X(y_1, y_2 \mid x) = C_X (F_{1\mid X} (y_1 \mid x),F_{2\mid X} (y_2 \mid x) ),
+\end{equation}
+where $F_{1\mid X}\equiv U$ and $F_{2\mid X}\equiv V$ are conditional marginal distributions of $Y_1$ and $Y_2$ given $X$ and $C_X$ is the conditional copula. 
 
-## Data generating model (DGM)
-
-The data generating model is described in terms of the calibration function given by $\eta(x) = g^{-1} (\theta(x))$, where $g^{-1}$ is the inverse link function that maps the copula parameter to $(-\infty, \infty)$.
 
 
-```{r dgm, message=FALSE}
 
+## Data generating model
+
+We consider parametric copula families $C_X \in \mathscr{C}\{ C(\cdot, \cdot; \theta (X))\}$ to specify the conditional copula. Since most parametric copula families have a restricted parameter range, we describe the data generating model (DGM) in terms of the calibration function $\eta(x)$ and set $ \theta(x) = g^{-1}(\eta(x))$ where $g^{-1}: \mathbb{R} \to \Theta$ is the inverse link function that ensures that the copula parameter has the correct range. The choice of $g^{-1}$ is not unique and depends on the copula family. The canonical choices for the inverse link function are defined in `BiCopEta2Par()` for various families (see `ConvertPar()` for details). The results are typically presented in the Kendall tau scale for interpretability across different copula families. 
+
+
+Below, we provide a walk-through example using the Gumbel family, where the Kendall $\tau$ changes as a function of the covariate in Figure \@ref(fig:dgm). 
+
+```{r dgm, message=FALSE, fig.align='center', fig.width=7, fig.height=5, fig.cap="Conditional Kendall $\\tau$ for Gumbel copula under DGM."}
 # simulate copula data given a covariate
-
-set.seed(2024)
-family <- 5  # Frank Copula 
+set.seed(2024) 
+family <- 4  # Gumbel Copula 
 n <- 1000    # number of observations
-X <- runif(n)  # covariate values
+X <- sort(runif(n))  # covariate values
 eta_fun <- function(x){ # calibration function
- 3*sin(6*pi*x)
+  sin(6*pi*x)
 }
 eta_true <- eta_fun(X)
 par_true <- BiCopEta2Par(family = family, eta = eta_true) # copula parameter
-udata <-  VineCopula::BiCopSim(n, family = family,
-                               par = par_true$par)
-
-tau_true <- VineCopula::BiCopPar2Tau(family, 
-                                     par = par_true$par)
-plot(X, tau_true,
-     ylim=c(-1,1), 
-     ylab=expression(tau("x")))
+udata <- VineCopula::BiCopSim(n, family = family, par = par_true$par)
+tau_true <- VineCopula::BiCopPar2Tau(family, par = par_true$par)
+plot(X, tau_true, type = "l", lwd=2, ylim=c(-0.5,1), ylab=expression(tau("x")))
 
 ```
 
 
+For data generation, one can specify conditional marginal models and obtain the response data in the observation scale rather than the uniform scale (see @ACL2019 for an application with the ARMA-GARCH type marginal models). This would allow investigating the impact of estimating or misspecifying the conditional marginal models in practical applications. 
+For brevity, we will proceed with the uniform data assuming that the true marginal models are used. 
+
+
+## Local likelihood estimation of the dependence parameter
+
+The local likelihood estimation uses the Taylor approximation to approximate the dependence parameter function at an observed covariate around a fixed point $x_0$, i.e.,
+$$
+\eta(X_i)\approx \eta(x_0) + \eta^{(1)}(x_0) (X_i - x_0) + \ldots + \dfrac{\eta^{(p)}(x_0)}{p!} (X_i - x_0)^{p}.
+$$
+Usually a linear fit with $p=1$ suffices to obtain a good estimate in practice. 
+
+For a given bandwidth parameter and a copula family, one can obtain the estimates of $\beta_k = \eta^{(k)}(\cdot)/k!$, $k=0,\ldots,p$ using a kernel-weighted local likelihood function
+$$
+\sum_{i=1}^n \log\left\{ c\left(u_i, v_i ; g^{-1}( \mathbf{x}_{i,0}^T \boldsymbol{\beta})\right)\right\} K_h\left(\dfrac{x_i-x_0}{h}\right),
+$$
+where $\mathbf{x}_{i,0} = (1, x_i-x_0, (x_i-x_0)^2, \ldots, (x_i-x_0)^p)^T$, $\boldsymbol{\beta}= (\beta_0, \beta_1, \ldots, \beta_p)^T$, $K$ is the kernel function and $h$ is the bandwidth parameter. This is implemented in `CondiCopLocFit()`.
+
+```{r local1, message=FALSE, fig.align='center', fig.width=6, fig.height=6, fig.cap="Conditional Kendall $\\tau$ estimates for Gumbel copula under DGM."}
+
+x0 <- 0.1
+band <- 0.1
+(fit1 <- CondiCopLocFit(u1 = udata[,1], u2 = udata[,2], family = family, 
+                        X = X, x = x0, degree = 1, band = band))
+
+```
+
+Repeating this procedure over a grid of covariate values allows to capture the underlying dependence parameter function. The function `CondiCopLocFit()` allows inputting a vector of fixed points for a given family and bandwidth. 
+
+
+```{r localseq, message=FALSE, fig.align='center', fig.width=7, fig.height=5, fig.cap="Conditional Kendall $\\tau$ estimates under the Gumbel copula using bandwidth $h=0.1$."}
+x0 <- seq(0, 1, by=0.02)
+fitseq <- CondiCopLocFit(u1 = udata[,1], u2 = udata[,2], 
+                         family = family, X = X, x = x0, 
+                         degree = 1, band = band)
+plot(X, tau_true, type = "l", lwd=2, ylim=c(-0.5,1), ylab=expression(tau("x")))
+points(x0, BiCopEta2Tau(fitseq$eta, family= family), col=2, pch = 20)
+
+```
+
+
+## Copula Selection and Model Tuning 
+
+To reduce the computation time in model selection, we calculate the cross-validated likelihood for a subset of the sample. 
+
+```{r select1, message=FALSE}
+bandset <- c(0.1, 0.2, 0.4, 0.8, 1) # bandwidth set
+famset <- c(1, 2, 3, 4, 5) # family set
+xind <- 100  # number of leave-one-out observations in CV likelihood calculation
+system.time({
+  cvselect <- CondiCopSelect(u1= udata[,1], u2 = udata[,2],
+                             X = X, family = famset, band = bandset,
+                             xind = xind)
+})
+(cv_res1 <- cvselect$cv)
+
+```
+
+The leave-one-out cross-validation for the full sample is provided below for comparisons. 
+
+```{r select2, message=FALSE}
+system.time({
+  cvselect <- CondiCopSelect(u1= udata[,1], u2 = udata[,2],
+                             X = X, family = famset, band = bandset,
+                             xind = n)
+})
+(cv_res2 <- cvselect$cv)
+
+```
+
+In both cases, we select the Gumbel copula with the bandwidth parameter $h = 0.1$. This suggests that a subset based selection can be used to reduce the computation time. 
+
+```{r cvplot, message=FALSE, fig.align='center', fig.width=8, fig.height=4, fig.cap="Cross-validated likelihood for copula and bandwidth selection based on a subset and the full sample."}
+cv_res <- bind_rows(cv_res1, cv_res2) %>% 
+  mutate(n = factor(c(rep(paste0("n=",xind), nrow(cv_res1)), 
+                      rep(paste0("n=",n), nrow(cv_res2)))),
+         band = factor(band), 
+         family = factor(family, levels = c(1,2,3,4,5), labels = c("Gaussian", "Student", "Clayton", "Gumbel", "Frank")))
+p <- ggplot(data = cv_res, aes(x = family, y = cv, fill =  band))
+p <- p + geom_bar(stat="identity", position = "dodge") + facet_grid(~n) 
+p + scale_fill_brewer(palette="Greys", direction=-1) + theme_bw() + 
+  xlab("") + ylab("CV Likelihood") +
+  theme(legend.position = "bottom", legend.direction = "horizontal")
+```
+
+We further compare the fits under the five copula families using the bandwidth parameter $h = 0.1$. 
+
+```{r localseq2, message=FALSE, fig.align='center', fig.width=7, fig.height=5, fig.cap="Conditional Kendall $\\tau$ estimates under different copula families."}
+x0 <- seq(0, 1, by=0.01)
+copcol <- c(3,4,5,2,6)
+fitseq <- sapply(1:5, function(ii) CondiCopLocFit(u1 = udata[,1], u2 = udata[,2], 
+                         family = ii, X = X, x = x0, 
+                         degree = 1, band = band))
+plot(X, tau_true, type = "l", lwd=2, ylim=c(-0.5,1), ylab=expression(tau("x")))
+for(ii in 1:5){
+  tauest <- BiCopEta2Tau(fitseq[,ii]$eta, family=ii)
+  lines(x0[tauest>0.01], tauest[tauest>0.01], col=copcol[ii])
+}
+```
+The results suggest that misspecification of the copula family does not drastically affect the local likelihood estimates of the conditional Kendall's tau, except for the Clayton copula (in cyan) which shows the most departure from the data generating Gumbel copula.
 
