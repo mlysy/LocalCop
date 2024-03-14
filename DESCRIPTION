@@ -1,7 +1,7 @@
 Package: LocalCop
 Title: Local Likelihood Inference for Conditional Copula Models
-Version: 0.0.0.9001
-Date: 2024-03-04
+Version: 0.0.0.9002
+Date: 2024-03-13
 Authors@R: 
     c(person(given = "Elif",
              family = "Acar",
@@ -33,7 +33,10 @@ Suggests:
     knitr,
     rmarkdown,
     bookdown,
-    dplyr, 
+    kableExtra,
+    dplyr,
+    readr,
+    tidyr,
     ggplot2
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
