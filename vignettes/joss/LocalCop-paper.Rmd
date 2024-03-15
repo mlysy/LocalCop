@@ -86,10 +86,10 @@ where $F_{1\mid X}(y_1 \mid x)$ and $F_{2\mid X}(y_2 \mid x)$ are the conditiona
 
 The focus of **LocalCop** is on estimating the conditional copula function, which is modelled semi-parametrically as 
 \begin{equation}
-C_X(u, v \mid x) = \mathcal{C}(u, v; \theta(x), \nu),
+C_X(u, v \mid x) = \mathcal{C}(u, v\mid \theta(x), \nu),
 (\#eq:copmod)
 \end{equation}
-where $\mathcal{C}(u, v \; \theta, \nu)$ is one of the parametric copula families listed in Table \@ref(tab:calib), the copula dependence parameter $\theta \in \Theta$ is an arbitrary function of $X$, and $\nu \in \Upsilon$ is an additional copula parameter present in some models. Since most parametric copula families have a restricted range $\Theta \subsetneq \mathbb{R}$, we describe the data generating model (DGM) in terms of the calibration function $\eta(x)$, such that
+where $\mathcal{C}(u, v \mid \theta, \nu)$ is one of the parametric copula families listed in Table \@ref(tab:calib), the copula dependence parameter $\theta \in \Theta$ is an arbitrary function of $X$, and $\nu \in \Upsilon$ is an additional copula parameter present in some models. Since most parametric copula families have a restricted range $\Theta \subsetneq \mathbb{R}$, we describe the data generating model (DGM) in terms of the calibration function $\eta(x)$, such that
 \begin{equation}
 \theta(x) = g^{-1}(\eta(x)),
 \end{equation}
@@ -111,7 +111,7 @@ $$
 $$
 One then estimates $\beta_k = \eta^{(k)}(x_0)/k!$ for $k = 0,\ldots,p$ using a kernel-weighted local likelihood function
 \begin{equation}
-\ell(\boldsymbol{\beta}) = \sum_{i=1}^n \log\left\{ c\left(u_i, v_i ; g^{-1}( \boldsymbol{x}_{i}^T \boldsymbol{\beta}), \nu \right)\right\} K_h\left(\dfrac{x_i-x_0}{h}\right),
+\ell(\boldsymbol{\beta}) = \sum_{i=1}^n \log\left\{ c\left(u_i, v_i \mid g^{-1}( \boldsymbol{x}_{i}^T \boldsymbol{\beta}), \nu \right)\right\} K_h\left(\dfrac{x_i-x_0}{h}\right),
 (\#eq:locallik)
 \end{equation}
 where $(u_i, v_i, x_i)$ is the data for observation $i$, $\boldsymbol{x}_i = (1, x_i - x_0, (x_i - x_0)^2, \ldots, (x_i - x_0)^p)$, $\boldsymbol{\beta}= (\beta_0, \beta_1, \ldots, \beta_p)$, and $K_h(z)$ is a kernel function with bandwidth parameter $h > 0$.  Having maximized $\ell(\boldsymbol{\beta})$ in \@ref(eq:locallik), one estimates $\eta(x_0)$ by $\hat \eta(x_0) = \hat \beta_0$.  Usually, a linear fit with $p=1$ suffices to obtain a good estimate in practice.
@@ -122,7 +122,7 @@ where $(u_i, v_i, x_i)$ is the data for observation $i$, $\boldsymbol{x}_i = (1,
 
 - `CondiCopLocFit()`: For estimating the calibration function at a sequence of values $\boldsymbol{x}_0 = (x_{01}, \ldots, x_{0m})$.
 
-- `CondiCopSelect()`: For selecting a copula family and bandwidth parameter using leave-one-out cross-validation (LOO-CV) as described in @ACL2019.
+- `CondiCopSelect()`: For selecting a copula family and bandwidth parameter using leave-one-out cross-validation (LOO-CV) with subsampling as described in @ACL2019.
 
 In the following example, we illustrate the model selection/tuning and fitting steps for data generated from a Clayton copula with conditional Kendall $\tau$ displayed in Figure \@ref(fig:copcomp).  The CV metric for each combination of family/bandwidth are displayed in Figure \@ref(fig:select).
 
@@ -152,10 +152,10 @@ In the following example, we illustrate the model selection/tuning and fitting s
 ```{r copcomp, echo = FALSE, fig.height = 2, fig.width = 9, out.width = "100%", fig.cap = "True vs estimated conditional Kendall $\\tau$ using various methods."}
 ```
 
-In Figure \@ref(fig:copcomp), we compare the true conditional Kendall $\tau$ to estimates using each of the three conditional copula fitting packages **LocalCop**, **gamCopula**, and **CondCopulas**.  Note than **CondCopulas** does not provide a mechanism for family and bandwidth selection, so we used the ones provided by `LocalCop::CondiCopSelect()`.
+In Figure \@ref(fig:copcomp), we compare the true conditional Kendall $\tau$ to estimates using each of the three conditional copula fitting packages **LocalCop**, **gamCopula**, and **CondCopulas**.  In **gamCopula**, selection of the copula family smoothing splines is done using the generalized CV framework provided by the \R package **mgcv** [@wood17].  In **CondCopulas**, selection of the bandwidth parameter is done using K-fold cross-validation.  In this particular example, the sample size is not large enough for **gamCopula** to pick a sufficiently flexible spline basis, and **CondCopulas** picks a large bandwidth which oversmooths the data.
 
 # Acknowledgements
 
-We acknowledge funding support from the Natural Sciences and Engineering Research Council of Canada ()
+We acknowledge funding support from the Natural Sciences and Engineering Research Council of Canada Discovery Grants RGPIN-2020-06753 (Acar) and RGPIN-2020-04364 (Lysy).
 
 # References

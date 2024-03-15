@@ -114,11 +114,18 @@ tau_gam <- as.numeric(gam_pred$tau)
 ## ---- condfit
 
 # fit with CondCopulas
+cond_select <- CondCopulas::CKT.hCV.Kfolds(
+  observedX1 = udata[,1], observedX2 = udata[,2],
+  observedZ = X,
+  ZToEstimate = x0,
+  range_h = bandset,
+)
+
 cond_par <- CondCopulas::estimateParCondCopula(
   observedX1 = udata[,1], observedX2 = udata[,2],
   observedX3 = X, newX3 = x0,
   family = fam_opt,
-  h = band_opt,
+  h = cond_select$hCV,
   method = "mle"
 )
 tau_cond <- VineCopula::BiCopPar2Tau(
