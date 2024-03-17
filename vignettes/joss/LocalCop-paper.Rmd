@@ -55,6 +55,7 @@ library(kableExtra)  # for styling the copula table
 library(tidyr)       # for data manipulations
 library(dplyr)       #
 library(ggplot2)     # for plots
+library(ggpubr)      # 
 library(gamCopula)   # other packages for fitting
 library(CondCopulas) # conditional copula models
 ```
@@ -124,35 +125,95 @@ where $(u_i, v_i, x_i)$ is the data for observation $i$, $\boldsymbol{x}_i = (1,
 
 - `CondiCopSelect()`: For selecting a copula family and bandwidth parameter using leave-one-out cross-validation (LOO-CV) with subsampling as described in @ACL2019.
 
-In the following example, we illustrate the model selection/tuning and fitting steps for data generated from a Clayton copula with conditional Kendall $\tau$ displayed in Figure \@ref(fig:copcomp).  The CV metric for each combination of family/bandwidth are displayed in Figure \@ref(fig:select).
+In the following example, we illustrate the model selection/tuning and fitting steps for data generated from a Clayton copula with conditional Kendall $\tau$ displayed in Figure \@ref(fig:copcomp).  The CV metric for each combination of family and bandwidth are displayed in Figure \@ref(fig:select1-plot).
 
 ```{r libs}
 ```
 
-```{r dgm}
+```{r dgm1-setup}
+```
+```{r dgm1}
+<<dgm>>
+```
+```{r select1-precalc}
+<<select-precalc>>
+```
+```{r select1-calc, eval = params$do_calc, warning = FALSE}
+<<select-calc>>
+```
+```{r select1-save, include = FALSE, eval = params$do_calc}
+saveRDS(cvselect, file = "cvselect1.rds")
+```
+```{r select1-load, include = FALSE, eval = !params$do_calc}
+cvselect <- readRDS("cvselect1.rds")
+```
+```{r select1-plot, echo = FALSE, fig.height = 2, fig.width = 9, out.width = "100%", fig.cap = "Cross-validation metric for each combination of family and bandwidth."}
+<<select-plot>>
 ```
 
-```{r select-precalc}
+```{r locfit1}
+<<locfit>>
 ```
-```{r select-calc, eval = params$do_calc, warning = FALSE}
+```{r gamfit1, include = FALSE}
+<<gamfit>>
 ```
-```{r select-save, include = FALSE, eval = params$do_calc}
+```{r condfit1, include = FALSE}
+<<condfit>>
 ```
-```{r select-load, include = FALSE, eval = !params$do_calc}
+```{r sumfit1, include = FALSE}
+sumfit1 <- tibble(
+  x = x0,
+  True = BiCopEta2Tau(family = family, eta = eta_fun(x0)),
+  LocalCop = tau_loc,
+  gamCopula = tau_gam,
+  CondCopulas = tau_cond
+)
 ```
-```{r select, echo = FALSE, fig.height = 2, fig.width = 9, out.width = "100%", fig.cap = "Cross-validation metric for each combination of family and bandwidth."}
+```{r dgm2-setup, include = FALSE}
+```
+```{r dgm2}
+<<dgm>>
+```
+```{r select2-precalc}
+<<select-precalc>>
+```
+```{r select2-calc, eval = params$do_calc, warning = FALSE}
+<<select-calc>>
+```
+```{r select2-save, include = FALSE, eval = params$do_calc}
+saveRDS(cvselect, file = "cvselect2.rds")
+```
+```{r select2-load, include = FALSE, eval = !params$do_calc}
+cvselect <- readRDS("cvselect2.rds")
+```
+```{r locfit2}
+<<locfit>>
+```
+```{r gamfit2, include = FALSE}
+<<gamfit>>
+```
+```{r condfit2, include = FALSE}
+<<condfit>>
+```
+```{r sumfit2, include = FALSE}
+sumfit2 <- tibble(
+  x = x0,
+  True = BiCopEta2Tau(family = family, eta = eta_fun(x0)),
+  LocalCop = tau_loc,
+  gamCopula = tau_gam,
+  CondCopulas = tau_cond
+)
+```
+```{r copcomp, echo = FALSE, fig.height = 4.5, fig.width = 9, out.width = "100%", fig.cap = "True vs estimated conditional Kendall $\\tau$ using various methods."}
+<<plotfit>>
+
+plot1 <- plotfit(sumfit1) + ggtitle("(a) n = 300")
+plot2 <- plotfit(sumfit2) + ggtitle("(b) n = 1000")
+
+ggarrange(plot1, plot2, nrow = 2, common.legend = TRUE)
 ```
 
-```{r locfit}
-```
-```{r gamfit, include = FALSE}
-```
-```{r condfit, include = FALSE}
-```
-```{r copcomp, echo = FALSE, fig.height = 2, fig.width = 9, out.width = "100%", fig.cap = "True vs estimated conditional Kendall $\\tau$ using various methods."}
-```
-
-In Figure \@ref(fig:copcomp), we compare the true conditional Kendall $\tau$ to estimates using each of the three conditional copula fitting packages **LocalCop**, **gamCopula**, and **CondCopulas**.  In **gamCopula**, selection of the copula family smoothing splines is done using the generalized CV framework provided by the \R package **mgcv** [@wood17].  In **CondCopulas**, selection of the bandwidth parameter is done using K-fold cross-validation.  In this particular example, the sample size is not large enough for **gamCopula** to pick a sufficiently flexible spline basis, and **CondCopulas** picks a large bandwidth which oversmooths the data.
+In Figure \@ref(fig:copcomp), we compare the true conditional Kendall $\tau$ to estimates using each of the three conditional copula fitting packages **LocalCop**, **gamCopula**, and **CondCopulas**, for sample sizes $n = 300$ and $n = 1000$.  In **gamCopula**, selection of the copula family smoothing splines is done using the generalized CV framework provided by the \R package **mgcv** [@wood17].  In **CondCopulas**, selection of the bandwidth parameter is done using LOO-CV.  In this particular example, the sample size of $n = 300$ is not large enough for **gamCopula** to pick a sufficiently flexible spline basis, and **CondCopulas** picks a large bandwidth which oversmooths the data.  For the larger sample size $n = 1000$, the three methods exhibit similar accuracy.
 
 # Acknowledgements
 

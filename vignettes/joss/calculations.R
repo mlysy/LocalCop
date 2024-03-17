@@ -3,16 +3,33 @@
 library(LocalCop)   # local likelihood estimation
 library(VineCopula) # simulate copula data
 
-## ---- dgm
+## ---- dgm1-setup
+
 set.seed(2024)
 
 # simulation setting
 family <- 3                    # Clayton Copula
 n_obs <- 300                   # number of observations
-X <- sort(runif(n_obs))        # covariate values
 eta_fun <- function(x) {       # calibration function
   sin(5*pi*x) + cos(8*pi*x^2)
 }
+
+## ---- dgm2-setup
+
+set.seed(2024)
+
+# simulation setting
+family <- 3                    # Clayton Copula
+n_obs <- 1000                  # number of observations
+eta_fun <- function(x) {       # calibration function
+  sin(5*pi*x) + cos(8*pi*x^2)
+}
+
+
+## ---- dgm
+
+# simulate covariate values
+X <- sort(runif(n_obs))
 
 # simulate response data
 eta_true <- eta_fun(X)                     # calibration parameter eta(x)
@@ -58,7 +75,7 @@ saveRDS(cvselect, file = "cvselect.rds")
 
 cvselect <- readRDS("cvselect.rds")
 
-## ---- select
+## ---- select-plot
 
 # plot cv results
 fam_names <- c("Gaussian", "Student", "Clayton", "Gumbel", "Frank")
@@ -83,7 +100,6 @@ as_tibble(cvselect$cv) %>%
 # extract the selected family and bandwidth from cvselect
 cv_res <- cvselect$cv
 i_opt <- which.max(cv_res$cv)
-cv_res[i_opt,] # selected combination
 fam_opt <- cv_res[i_opt,]$family
 band_opt <- cv_res[i_opt,]$band
 
@@ -114,10 +130,10 @@ tau_gam <- as.numeric(gam_pred$tau)
 ## ---- condfit
 
 # fit with CondCopulas
-cond_select <- CondCopulas::CKT.hCV.Kfolds(
+cond_select <- CondCopulas::CKT.hCV.l1out(
   observedX1 = udata[,1], observedX2 = udata[,2],
   observedZ = X,
-  ZToEstimate = x0,
+  # ZToEstimate = x0,
   range_h = bandset,
 )
 
@@ -133,41 +149,32 @@ tau_cond <- VineCopula::BiCopPar2Tau(
   par = cond_par
 )
 
+## ---- plotfit
 
-## ---- copcomp
-
-# true tau(x)
-tau_true <- BiCopEta2Tau(family = family, eta = eta_fun(x0))
-
-# plot
-tibble(
-  x = x0,
-  True = tau_true,
-  LocalCop = tau_loc,
-  gamCopula = tau_gam,
-  CondCopulas = tau_cond
-) %>%
-  pivot_longer(cols = !x:True, names_to = "Estimator", values_to = "Est") %>%
-  pivot_longer(cols = c("True", "Est"), names_to = "Method", values_to = "tau") %>%
-  mutate(
-    Method = ifelse(Method == "Est", Estimator, Method),
-    Method = factor(Method, levels = c("True", "LocalCop", "gamCopula", "CondCopulas")),
-    Estimator = factor(Estimator, levels = c("LocalCop", "gamCopula", "CondCopulas"))
-  ) %>%
-  ggplot(aes(x = x, y = tau, group = Method)) +
-  geom_line(aes(color = Method), linewidth = 1) +
-  scale_color_manual(
-    name = expression("Kendall "*tau),
-    values = c("black", "red", "green4", "blue")
-  ) +
-  facet_wrap(. ~ Estimator) +
-  xlab(expression(x)) + ylab(expression(tau(x))) +
-  theme_minimal() +
-  theme(
-    legend.position = "right",
-    ## legend.title = element_blank(),
-    strip.text = element_blank()
-  )
+plotfit <- function(dat) {
+  dat %>%
+    pivot_longer(cols = !x:True, names_to = "Estimator", values_to = "Est") %>%
+    pivot_longer(cols = c("True", "Est"), names_to = "Method", values_to = "tau") %>%
+    mutate(
+      Method = ifelse(Method == "Est", Estimator, Method),
+      Method = factor(Method, levels = c("True", "LocalCop", "gamCopula", "CondCopulas")),
+      Estimator = factor(Estimator, levels = c("LocalCop", "gamCopula", "CondCopulas"))
+    ) %>%
+    ggplot(aes(x = x, y = tau, group = Method)) +
+    geom_line(aes(color = Method), linewidth = 1) +
+    scale_color_manual(
+      name = expression("Kendall "*tau),
+      values = c("black", "red", "green4", "blue")
+    ) +
+    facet_wrap(. ~ Estimator) +
+    xlab(expression(x)) + ylab(expression(tau(x))) +
+    theme_minimal() +
+    theme(
+      legend.position = "right",
+      ## legend.title = element_blank(),
+      strip.text = element_blank()
+    )
+}
 
 ## ---- scratch
 
