@@ -2,7 +2,7 @@
 
 *Elif Fidan Acar, Martin Lysy*
 
-*March 8, 2019*
+*March 18, 2024*
 
 ---
 
@@ -12,11 +12,17 @@ Implements a local likelihood estimator for the dependence parameter in bivariat
 
 ### Installation
 
-Install the **R** [**`devtools`**](https://CRAN.R-project.org/package=devtools) package and run
+To install the CRAN version (0.0.1):
+
+```r
+install.packages("LocalCop")
+```
+
+To install the latest development version: first install the [**`devtools`**](https://CRAN.R-project.org/package=devtools) package, then:
 ```{r}
 devtools::install_github("mlysy/LocalCop")
 ```
 
-### Examples
+### Usage
 
-After installing and loading the package, please see `?CondiCopSelect`.
+Please see package vignette: `vignette("LocalCop-vignette")`.
