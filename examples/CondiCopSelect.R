@@ -1,7 +1,7 @@
 # simulate data
-set.seed(2024)
+set.seed(123)
 family <- 5 # Frank copula
-n <- 2000
+n <- 1000
 x <- runif(n) # covariate values
 eta_fun <- function(x) 2*cos(12*pi*x) # copula dependence parameter
 eta_true <- eta_fun(x)
@@ -12,11 +12,11 @@ udata <- VineCopula::BiCopSim(n, family=family,
 # bandwidth and family selection
 bandset <- c(.01, .04, .1) # bandwidth set
 famset <- c(2, 5) # family set
-xind <- 200 # number of leave-one-out observations in CV likelihood calculation
+n_loo <- 100 # number of leave-one-out observations in CV likelihood calculation
 system.time({
   cvsel <- CondiCopSelect(u1= udata[,1], u2 = udata[,2],
                           x = x, family = famset, band = bandset,
-                          xind = xind)
+                          xind = n_loo)
 })
 
 # compare estimates to true value
