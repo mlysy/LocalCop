@@ -10,6 +10,7 @@ Fits a bivariate conditional copula \eqn{C(u_1, u_2 | \theta_x)}, where \eqn{\th
 }
 \examples{
 # simulate data
+set.seed(2024)
 family <- 5 # Frank copula
 n <- 2000
 x <- runif(n) # covariate values

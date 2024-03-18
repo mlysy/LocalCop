@@ -1,7 +1,7 @@
 Package: LocalCop
 Title: Local Likelihood Inference for Conditional Copula Models
-Version: 0.0.0.9002
-Date: 2024-03-13
+Version: 0.0.1
+Date: 2024-03-18
 Authors@R: 
     c(person(given = "Elif",
              family = "Acar",
@@ -19,7 +19,8 @@ URL: https://github.com/mlysy/LocalCop
 BugReports: https://github.com/mlysy/LocalCop/issues
 License: GPL-3
 Encoding: UTF-8
-LazyData: true
+Depends:
+    R (>= 3.5.0)
 LinkingTo: 
     TMB,
     RcppEigen

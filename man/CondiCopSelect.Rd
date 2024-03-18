@@ -60,6 +60,7 @@ Selects among a set of bandwidths and/or copula families the one which maximizes
 }
 \examples{
 # simulate data
+set.seed(2024)
 family <- 5 # Frank copula
 n <- 2000
 x <- runif(n) # covariate values

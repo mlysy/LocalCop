@@ -97,5 +97,6 @@ plot(x0, BiCopEta2Tau(family, eta = eta_fun(x0)), type = "l",
      xlab = expression(x), ylab = expression(tau(x)))
 lines(x0, BiCopEta2Tau(family, eta = eta_hat$eta), col = "red")
 lines(x0, BiCopEta2Tau(family, eta = eta_hat2$eta), col = "blue")
-legend("bottomright", legend = c("True", "optim_default", "Nelder-Mead"))
+legend("bottomright", fill = c("black", "red", "blue"),
+       legend = c("True", "optim_default", "Nelder-Mead"))
 }
