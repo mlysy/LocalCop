@@ -37,7 +37,7 @@ BiCopParInt <- function(family) {
   } else if(family==124 || family==134 || family==224 || family==234) {
     intv <- c(-500,-1)
   } else {
-    stop("Unknown family.")
+    stop("Unknown copula family.")
   }
   return(intv)
 }

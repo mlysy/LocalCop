@@ -16,7 +16,7 @@
 #' @param eta,eta2 Vector of parameters on the `eta` scale.  See **Details**.
 #' @param par,par2 Vector of parameters on the `par` scale.
 #' @param tau Vector of parameters on the `tau` scale.
-#' @details The copula family integer codes are identical to those of the \pkg{VineCopula} package. Currently, the only the following families are implemented:
+#' @details The copula family integer codes are identical to those of the \pkg{VineCopula} package. Currently, the following families are implemented:
 #' \describe{
 #'   \item{1}{Gaussian copula.}
 #'   \item{2}{Student-t copula.}
@@ -34,64 +34,50 @@
 #' @rdname ConvertPar
 #' @export
 BiCopEta2Par <- function(family, eta, eta2=0) {
-
-  if(family==1 || family==2){
+  if(family==1 || family==2) {
     par <- (exp(eta)-exp(-eta))/(exp(eta)+exp(-eta)) # [-1,1]
     ## par2 <- eta2
-  }
-  if(family==3 || family==13) {
+  } else if(family==3 || family==13) {
     par <- exp(eta) # [0,100]
     ## par2 <- eta2
-  }
-  if(family==4 || family==14 || family== 6 || family== 16) {
+  } else if(family==4 || family==14 || family== 6 || family== 16) {
     par <- exp(eta)+1 # [1,100]
     ## par2 <- eta2
-  }
-  if(family==5) {
+  } else if(family==5) {
     par <- eta # [-100,100]
     ## par2 <- eta2
-  }
- ## if(family==7 || family==17){par <- 7*exp(eta)/(exp(eta)+1); par2 <- eta2}  # [0,7]
-  if(family==7 || family==17) {
+  } else if(family==7 || family==17) {
     par <- 7*(pnorm(eta)) # [0,7]
     ## par2 <- eta2
-  }
-  if(family==8 || family==9 || family==18 || family==19) {
+  } else if(family==8 || family==9 || family==18 || family==19) {
     par <- 1+5*exp(eta)/(exp(eta)+1) # [1,6]
     ## par2 <- eta2
-  }
-  if(family==10 || family==20) {
+  } else if(family==10 || family==20) {
     par <- 1+7*exp(eta)/(exp(eta)+1) # [1,8]
     ## par2 <- eta2
-  }
-
-  if(family==23 || family==33) {
+  } else if(family==23 || family==33) {
     par <- -exp(eta) # [-100,0]
     ## par2 <- eta2
-  }
-  if(family==24 || family==34  || family==26 || family==36) {
+  } else if(family==24 || family==34  || family==26 || family==36) {
     par <-  -(exp(eta)+1) # [-100,-1]
     ## par2 <- eta2
-  }
-  if(family==27 || family==37) {
+  } else if(family==27 || family==37) {
     par <-  -(7*exp(eta)/(exp(eta)+1)) # [-7,0]
     ## par2 <- eta2
-  }
-  if(family==28 || family==29 || family==38 || family==39) {
+  } else if(family==28 || family==29 || family==38 || family==39) {
     par <-  -( 1+5*exp(eta)/(exp(eta)+1)) # [-6,-1]
     ## par2 <- eta2
-  }
-  if(family==30 || family==40) {
+  } else if(family==30 || family==40) {
     par <-  -(1+7*exp(eta)/(exp(eta)+1)) # [-8,-1]
     ## par2 <- eta2
-  }
-  if(family==104 || family==114 || family==204 || family==214) {
+  } else if(family==104 || family==114 || family==204 || family==214) {
     par <- exp(eta)+1 # [1,infty]
     ## par2 <- eta2
-  }
-  if(family==124 || family==134 || family==224 || family==234) {
+  } else if(family==124 || family==134 || family==224 || family==234) {
     par <- -(exp(eta)+1) # [-infty,-1]
     ## par2 <- eta2
+  } else {
+    stop("Unknown copula family.")
   }
   par2 <- eta2
   return(list(par=par, par2=par2))
@@ -108,59 +94,47 @@ BiCopPar2Eta <- function(family, par, par2=0) {
   if(family==1 || family==2) {
     eta <- 0.5*log((1+par)/(1-par))
     ## eta2 <-par2
-  }
-  if(family==3 || family==13) {
+  } else if(family==3 || family==13) {
     eta <- log(par)
     ## eta2 <-par2
-  }
-  if(family==4 || family==14 || family== 6) {
+  } else if(family==4 || family==14 || family== 6) {
     eta <- log(par-1)
     ## eta2 <-par2
-  }
-  if(family==5) {
+  } else if(family==5) {
     eta <- par
     ## eta2 <-par2
-  }
- ## if(family==7 || family==17){eta <- log(par/(7-par)) ; eta2 <-par2}
-  if(family==7 || family==17) {
+  } else if(family==7 || family==17) {
     eta <- qnorm(par/7)
     ## eta2 <-par2
-  }
-  if(family==8 || family==9 || family==18 || family==19) {
+  } else if(family==8 || family==9 || family==18 || family==19) {
     eta <- log((par-1) / (6-par))
     ## eta2 <-par2
-  }
-  if(family==10 || family==20) {
+  } else if(family==10 || family==20) {
     eta <- log((par-1) / (8-par))
     ## eta2 <-par2
-  }
-  if(family==23 || family==33) {
+  } else if(family==23 || family==33) {
     eta <- log(-par)
     ## eta2 <-par2
-  }
-  if(family==24 || family==34  || family==26 || family==36) {
+  } else if(family==24 || family==34  || family==26 || family==36) {
     eta <- log(-(par-1))
     ## eta2 <-par2
-  }
-  if(family==27 || family==37) {
+  } else if(family==27 || family==37) {
     eta <- log(-par/(7+par))
     ## eta2 <-par2
-  }
-  if(family==28 || family==29 || family==38 || family==39) {
+  } else if(family==28 || family==29 || family==38 || family==39) {
     eta <- log((-par-1) / (6+par))
     ## eta2 <-par2
-  }
-  if(family==30 || family==40) {
+  } else if(family==30 || family==40) {
     eta <- log((-par-1) / (8+par))
     ## eta2 <-par2
-  }
-  if(family==104 || family==114 || family==204 || family==214) {
+  } else if(family==104 || family==114 || family==204 || family==214) {
     eta <- log(par-1)
     ## eta2 <-par2
-  }
-  if(family==124 || family==134 || family==224 || family==234) {
+  } else if(family==124 || family==134 || family==224 || family==234) {
     eta <- log(-(par-1))
     ## eta2 <-par2
+  } else {
+    stop("Unknown copula family.")
   }
   eta2 <- par2
   return(list(eta = eta, eta2 = eta2))
@@ -174,7 +148,7 @@ BiCopPar2Eta <- function(family, par, par2=0) {
 
 #' @rdname ConvertPar
 #' @export
-BiCopEta2Tau <- function(family, eta, eta2=0){
+BiCopEta2Tau <- function(family, eta, eta2=0) {
   pars <- BiCopEta2Par(family, eta, eta2)
   tau  <- VineCopula::BiCopPar2Tau(family, pars$par, pars$par2)
   return(tau)
