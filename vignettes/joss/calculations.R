@@ -29,10 +29,10 @@ eta_fun <- function(x) {       # calibration function
 ## ---- dgm
 
 # simulate covariate values
-X <- sort(runif(n_obs))
+x <- sort(runif(n_obs))
 
 # simulate response data
-eta_true <- eta_fun(X)                     # calibration parameter eta(x)
+eta_true <- eta_fun(x)                     # calibration parameter eta(x)
 par_true <- BiCopEta2Par(family = family,  # copula parameter theta(x)
                          eta = eta_true)
 udata <- VineCopula::BiCopSim(n_obs, family = family, par = par_true)
@@ -41,10 +41,10 @@ udata <- VineCopula::BiCopSim(n_obs, family = family, par = par_true)
 
 # plot Kendall tau
 tibble(
-  X = X,
+  x = x,
   tau = VineCopula::BiCopPar2Tau(family, par = par_true)
 ) %>%
-  ggplot(aes(x = X, y = tau)) +
+  ggplot(aes(x = x, y = tau)) +
   geom_line() +
   ylim(c(0, 1)) +
   xlab(expression(x)) + ylab(expression(tau(x)))
@@ -63,7 +63,7 @@ n_loo <- 100                   # number of LOO-CV observations
 
 # calculate cv for each combination of family and bandwidth
 cvselect <- CondiCopSelect(u1= udata[,1], u2 = udata[,2],
-                           X = X, xind = n_loo,
+                           x = x, xind = n_loo,
                            kernel = kernel, degree = degree,
                            family = famset, band = bandset)
 
@@ -106,7 +106,7 @@ band_opt <- cv_res[i_opt,]$band
 # calculate eta(x) on a grid of values
 x0 <- seq(0, 1, by = 0.01)
 copfit <- CondiCopLocFit(u1 = udata[,1], u2 = udata[,2],
-                         X = X, x = x0,
+                         x = x, x0 = x0,
                          kernel = kernel, degree = degree,
                          family = fam_opt, band = band_opt)
 # convert eta to Kendall tau
@@ -117,12 +117,12 @@ tau_loc <- BiCopEta2Tau(copfit$eta, family= fam_opt)
 # fit with gamCopula
 gam_fit <- gamCopula::gamBiCopSelect(
   udata = udata[,1:2],
-  smooth.covs = data.frame(X = X)
+  smooth.covs = data.frame(x = x)
 )
 gam_res <- gam_fit$res
 gam_pred <- gamCopula::gamBiCopPredict(
   object = gam_res,
-  newdata = data.frame(X = x0),
+  newdata = data.frame(x = x0),
   target = "tau"
 )
 tau_gam <- as.numeric(gam_pred$tau)
@@ -132,14 +132,14 @@ tau_gam <- as.numeric(gam_pred$tau)
 # fit with CondCopulas
 cond_select <- CondCopulas::CKT.hCV.l1out(
   observedX1 = udata[,1], observedX2 = udata[,2],
-  observedZ = X,
+  observedZ = x,
   # ZToEstimate = x0,
   range_h = bandset,
 )
 
 cond_par <- CondCopulas::estimateParCondCopula(
   observedX1 = udata[,1], observedX2 = udata[,2],
-  observedX3 = X, newX3 = x0,
+  observedX3 = x, newX3 = x0,
   family = fam_opt,
   h = cond_select$hCV,
   method = "mle"
@@ -179,15 +179,15 @@ plotfit <- function(dat) {
 ## ---- scratch
 
 xi <- .26
-wgt <- KernWeight(X = X, x = xi, band = band_opt,
+wgt <- KernWeight(x = x, x0 = xi, band = band_opt,
                   kernel = KernEpa, band_type = "constant")
 adfun <- CondiCopLocFun(
   u1 = udata[,1],
   u2 = udata[,2],
   wgt = wgt,
   family = fam_opt,
-  X = X,
-  x = xi,
+  x = x,
+  x0 = xi,
   degree = 0,
   eta = c(0, 0),
   nu = 1
@@ -200,8 +200,8 @@ CondiCopLocFit(
   u1 = udata[,1],
   u2 = udata[,2],
   family = fam_opt,
-  X = X,
-  x = xi,
+  x = x,
+  x0 = xi,
   degree = 0,
   band = band_opt,
   optim_fun = optim_fun

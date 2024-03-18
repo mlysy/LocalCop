@@ -24,7 +24,7 @@ test_that("LocLikFun is same in VineCopula and TMB", {
       ll_r <- sum(args$wgt * log(ll_r))
       # loglik in TMB
       ll_tmb <- CondiCopLocFun(u1 = args$udata[,1], u2 = args$udata[,2],
-                               family = family, X = args$X, x = args$x,
+                               family = family, x = args$x, x0 = args$x0,
                                wgt = args$wgt, eta = args$eta, nu = args$epar2)
       ll_tmb <- -ll_tmb$fn(args$eta)
       expect_equal(ll_r, ll_tmb)

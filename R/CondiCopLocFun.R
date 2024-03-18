@@ -5,8 +5,8 @@
 #' @template param-u1
 #' @template param-u2
 #' @template param-family
-#' @template param-X
-#' @param x Scalar covariate value at which to evaluate the local likelihood.  Does not have to be a subset of `X`.
+#' @template param-x
+#' @param x0 Scalar covariate value at which to evaluate the local likelihood.  Does not have to be a subset of `x`.
 #' @param wgt Vector of positive kernel weights.
 #' @template param-degree
 #' @param eta Value of the copula dependence parameter.  Scalar or vector of length two, depending on whether `degree` is 0 or 1.
@@ -15,7 +15,7 @@
 #' @example examples/CondiCopLocFun.R
 #' @export
 CondiCopLocFun <- function(u1, u2, family,
-                           X, x, wgt, degree = 1,
+                           x, x0, wgt, degree = 1,
                            eta, nu) {
   if(!family %in% 1:5) {
     stop("Unsupported copula family (must be integer between 1-5).")
@@ -31,7 +31,7 @@ CondiCopLocFun <- function(u1, u2, family,
   # data input
   data <- list(model = "LocalLikelihood",
                y1 = u1[wpos], y2 = u2[wpos],
-               wgt = wgt[wpos], xc = X[wpos]-x,
+               wgt = wgt[wpos], xc = x[wpos]-x0,
                family = family, nu = nu[wpos])
   parameters <- list(beta = eta)
   # convert degree to TMB::map
@@ -51,26 +51,4 @@ CondiCopLocFun <- function(u1, u2, family,
   )
 }
 
-#--- helper function (not exported) --------------------------------------------
 
-# convert degree to integer
-.format_degree <- function(degree) {
-  if(!degree %in% 0:1) stop("degree must be 0 or 1.")
-  ## degree <- match.arg(degree)
-  ## return(as.numeric(degree == "linear"))
-}
-
-## #' Local likelihood estimation at a single covariate value.
-## #'
-## #' @inheritParams CondiCopLocFun
-## #' @return List with elements \code{eta} and \code{loglik}.
-## #' @export
-## CondiCopLocFit1 <- function(u1, u2, family,
-##                             X, x, wgt, degree = c("linear", "constant"),
-##                             eta, nu = 0) {
-##   obj <- CondiCopLocFun(u1 = u1, u2 = u2, family = family,
-##                         z = z, wgt = wgt, degree = degree, eta = eta, nu = nu)
-##   opt <- optim(par = obj$par, fn = obj$fn, gr = obj$gr,
-##                method = "BFGS")
-##   return(list(eta = as.numeric(opt$par), loglik = -opt$value))
-## }

@@ -37,10 +37,10 @@
 #' Get bandwidth set.
 #'
 #' @noRd
-.get_band <- function(X, nband) {
-  dx <- diff(sort(X),1)
+.get_band <- function(x, nband) {
+  dx <- diff(sort(x),1)
   h.min <- max(dx)
-  h.max <- max(X)-min(X)
+  h.max <- max(x)-min(x)
   # get nband+2 values and remove smallest two
   log.seq <- seq(from=log(h.min), to=log(h.max), length.out = (nband+2))
   band <- round(exp(log.seq),5)
@@ -61,7 +61,7 @@
   opt <- stats::nlminb(start = obj$par,
                        objective = obj$fn,
                        gradient = obj$gr)
-  # only need constant term since xc = 0 at x = X[ii]
+  # only need constant term since xc = 0 at x0 = x[ii]
   return(opt$par[1])
 }
 
@@ -96,3 +96,25 @@
   }
   pareval
 }
+
+# convert degree to integer
+.format_degree <- function(degree) {
+  if(!degree %in% 0:1) stop("degree must be 0 or 1.")
+  ## degree <- match.arg(degree)
+  ## return(as.numeric(degree == "linear"))
+}
+
+## #' Local likelihood estimation at a single covariate value.
+## #'
+## #' @inheritParams CondiCopLocFun
+## #' @return List with elements \code{eta} and \code{loglik}.
+## #' @export
+## CondiCopLocFit1 <- function(u1, u2, family,
+##                             X, x0, wgt, degree = c("linear", "constant"),
+##                             eta, nu = 0) {
+##   obj <- CondiCopLocFun(u1 = u1, u2 = u2, family = family,
+##                         z = z, wgt = wgt, degree = degree, eta = eta, nu = nu)
+##   opt <- optim(par = obj$par, fn = obj$fn, gr = obj$gr,
+##                method = "BFGS")
+##   return(list(eta = as.numeric(opt$par), loglik = -opt$value))
+## }

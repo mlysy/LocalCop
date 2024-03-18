@@ -1,5 +1,7 @@
 ---
 title: 'LocalCop: An R package for local likelihood inference for conditional copulas'
+params:
+  do_calc: FALSE
 tags:
   - R
   - C++
@@ -36,8 +38,6 @@ output:
 csl: apa.csl
 journal: JOSS
 link-citations: true
-params:
-  do_calc: FALSE
 ---
 
 <!-- !!! ---- WARNING ---- !!!

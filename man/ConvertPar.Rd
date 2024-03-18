@@ -32,7 +32,7 @@ Vector of converted parameters.
 Conversions between various bivariate copula parametrizations.
 }
 \details{
-The copula family integer codes are identical to those of the \pkg{VineCopula} package. Currently, the only the following families are implemented:
+The copula family integer codes are identical to those of the \pkg{VineCopula} package. Currently, the following families are implemented:
 \describe{
 \item{1}{Gaussian copula.}
 \item{2}{Student-t copula.}

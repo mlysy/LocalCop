@@ -6,7 +6,7 @@ output:
   bookdown::html_vignette2:
     toc: true
 author: Elif F. Acar, Martin Lysy
-date: 2024-03-11
+date: 2024-03-17
 bibliography: references.bib 
 link-citations: true 
 vignette: >
@@ -81,11 +81,11 @@ The code below shows how to simulate data from model \@ref(eq:copmod) using the 
 set.seed(2024) 
 family <- 4  # Gumbel Copula 
 n <- 1000    # number of observations
-X <- sort(runif(n))  # covariate values
+x <- sort(runif(n))  # covariate values
 eta_fun <- function(x) sin(6*pi*x) # calibration function
 
 # simulate data
-eta_true <- eta_fun(X)
+eta_true <- eta_fun(x)
 par_true <- BiCopEta2Par(family = family, eta = eta_true) # copula parameter
 udata <- VineCopula::BiCopSim(n, family = family, par = par_true$par)
 
@@ -128,8 +128,8 @@ band <- 0.1
 degree <- 1
 kernel <- KernEpa # Epanichov kernel (default value)
 fit1 <- CondiCopLocFit(
-  u1 = udata[,1], u2 = udata[,2], X = X,
-  x = x0,
+  u1 = udata[,1], u2 = udata[,2], x = x,
+  x0 = x0,
   family = family, 
   degree = degree,
   kernel = kernel,
@@ -146,8 +146,8 @@ Repeating this procedure over a grid of covariate values produces an estimate $\
 ```{r localseq, message=FALSE, fig.height=3.5, warning=FALSE, fig.cap="Conditional Kendall $\\tau$ estimates under the Gumbel copula using bandwidth $h=0.1$."}
 x0 <- seq(0, 1, by=0.02)
 fitseq <- CondiCopLocFit(
-  u1 = udata[,1], u2 = udata[,2], X = X, 
-  x = x0,
+  u1 = udata[,1], u2 = udata[,2], x = x, 
+  x0 = x0,
   family = family, 
   degree = degree,
   kernel = kernel,
@@ -195,7 +195,7 @@ n_loo <- 100  # number of leave-one-out observations in CV likelihood calculatio
 ```{r select1-calc, eval = params$do_calc, message=FALSE}
 system.time({
   cvselect1 <- CondiCopSelect(
-    u1 = udata[,1], u2 = udata[,2], X = X,
+    u1 = udata[,1], u2 = udata[,2], x = x,
     family = famset, 
     degree = degree,
     kernel = kernel,
@@ -221,7 +221,7 @@ The leave-one-out cross-validation for the full sample is provided below for com
 ```{r select2-calc, eval = params$do_calc, message=FALSE}
 system.time({
   cvselect2 <- CondiCopSelect(
-    u1 = udata[,1], u2 = udata[,2], X = X,
+    u1 = udata[,1], u2 = udata[,2], x = x,
     family = famset, 
     degree = degree,
     kernel = kernel,
@@ -273,8 +273,8 @@ Figure \@ref(fig:localseq2) displays the true and estimated conditional Kendall 
 x0 <- seq(0, 1, by=0.01)
 tau_est <- sapply(1:5, function(fam_id) {
   fit <- CondiCopLocFit(
-    u1 = udata[,1], u2 = udata[,2], X = X,
-    x = x0,
+    u1 = udata[,1], u2 = udata[,2], x = x,
+    x0 = x0,
     family = fam_id, 
     degree = degree,
     kernel = kernel,

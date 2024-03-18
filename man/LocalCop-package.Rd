@@ -12,9 +12,9 @@ Fits a bivariate conditional copula \eqn{C(u_1, u_2 | \theta_x)}, where \eqn{\th
 # simulate data
 family <- 5 # Frank copula
 n <- 2000
-X <- runif(n) # covariate values
+x <- runif(n) # covariate values
 eta_fun <- function(x) 2*cos(12*pi*x) # copula dependence parameter
-eta_true <- eta_fun(X)
+eta_true <- eta_fun(x)
 par_true <- BiCopEta2Par(family, eta = eta_true)
 udata <- VineCopula::BiCopSim(n, family=family,
                               par = par_true$par)
@@ -25,7 +25,7 @@ famset <- c(2, 5) # family set
 xind <- 200 # number of leave-one-out observations in CV likelihood calculation
 system.time({
   cvsel <- CondiCopSelect(u1= udata[,1], u2 = udata[,2],
-                          X = X, family = famset, band = bandset,
+                          x = x, family = famset, band = bandset,
                           xind = xind)
 })
 
