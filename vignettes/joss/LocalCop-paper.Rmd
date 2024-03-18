@@ -34,7 +34,6 @@ output:
     base_format: rticles::joss_article
     toc: false
     keep_md: false
-# output: rticles::joss_article
 csl: apa.csl
 journal: JOSS
 link-citations: true
@@ -42,7 +41,9 @@ link-citations: true
 
 <!-- !!! ---- WARNING ---- !!!
 
-In order to compile this file, you must run `source("joss_article2.R")` first, due to a bug in `rticles::joss_article()`.
+~~In order to compile this file, you must run `source("joss_article2.R")` first, due to a bug in `rticles::joss_article()`.~~
+
+**Update:** The bug has now been fixed on the development version of [**rticles**](https://github.com/rstudio/rticles).  In order to compile the manuscript, it now suffices to have this version installed: `remotes::install_github('rstudio/rticles', upgrade = TRUE)`.
 
 -->
 
