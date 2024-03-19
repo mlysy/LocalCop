@@ -9,6 +9,7 @@
 #' @template param-kernel
 #' @param band Kernel bandwidth parameter (positive scalar).  See **Details.**
 #' @param band_type  A character string specifying the type of bandwidth: either "constant" or "variable".  See **Details**.
+#' @return A vector of nonnegative kernel weights of the same length as `x`.
 #' @details For the constant bandwidth of size `band = h`, the weights are calculated as
 #' ```
 #' wgt = kernel((x-x0) / h) / h

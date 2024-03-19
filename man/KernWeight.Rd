@@ -17,6 +17,9 @@ KernWeight(x, x0, band, kernel = KernEpa, band_type = "constant")
 
 \item{band_type}{A character string specifying the type of bandwidth: either "constant" or "variable".  See \strong{Details}.}
 }
+\value{
+A vector of nonnegative kernel weights of the same length as \code{x}.
+}
 \description{
 Calculate local likelihood kernel weights.
 }

@@ -110,7 +110,8 @@ plot_fun <- function(fam) {
                          " = ", signif(cvsel$cv$cv[famind], 3)))
 }
 
-par(mfrow = c(1,2))
+oldpar <- par(mfrow = c(1,2))
 plot_fun(2)
 plot_fun(5)
+par(oldpar)
 }
