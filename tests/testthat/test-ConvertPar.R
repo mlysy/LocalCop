@@ -7,7 +7,7 @@ test_that("Conversion eta => tau/par => eta gives original value.", {
   for(ii in 1:nreps) {
     # parameters on the eta scale
     n <- sample(1:10, 1)
-    etas <- list(eta = rnorm(n, sd = 1),
+    etas <- list(eta = rnorm(n, sd = 1/5),
                  eta2 = runif(n, 2, 20))
     family <- sample(1:5, 1) # TODO: implement more families
     type <- sample(c("par", "tau"), 1)

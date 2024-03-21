@@ -8,8 +8,8 @@ CondiCopLocFit(
   u1,
   u2,
   family,
-  X,
   x,
+  x0,
   nx = 100,
   degree = 1,
   eta,
@@ -25,13 +25,13 @@ CondiCopLocFit(
 
 \item{u2}{Vector of second uniform response.}
 
-\item{family}{An integer defining the bivariate copula family to use.  See \code{\link{ConvertPar}}.}
+\item{family}{An integer defining the bivariate copula family to use.  See \code{\link[=ConvertPar]{ConvertPar()}}.}
 
-\item{X}{Vector of observed covariate values.}
+\item{x}{Vector of observed covariate values.}
 
-\item{x}{Vector of covariate values within \code{range(X)} at which to fit the local likelihood.  Does not have to be a subset of \code{X}.}
+\item{x0}{Vector of covariate values within \code{range(x)} at which to fit the local likelihood.  Does not have to be a subset of \code{x}.}
 
-\item{nx}{If \code{x} is missing, defaults to \code{nx} equally spaced values in \code{range(X)}.}
+\item{nx}{If \code{x0} is missing, defaults to \code{nx} equally spaced values in \code{range(x)}.}
 
 \item{degree}{Integer specifying the polynomial order of the local likelihood function.  Currently only 0 and 1 are supported.}
 
@@ -39,19 +39,19 @@ CondiCopLocFit(
 
 \item{nu}{Optional initial value of second copula parameter, if it exists.  If missing and required, will be estimated unconditionally by \code{\link[VineCopula:BiCopEst]{VineCopula::BiCopEst()}}.  If provided and required, will not be estimated.}
 
-\item{kernel}{Kernel function to use.  Should accept a numeric vector parameter and return a non-negative numeric vector of the same length.  See \code{\link{KernFun}}.}
+\item{kernel}{Kernel function to use.  Should accept a numeric vector parameter and return a non-negative numeric vector of the same length.  See \code{\link[=KernFun]{KernFun()}}.}
 
-\item{band}{Kernal bandwidth parameter (positive scalar).  See \code{\link{KernWeight}}.}
+\item{band}{Kernal bandwidth parameter (positive scalar).  See \code{\link[=KernWeight]{KernWeight()}}.}
 
 \item{optim_fun}{Optional specification of local likelihood optimization algorithm.  See \strong{Details}.}
 
-\item{cl}{Optional parallel cluster created with \code{\link[parallel:makeCluster]{parallel::makeCluster()}}, in which case optimization for each element of \code{x} will be done in parallel on separate cores.  If \code{cl == NA}, computations are run serially.}
+\item{cl}{Optional parallel cluster created with \code{\link[parallel:makeCluster]{parallel::makeCluster()}}, in which case optimization for each element of \code{x0} will be done in parallel on separate cores.  If \code{cl == NA}, computations are run serially.}
 }
 \value{
 List with the following elements:
 \describe{
-\item{\code{x}}{The vector of covariate values at which the local likelihood is fit.}
-\item{\code{eta}}{The vector of estimated dependence parameters of the same length as \code{x}.}
+\item{\code{x}}{The vector of covariate values \code{x0} at which the local likelihood is fit.}
+\item{\code{eta}}{The vector of estimated dependence parameters of the same length as \code{x0}.}
 \item{\code{nu}}{The scalar value of the estimated (or provided) second copula parameter.}
 }
 }
@@ -59,45 +59,44 @@ List with the following elements:
 Estimate the bivariate copula dependence parameter \code{eta} at multiple covariate values.
 }
 \details{
-By default, optimization is performed by taking a few steps with the gradient-free simplex algorithm \code{stats::optim(method = "Nelder-Mead")} for stability, then continuing with the quasi-Newton algorithm \code{stats::optim(method = "BFGS")}, which uses gradient information provided by automatic differentiation (AD) as implemented by \pkg{TMB}.
+By default, optimization is performed with the quasi-Newton algorithm provided by \code{\link[stats:nlminb]{stats::nlminb()}}, which uses gradient information provided by automatic differentiation (AD) as implemented by \pkg{TMB}.
 
-If the default method is to be overridden, \code{optim_fun} should be provided as a function taking a single argument corresponding to the output of \code{\link[=CondiCopLocFun]{CondiCopLocFun()}}, and return a scalar value corresponding to the estimate of \code{eta} at a given covariate value in \code{x}.  Note that \pkg{TMB} calculates the \emph{negative} local (log)likelihood, such that the objective function is to be minimized.  See \strong{Examples}.
+If the default method is to be overridden, \code{optim_fun} should be provided as a function taking a single argument corresponding to the output of \code{\link[=CondiCopLocFun]{CondiCopLocFun()}}, and return a scalar value corresponding to the estimate of \code{eta} at a given covariate value in \code{x0}.  Note that \pkg{TMB} calculates the \emph{negative} local (log)likelihood, such that the objective function is to be minimized.  See \strong{Examples}.
 }
 \examples{
 # simulate data
 family <- 5 # Frank copula
 n <- 1000
-X <- runif(n) # covariate values
+x <- runif(n) # covariate values
 eta_fun <- function(x) 2*cos(12*pi*x) # copula dependence parameter
-eta_true <- eta_fun(X)
+eta_true <- eta_fun(x)
 par_true <- BiCopEta2Par(family, eta = eta_true)
 udata <- VineCopula::BiCopSim(n, family=family,
                               par = par_true$par)
 
 # local likelihood estimation
-x <- seq(min(X), max(X), len = 100)
+x0 <- seq(min(x), max(x), len = 100)
 band <- .02
 system.time({
   eta_hat <- CondiCopLocFit(u1 = udata[,1], u2 = udata[,2],
-                            family = family, X = X, x = x, band = band)
+                            family = family, x = x, x0 = x0, band = band)
 })
 
-# custom optimization routine using stats::nlminb
-# (somewhat faster but less stable/accurate than default)
-optim_fast <- function(obj) {
-  opt <- stats::nlminb(start = obj$par, objective = obj$fn,
-                       gradient = obj$gr)
-  return(opt$par[1]) # always return constant term even if degree == 1
+# custom optimization routine using stats::optim (gradient-free)
+my_optim <- function(obj) {
+  opt <- stats::optim(par = obj$par, fn = obj$fn, method = "Nelder-Mead")
+  return(opt$par[1]) # always return constant term, even if degree > 0
 }
 system.time({
   eta_hat2 <- CondiCopLocFit(u1 = udata[,1], u2 = udata[,2],
-                             family = family, X = X, x = x, band = band,
-                             optim_fun = optim_fast)
+                             family = family, x = x, x0 = x0, band = band,
+                             optim_fun = my_optim)
 })
 
-plot(x, BiCopEta2Tau(family, eta = eta_fun(x)), type = "l",
+plot(x0, BiCopEta2Tau(family, eta = eta_fun(x0)), type = "l",
      xlab = expression(x), ylab = expression(tau(x)))
-lines(x, BiCopEta2Tau(family, eta = eta_hat$eta), col = "red")
-lines(x, BiCopEta2Tau(family, eta = eta_hat2$eta), col = "blue")
-legend("bottomright", legend = c("True", "optim_default", "optim_fast"))
+lines(x0, BiCopEta2Tau(family, eta = eta_hat$eta), col = "red")
+lines(x0, BiCopEta2Tau(family, eta = eta_hat2$eta), col = "blue")
+legend("bottomright", fill = c("black", "red", "blue"),
+       legend = c("True", "optim_default", "Nelder-Mead"))
 }

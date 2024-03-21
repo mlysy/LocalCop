@@ -53,15 +53,17 @@ namespace LocalCop {
   /// @return Value of the copula PDF.
   template <class Type>
   Type dgumbel(Type u1, Type u2, Type theta, int give_log=0) {
-    Type term1 = log(u1);
-    Type term2 = log(u2);
-    Type term3 = pow(-term1, theta) + pow(-term2, theta);
-    Type term4 = Type(1.0) / theta;
-    Type term5 = theta - Type(1.0);
-    Type term6 = term4 - Type(1.0);
-    Type logans = term5 * (log(term1) + log(term1)) + Type(2.0) * term6 * log(term3) - pow(term3, term4) - term1 - term2;
-    logans += log(Type(1.0) + (theta - Type(1.0)) * pow(term3, -term4))
-    if(give_log) return logans; else return exp(logans);
+    Type log_u1 = log(u1);
+    Type log_u2 = log(u2);
+    Type loglog_u1 = log(-log_u1);
+    Type loglog_u2 = log(-log_u2);
+    Type log_theta = log(theta - 1.0);
+    Type lsum = logspace_add(theta * loglog_u1, theta * loglog_u2);
+    Type ans = (theta - 1.0) * (loglog_u1 + loglog_u2);
+    ans += (2.0 * (1.0/theta - 1.0)) * lsum - exp(1.0/theta * lsum);
+    ans += log_theta + logspace_add(-log_theta,  -1.0/theta * lsum);
+    ans -= log_u1 + log_u2;
+    if(give_log) return ans; else return exp(ans);
   }
   VECTORIZE4_ttti(dgumbel)
 

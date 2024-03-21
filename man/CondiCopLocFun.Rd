@@ -4,18 +4,18 @@
 \alias{CondiCopLocFun}
 \title{Create a \pkg{TMB} local likelihood function.}
 \usage{
-CondiCopLocFun(u1, u2, family, X, x, wgt, degree = 1, eta, nu)
+CondiCopLocFun(u1, u2, family, x, x0, wgt, degree = 1, eta, nu)
 }
 \arguments{
 \item{u1}{Vector of first uniform response.}
 
 \item{u2}{Vector of second uniform response.}
 
-\item{family}{An integer defining the bivariate copula family to use.  See \code{\link{ConvertPar}}.}
+\item{family}{An integer defining the bivariate copula family to use.  See \code{\link[=ConvertPar]{ConvertPar()}}.}
 
-\item{X}{Vector of observed covariate values.}
+\item{x}{Vector of observed covariate values.}
 
-\item{x}{Scalar covariate value at which to evaluate the local likelihood.  Does not have to be a subset of \code{X}.}
+\item{x0}{Scalar covariate value at which to evaluate the local likelihood.  Does not have to be a subset of \code{x}.}
 
 \item{wgt}{Vector of positive kernel weights.}
 
@@ -23,7 +23,7 @@ CondiCopLocFun(u1, u2, family, X, x, wgt, degree = 1, eta, nu)
 
 \item{eta}{Value of the copula dependence parameter.  Scalar or vector of length two, depending on whether \code{degree} is 0 or 1.}
 
-\item{nu}{Value of the other copula parameter.  Needn't be supplied if it doesn't exist.}
+\item{nu}{Value of the other copula parameter.  Scalar or vector of same length as \code{u1}.  Ignored if \code{family != 2}.}
 }
 \value{
 A list as returned by a call to \code{\link[TMB:MakeADFun]{TMB::MakeADFun()}}.  In particular, this contains elements \code{fun} and \code{gr} for the \emph{negative} local likelihood and its gradient with respect to \code{eta}.
@@ -47,7 +47,7 @@ udata <- VineCopula::BiCopSim(n, family = family, par = rho, par2 = nu)
 # parameter conversion: equivalent to BiCopPar2Eta(family = 2, ...)
 rho2eta <- function(rho) .5 * log((1+rho)/(1-rho))
 nll_obj <- CondiCopLocFun(u1 = udata[,1], u2 = udata[,2], family = family,
-                          X = rep(0, n), x = 0, # centered covariate X - x == 0
+                          x = rep(0, n), x0 = 0, # centered covariate x - x0 == 0
                           wgt = rep(1, n), # unweighted
                           degree = 0, # zero-order fit
                           eta = c(rho2eta(rho), 0),
@@ -58,11 +58,7 @@ stucop_lik <- function(rho) {
   -nll_obj$fn(c(rho2eta(rho), 0))
 }
 
-# compare to VineCopula.  since LocalCop considers nu to be fixed, its student-t
-# likelihood differs from that of VineCopula in two ways:
-# 1. qt(u1, df = nu) and qt(u2, df = nu) only need to be calculated once.
-# 2. nu-only terms are dropped form LocalCop likelihood.
-# these factors contribute to the difference in speed observed below.
+# compare to VineCopula.
 rhovec <- runif(50, -1, 1)
 system.time({
   ll1 <- sapply(rhovec, stucop_lik) # LocalCop
@@ -71,12 +67,11 @@ system.time({
   ll2 <- sapply(rhovec, function(rho) {
     # VineCopula
     sum(log(VineCopula::BiCopPDF(u1 = udata[,1], u2 = udata[,2],
-                                        family = family,
-                                        par = rho, par2 = nu)))
+                                 family = family,
+                                 par = rho, par2 = nu)))
   })
 })
 
 # difference between the two
-range(ll1 -
-      (ll2 - n * (lgamma(.5*(nu+2)) + lgamma(.5*nu) - 2*lgamma(.5*(nu+1)))))
+range(ll1 - ll2)
 }

@@ -8,7 +8,7 @@ CondiCopLikCV(
   u1,
   u2,
   family,
-  X,
+  x,
   xind = 100,
   degree = 1,
   eta,
@@ -26,25 +26,25 @@ CondiCopLikCV(
 
 \item{u2}{Vector of second uniform response.}
 
-\item{family}{An integer defining the bivariate copula family to use.  See \code{\link{ConvertPar}}.}
+\item{family}{An integer defining the bivariate copula family to use.  See \code{\link[=ConvertPar]{ConvertPar()}}.}
 
-\item{X}{Vector of observed covariate values.}
+\item{x}{Vector of observed covariate values.}
 
-\item{xind}{Vector of indices in \code{sort(X)} at which to calculate leave-one-out parameter estimates.  Can also be supplied as a single integer, in which case \code{xind} equally spaced observations are taken from \code{X}.}
+\item{xind}{Vector of indices in \code{sort(x)} at which to calculate leave-one-out parameter estimates.  Can also be supplied as a single integer, in which case \code{xind} equally spaced observations are taken from \code{x}.}
 
 \item{degree}{Integer specifying the polynomial order of the local likelihood function.  Currently only 0 and 1 are supported.}
 
 \item{eta, nu, kernel, band, optim_fun, cl}{See \code{\link[=CondiCopLocFit]{CondiCopLocFit()}}.}
 
-\item{cveta_out}{If \code{TRUE}, return the CV estimate of eta at each point in \code{X} in addition to the CV log-likelihood.}
+\item{cveta_out}{If \code{TRUE}, return the CV estimate of eta at each point in \code{x} in addition to the CV log-likelihood.}
 
-\item{cv_all}{If \code{FALSE}, evaluate the CV likelihood at only the leave-one-out observations specified by \code{xind}.  Otherwise, interpolate the leave-one-out estimates of eta to all values in \code{X}, and evaluate the CV likelihood at all observations.}
+\item{cv_all}{If \code{FALSE}, evaluate the CV likelihood at only the leave-one-out observations specified by \code{xind}.  Otherwise, interpolate the leave-one-out estimates of eta to all values in \code{x}, and evaluate the CV likelihood at all observations.}
 }
 \value{
 If \code{cveta_out = FALSE}, scalar value of the cross-validated log-likelihood.  Otherwise, a list with elements:
 \describe{
-\item{\code{x}}{The sorted values of \code{X}.}
-\item{\code{eta}}{The leave-one-out estimates interpolated from the values in \code{xind} to all of those in \code{X}.}
+\item{\code{x}}{The sorted values of \code{x}.}
+\item{\code{eta}}{The leave-one-out estimates interpolated from the values in \code{xind} to all of those in \code{x}.}
 \item{\code{nu}}{The scalar value of the estimated (or provided) second copula parameter.}
 \item{\code{loglik}}{The cross-validated log-likelihood.}
 }

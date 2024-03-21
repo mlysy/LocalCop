@@ -5,34 +5,34 @@
 #' @template param-u1
 #' @template param-u2
 #' @template param-family
-#' @template param-X
-#' @param xind Vector of indices in `sort(X)` at which to calculate leave-one-out parameter estimates.  Can also be supplied as a single integer, in which case `xind` equally spaced observations are taken from `X`.
+#' @template param-x
+#' @param xind Vector of indices in `sort(x)` at which to calculate leave-one-out parameter estimates.  Can also be supplied as a single integer, in which case `xind` equally spaced observations are taken from `x`.
 #' @template param-degree
 #' @param eta,nu,kernel,band,optim_fun,cl See [CondiCopLocFit()].
 #' @template param-cv_all
-#' @param cveta_out If `TRUE`, return the CV estimate of eta at each point in `X` in addition to the CV log-likelihood.
+#' @param cveta_out If `TRUE`, return the CV estimate of eta at each point in `x` in addition to the CV log-likelihood.
 #' @return If `cveta_out = FALSE`, scalar value of the cross-validated log-likelihood.  Otherwise, a list with elements:
 #' \describe{
-#'   \item{`x`}{The sorted values of `X`.}
-#'   \item{`eta`}{The leave-one-out estimates interpolated from the values in `xind` to all of those in `X`.}
+#'   \item{`x`}{The sorted values of `x`.}
+#'   \item{`eta`}{The leave-one-out estimates interpolated from the values in `xind` to all of those in `x`.}
 #'   \item{`nu`}{The scalar value of the estimated (or provided) second copula parameter.}
 #'   \item{`loglik`}{The cross-validated log-likelihood.}
 #' }
 #' @seealso This function is typically used in conjunction with [CondiCopSelect()]; see example there.
 #' @export
-CondiCopLikCV <- function(u1, u2, family, X, xind = 100,
+CondiCopLikCV <- function(u1, u2, family, x, xind = 100,
                           degree = 1,
                           eta, nu, kernel = KernEpa, band,
                           optim_fun, cveta_out = FALSE,
                           cv_all = FALSE, cl = NA) {
   # sort observations
-  ix <- order(X)
-  X <- X[ix]
+  ix <- order(x)
+  x <- x[ix]
   u1 <- u1[ix]
   u2 <- u2[ix]
   # index of validation observations
   if(length(xind) == 1) {
-    xind <- unique(round(seq(1, length(X), len = xind)))
+    xind <- unique(round(seq(1, length(x), len = xind)))
   }
   # initialize eta and nu
   if(!degree %in% 0:1) stop("degree must be 0 or 1.")
@@ -47,10 +47,10 @@ CondiCopLikCV <- function(u1, u2, family, X, xind = 100,
     optim_fun <- .optim_default
   }
   fun <- function(ii) {
-    wgt <- KernWeight(X = X[-ii], x = X[ii], band = band,
+    wgt <- KernWeight(x = x[-ii], x0 = x[ii], band = band,
                       kernel = kernel, band_type = "constant")
     obj <- CondiCopLocFun(u1 = u1[-ii], u2 = u2[-ii], family = family,
-                          X = X[-ii], x = X[ii],
+                          x = x[-ii], x0 = x[ii],
                           wgt = wgt, degree = degree, eta = ieta, nu = inu)
     return(optim_fun(obj))
   }
@@ -60,7 +60,7 @@ CondiCopLikCV <- function(u1, u2, family, X, xind = 100,
   } else {
     # run in parallel
     parallel::clusterExport(cl,
-                            varlist = c("fun", "u1", "u2", "family", "X",
+                            varlist = c("fun", "u1", "u2", "family", "x",
                                         "band", "kernel", "optim_fun",
                                         "ieta", "inu"),
                             envir = environment())
@@ -68,26 +68,26 @@ CondiCopLikCV <- function(u1, u2, family, X, xind = 100,
   }
   # validation step
   # interpolate cveta to all observations
-  cveta <- approx(X[xind], y = cveta, xout = X)$y
+  cveta <- approx(x[xind], y = cveta, xout = x)$y
   if(cv_all) xind <- 1:length(u1)
   nx <- length(xind)
   obj <- CondiCopLocFun(u1 = u1[xind], u2 = u2[xind], family = family,
-                        X = cveta[xind], x = 0, eta = c(0,1), nu = inu,
+                        x = cveta[xind], x0 = 0, eta = c(0,1), nu = inu,
                         wgt = rep(1, nx), degree = 1)
   cvll <- -obj$fn(c(0,1))
-  # correct for likelihood constants
-  if(family == 2) {
-    # Student-t
-    cst <- lgamma(.5*(inu+2)) + lgamma(.5*inu) - 2*lgamma(.5*(inu+1))
-    cvll <- cvll + nx * cst
-  }
-  if(family == 4) {
-    cvll <- cvll - sum(log(u1[xind]) + log(u2[xind]))
-  }
+  ## # correct for likelihood constants
+  ## if(family == 2) {
+  ##   # Student-t
+  ##   cst <- lgamma(.5*(inu+2)) + lgamma(.5*inu) - 2*lgamma(.5*(inu+1))
+  ##   cvll <- cvll + nx * cst
+  ## }
+  ## if(family == 4) {
+  ##   cvll <- cvll - sum(log(u1[xind]) + log(u2[xind]))
+  ## }
   if(!cveta_out) {
     return(cvll)
   } else {
-    return(list(x = X, eta = cveta, nu = inu, loglik = cvll))
+    return(list(x = x, eta = cveta, nu = inu, loglik = cvll))
   }
 }
 

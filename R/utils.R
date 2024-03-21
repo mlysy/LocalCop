@@ -1,18 +1,28 @@
 #--- unexported utility functions ----------------------------------------------
 
-# family set for given pair
-# TODO: Add rotated families for the case with only negative dependence
+#' Construct the famil set.
+#'
+#' @details Calculates `nper` estimates of Kendall tau for non-overlaping sets of `u1` and `u2`.  If these are all positive, then can use any of the copula families.  Otherwise, can only use those which allow bot positive and negative dependence.
+#'
+#' **TODO:** Add rotated families for the case with only negative dependence.
+#' @noRd
 .get_family <- function(u1, u2, nper) {
-    # empirical tau on non-overlapping periods
-    etau <- .get_tau(u1, u2, nper)
-    if(all(etau > 0)) {
-      family  <- 1:5   # case with only positive dependence
-    } else {
-      family <- c(1,2,5) # cases with both positive and negative dependence
-    }
+  # empirical tau on non-overlapping periods
+  etau <- .get_tau(u1, u2, nper)
+  if(all(etau > 0)) {
+    family  <- 1:5   # case with only positive dependence
+  } else {
+    family <- c(1,2,5) # cases with both positive and negative dependence
   }
+}
 
-# kendall's tau on non-overlaping sets
+#' Kendall's tau on non-overlaping sets.
+#'
+#' @param u1, u2 Vectors of uniforms.
+#' @param ntau Number of taus to calculate.
+#' @return A vector of `ntau` taus.
+#' @details Divides `u1` and `u2` into `ntau` non-overlaping sets and calculates the Kendall tau for each set.
+#' @noRd
 .get_tau <- function(u1, u2, ntau) {
   n <- length(u1)
   irng <- unique(round(seq(1, n, len = ntau+1)))
@@ -24,32 +34,41 @@
         })
 }
 
-# get bandwidth set
-.get_band <- function(X, nband) {
-  dx <- diff(sort(X),1)
+#' Get bandwidth set.
+#'
+#' @noRd
+.get_band <- function(x, nband) {
+  dx <- diff(sort(x),1)
   h.min <- max(dx)
-  h.max <- max(X)-min(X)
+  h.max <- max(x)-min(x)
   # get nband+2 values and remove smallest two
   log.seq <- seq(from=log(h.min), to=log(h.max), length.out = (nband+2))
   band <- round(exp(log.seq),5)
   band[-(1:2)]
 }
 
-# default optimization function
+#' Default optimization function.
+#'
+#' @noRd
 .optim_default <- function(obj) {
-  # coarse optimization: gradient-free
-  opt <- optim(par = obj$par, fn = obj$fn, gr = obj$gr,
-               method = "Nelder-Mead",
-               control = list(maxit = 50, reltol = 1e-2))
-  # fine optimization: quasi-newton (gradient-based)
-  opt <- optim(par = opt$par, fn = obj$fn, gr = obj$gr,
-               method = "BFGS")
-  # only need constant term since xc = 0 at x = X[ii]
+  ## # coarse optimization: gradient-free
+  ## opt <- optim(par = obj$par, fn = obj$fn, gr = obj$gr,
+  ##              method = "Nelder-Mead",
+  ##              control = list(maxit = 50, reltol = 1e-2))
+  ## # fine optimization: quasi-newton (gradient-based)
+  ## opt <- optim(par = opt$par, fn = obj$fn, gr = obj$gr,
+  ##              method = "BFGS")
+  opt <- stats::nlminb(start = obj$par,
+                       objective = obj$fn,
+                       gradient = obj$gr)
+  # only need constant term since xc = 0 at x0 = x[ii]
   return(opt$par[1])
 }
 
-# estimate eta and/or nu if required
-# warning: passing NAs will result in fitting
+#' Estimate `eta` and/or `nu` if required.
+#'
+#' @param eta,nu Optional values of `eta` and/or `nu`.  If either of these is missing or `NA`, then uses [VineCopula::BiCopEst()] to estimate the parameters.
+#' @noRd
 .get_etaNu <- function(u1, u2, family, degree, eta, nu) {
   if(missing(eta)) eta <- NA
   if(missing(nu)) nu <- NA
@@ -66,7 +85,9 @@
   list(eta = eta, nu = nu)
 }
 
-# determine whether to run code in parallel.
+#' Determine whether to run code in parallel.
+#'
+#' @noRd
 .check_parallel <- function(cl) {
   pareval <- !anyNA(cl)
   if (!requireNamespace("parallel", quietly = TRUE)) {
@@ -75,3 +96,25 @@
   }
   pareval
 }
+
+# convert degree to integer
+.format_degree <- function(degree) {
+  if(!degree %in% 0:1) stop("degree must be 0 or 1.")
+  ## degree <- match.arg(degree)
+  ## return(as.numeric(degree == "linear"))
+}
+
+## #' Local likelihood estimation at a single covariate value.
+## #'
+## #' @inheritParams CondiCopLocFun
+## #' @return List with elements \code{eta} and \code{loglik}.
+## #' @export
+## CondiCopLocFit1 <- function(u1, u2, family,
+##                             X, x0, wgt, degree = c("linear", "constant"),
+##                             eta, nu = 0) {
+##   obj <- CondiCopLocFun(u1 = u1, u2 = u2, family = family,
+##                         z = z, wgt = wgt, degree = degree, eta = eta, nu = nu)
+##   opt <- optim(par = obj$par, fn = obj$fn, gr = obj$gr,
+##                method = "BFGS")
+##   return(list(eta = as.numeric(opt$par), loglik = -opt$value))
+## }

@@ -37,11 +37,10 @@ namespace LocalCop {
   /// @return Value of the h-function.  
   template <class Type>
   Type hfrank(Type u1, Type u2, Type theta, int give_log=0) {
-    Type term1 = exp(-theta * u1) - Type(1.0);
-    Type term2 = exp(-theta * u2) - Type(1.0);
-    Type term3 = exp(-theta) - Type(1.0);
-    Type logans = -theta * u1 + log(term2) - log(term3 + term1 * term2);
-    if(give_log) return logans; else return exp(logans);
+    Type exp_u2 = exp(-theta*u2) - 1.0;
+    Type ans = exp(-theta*u1) * exp_u2;
+    ans /= ((exp(-theta) - 1.0) + ans - exp_u2);
+    if(give_log) return log(ans); else return ans;
   }
   VECTORIZE4_ttti(hfrank)
       
@@ -55,10 +54,14 @@ namespace LocalCop {
   /// @return Value of the copula PDF. 
   template <class Type>
   Type dfrank(Type u1, Type u2, Type theta, int give_log=0) {
-    Type term1 = Type(1.0) - exp(-theta);
-    Type term2 = (Type(1.0) - exp(-theta * u1)) * (Type(1.0) - exp(-theta * u2));
-    Type logans = log(theta) + log(term1) - theta * (u1 + u2) - Type(2.0) * log(term1 - term2);
-    if(give_log) return logans; else return exp(logans);
+    Type term1 =  exp(-theta*u1);
+    Type term2 =  exp(-theta*u2); 
+    Type term3 =  exp(-theta) - 1.0;
+    Type term4 = (term3 + (term1 - 1.0) * (term2 - 1.0));
+    term4 *= term4;
+    Type ans = -theta * term3 * term1 * term2;
+    ans /= term4;
+    if(give_log) return log(ans); else return ans;
   }
   VECTORIZE4_ttti(dfrank)
 
