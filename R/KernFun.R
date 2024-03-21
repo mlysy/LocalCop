@@ -20,7 +20,7 @@ NULL
 
 #' @rdname KernFun
 #' @export
-KernEpa <-function(t){
+KernEpa <-function(t) {
   return(pmax(3/4 * (1-t^2), 0))
 }
 
@@ -31,7 +31,7 @@ KernEpa <-function(t){
 
 #' @rdname KernFun
 #' @export
-KernGaus <- function(t){
+KernGaus <- function(t) {
   return(dnorm(t))
 }
 
@@ -42,7 +42,7 @@ KernGaus <- function(t){
 
 #' @rdname KernFun
 #' @export
-KernBeta <- function(t,par=.5){
+KernBeta <- function(t,par=.5) {
   return(pmax(1-t^2, 0)^par/beta(.5,par+1))
 }
 
@@ -54,7 +54,7 @@ KernBeta <- function(t,par=.5){
 
 #' @rdname KernFun
 #' @export
-KernBiQuad <- function(t){
+KernBiQuad <- function(t) {
   return(15/16 * pmax(1-t^2, 0)^2)
 }
 
@@ -65,6 +65,6 @@ KernBiQuad <- function(t){
 
 #' @rdname KernFun
 #' @export
-KernTriAng <- function(t){
+KernTriAng <- function(t) {
   return(pmax(1-abs(t), 0))
 }

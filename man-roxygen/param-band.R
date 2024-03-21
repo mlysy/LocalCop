@@ -1,2 +1,2 @@
-#' @param band Kernal bandwidth parameter (positive scalar).  See \code{\link{KernWeight}}.
+#' @param band Kernal bandwidth parameter (positive scalar).  See [KernWeight()].
 

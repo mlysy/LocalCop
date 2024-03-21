@@ -1,0 +1,6 @@
+"Family","$\mathcal{C}(u, v \mid \theta,\nu)$","$\theta \in \Theta$","$\nu \in \Upsilon$","$g^{-1}(\eta)$","$\tau(\theta)$"
+"Gaussian","$\Phi_\theta ( \Phi^{-1}(u), \Phi^{-1}(v))$","$(-1,1)$","-","$\dfrac{e^{\eta} - e^{-\eta}}{e^{\eta} + e^{-\eta}}$","$\frac{2}{\pi}\arcsin(\theta)$"
+"Student-t","$t_{\theta,\nu} ( t_\nu^{-1}(u), t_\nu^{-1}(v))$","$(-1,1)$","$(0, \infty)$","$\dfrac{e^{\eta} - e^{-\eta}}{e^{\eta} + e^{-\eta}}$","$\frac{2}{\pi}\arcsin(\theta)$"
+"Clayton","$\displaystyle (u^{-\theta} + v^{-\theta} -1)^{-\frac{1}{\theta}}$","$(0, \infty)$","-","$e^\eta$","$\frac{\theta}{\theta + 2}$"
+"Gumbel","$\displaystyle  \exp\left[ - \{  (-\log u)^\theta + (-\log v)^\theta\}^{\frac{1}{\theta}} \right]$","$[1, \infty)$","-","$e^\eta + 1$","$1 - \frac{1}{\theta}$"
+"Frank","$-\frac{1}{\theta}\log \left\{ 1 + \frac{(e^{-\theta u} - 1)(e^{-\theta v} - 1)}{e^{-\theta} - 1}\right\}$","$(-\infty, \infty)\setminus\{0\}$","-","$\eta$","no closed form"
