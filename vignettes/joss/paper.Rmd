@@ -34,6 +34,22 @@ output:
     base_format: rticles::joss_article
     toc: false
     keep_md: true
+header-includes:
+  # to use kableExtra
+  - \usepackage{booktabs}
+  # - \usepackage{longtable}
+  # - \usepackage{array}
+  # - \usepackage{multirow}
+  # - \usepackage{wrapfig}
+  # - \usepackage{float}
+  # - \usepackage{colortbl}
+  # - \usepackage{pdflscape}
+  # - \usepackage{tabu}
+  # - \usepackage{threeparttable}
+  # - \usepackage{threeparttablex}
+  # - \usepackage[normalem]{ulem}
+  # - \usepackage{makecell}
+  # - \usepackage{xcolor}
 csl: apa.csl
 journal: JOSS
 link-citations: true
@@ -52,7 +68,10 @@ knitr::read_chunk("calculations.R")
 library(LocalCop)
 library(VineCopula)  # for simulating copula data
 library(readr)       # for reading in the copula table
-library(kableExtra)  # for styling the copula table
+options(
+  kableExtra.latex.load_packages = FALSE
+)                    # for styling the copula table
+library(kableExtra)  # add packages manually for joss submission
 library(tidyr)       # for data manipulations
 library(dplyr)       #
 library(ggplot2)     # for plots

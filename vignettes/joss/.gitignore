@@ -2,3 +2,4 @@
 *.pdf
 !joss_article2.R
 !calculations.R
+!paper_files/figure-latex/*

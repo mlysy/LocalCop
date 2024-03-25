@@ -34,6 +34,22 @@ output:
     base_format: rticles::joss_article
     toc: false
     keep_md: true
+header-includes:
+  # to use kableExtra
+  - \usepackage{booktabs}
+  # - \usepackage{longtable}
+  # - \usepackage{array}
+  # - \usepackage{multirow}
+  # - \usepackage{wrapfig}
+  # - \usepackage{float}
+  # - \usepackage{colortbl}
+  # - \usepackage{pdflscape}
+  # - \usepackage{tabu}
+  # - \usepackage{threeparttable}
+  # - \usepackage{threeparttablex}
+  # - \usepackage[normalem]{ulem}
+  # - \usepackage{makecell}
+  # - \usepackage{xcolor}
 csl: apa.csl
 journal: JOSS
 link-citations: true
