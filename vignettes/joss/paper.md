@@ -1,0 +1,262 @@
+---
+title: 'LocalCop: An R package for local likelihood inference for conditional copulas'
+params:
+  do_calc: FALSE
+tags:
+  - R
+  - C++
+  - copula
+  - local likelihood
+  - covariate effect
+authors:
+  - name: Elif Fidan Acar
+    orcid: 
+    affiliation: "1, 2" # (Multiple affiliations must be quoted)
+  - name: Martin Lysy
+    orcid: 
+    affiliation: 3
+  - name: Alan Kuchinsky
+    orcid: 
+    affiliation: 1
+affiliations:
+ - name: University of Manitoba
+   index: 1
+ - name: Hospital for Sick Children
+   index: 2
+ - name: University of Waterloo
+   index: 3
+citation_author: Acar et. al.
+date: 11 March 2024
+year: 2024
+bibliography: references.bib
+output:
+  bookdown::pdf_book:
+    base_format: rticles::joss_article
+    toc: false
+    keep_md: true
+csl: apa.csl
+journal: JOSS
+link-citations: true
+---
+
+<!-- !!! ---- WARNING ---- !!!
+
+~~In order to compile this file, you must run `source("joss_article2.R")` first, due to a bug in `rticles::joss_article()`.~~
+
+**Update:** The bug has now been fixed on the development version of [**rticles**](https://github.com/rstudio/rticles).  In order to compile the manuscript, it now suffices to have this version installed: `remotes::install_github('rstudio/rticles', upgrade = TRUE)`.
+
+-->
+
+
+
+<!-- latex macros -->
+\newcommand{\R}{{\textsf{R}}}
+\newcommand{\cpp}{{\textsf{C++}}}
+
+# Summary
+
+Conditional copulas models allow the dependence structure between multiple response variables to be modelled as a function of covariates.  **LocalCop** is an \R/\cpp package for computationally efficient semiparametric conditional copula modelling using a local likelihood inference framework developed in @ACY2011, @ACY2013 and @ACL2019.
+
+# Statement of Need
+
+There are well-developed \R packages such as **copula** [@copula1; @copula2; @copula3; @copula4] and **VineCopula** [@vinecopula] for fitting copulas in various multivariate data settings. However, these software focus exclusively on unconditional dependence modelling and do not accommodate covariate information. 
+
+Aside from **LocalCop**, \R packages for fitting conditional copulas are **gamCopula** [@gamcopula] and **CondCopulas** [@condcopulas]. **gamCopula** estimates the covariate-dependent copula parameter using spline smoothing.  While this typically has lower variance than the local likelihood estimate provided by **LocalCop**, it also tends to have lower accuracy [@ACL2019].  **CondCopulas** estimates the copula parameter using a semi-parametric maximum-likelihood method based on a kernel-weighted conditional concordance metric.  **LocalCop** also uses kernel weighting, but it uses the full likelihood information of a given copula family rather than just that contained in the concordance metric, and is therefore more statistically efficient.
+
+Local likelihood methods typically involve solving a large number of low-dimensional optimization problems and thus can be computationally intensive.  To address this issue, **LocalCop** implements the local likelihood function in \cpp, using the \R/\cpp package **TMB** [@kristensen.etal16] to efficiently obtain the associated score function using automatic differentiation.  Thus, **LocalCop** is able to solve each optimization problem very quickly using gradient-based algorithms.  It also provides a means of easily parallelizing the optimization across multiple cores, rendering **LocalCop** competitive in terms of speed with other available software for conditional copula estimation.
+
+# Background
+
+For any bivariate response vector $(Y_1, Y_2)$, the conditional joint distribution given a covariate $X$ is given by 
+\begin{equation}
+F_X(y_1, y_2 \mid x) = C_X (F_{1\mid X} (y_1 \mid x),F_{2\mid X} (y_2 \mid x) \mid x ),
+(\#eq:fullmodel)
+\end{equation}
+where $F_{1\mid X}(y_1 \mid x)$ and $F_{2\mid X}(y_2 \mid x)$ are the conditional marginal distributions of $Y_1$ and $Y_2$ given $X$, and $C_X(u, v \mid x)$ is a conditional copula function.  That is, for given $X = x$, the function $C_X(u, v \mid x)$ is a bivariate CDF with uniform margins. 
+
+The focus of **LocalCop** is on estimating the conditional copula function, which is modelled semi-parametrically as 
+\begin{equation}
+C_X(u, v \mid x) = \mathcal{C}(u, v\mid \theta(x), \nu),
+(\#eq:copmod)
+\end{equation}
+where $\mathcal{C}(u, v \mid \theta, \nu)$ is one of the parametric copula families listed in Table \@ref(tab:calib), the copula dependence parameter $\theta \in \Theta$ is an arbitrary function of $X$, and $\nu \in \Upsilon$ is an additional copula parameter present in some models. Since most parametric copula families have a restricted range $\Theta \subsetneq \mathbb{R}$, we describe the data generating model (DGM) in terms of the calibration function $\eta(x)$, such that
+\begin{equation}
+\theta(x) = g^{-1}(\eta(x)),
+\end{equation}
+where $g^{-1}: \mathbb{R} \to \Theta$ an inverse-link function which ensures that the copula parameter has the correct range. The choice of $g^{-1}(\eta)$ is not unique and depends on the copula family. Table \@ref(tab:calib) displays the copula function $\mathcal{C}(u, v \mid \theta, \nu)$ for each of the copula families provided by **LocalCop**, along with other relevant information including the canonical choice of the inverse link function $g^{-1}(\eta)$.  In Table \@ref(tab:calib), $\Phi^{-1}(p)$ denotes the inverse CDF of the standard normal; $t_{\nu}^{-1}(p)$ denotes the inverse CDF of the Student-t with $\nu$ degrees of freedom; $\Phi_{\theta}(z_1, z_2)$ denotes the CDF of a bivariate normal with mean $(0, 0)$ and variance $\left[\begin{smallmatrix}1 & \theta \\ \theta & 1\end{smallmatrix}\right]$; and $t_{\theta,\nu}(z_1, z_2)$ denotes the CDF of a bivariate Student-t with location $(0, 0)$, scale $\left[\begin{smallmatrix}1 & \theta \\ \theta & 1\end{smallmatrix}\right]$, and degrees of freedom $\nu$.
+
+
+\begin{table}
+\centering
+\caption{(\#tab:calib)Copula families implemented in \textbf{LocalCop}.}
+\centering
+\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\begin{tabular}[t]{llllll}
+\toprule
+Family & $\mathcal{C}(u, v \mid \theta,\nu)$ & $\theta \in \Theta$ & $\nu \in \Upsilon$ & $g^{-1}(\eta)$ & $\tau(\theta)$\\
+\midrule
+Gaussian & $\Phi_\theta ( \Phi^{-1}(u), \Phi^{-1}(v))$ & $(-1,1)$ & - & $\dfrac{e^{\eta} - e^{-\eta}}{e^{\eta} + e^{-\eta}}$ & $\frac{2}{\pi}\arcsin(\theta)$\\
+Student-t & $t_{\theta,\nu} ( t_\nu^{-1}(u), t_\nu^{-1}(v))$ & $(-1,1)$ & $(0, \infty)$ & $\dfrac{e^{\eta} - e^{-\eta}}{e^{\eta} + e^{-\eta}}$ & $\frac{2}{\pi}\arcsin(\theta)$\\
+Clayton & $\displaystyle (u^{-\theta} + v^{-\theta} -1)^{-\frac{1}{\theta}}$ & $(0, \infty)$ & - & $e^\eta$ & $\frac{\theta}{\theta + 2}$\\
+Gumbel & $\displaystyle  \exp\left[ - \{  (-\log u)^\theta + (-\log v)^\theta\}^{\frac{1}{\theta}} \right]$ & $[1, \infty)$ & - & $e^\eta + 1$ & $1 - \frac{1}{\theta}$\\
+Frank & $-\frac{1}{\theta}\log \left\{ 1 + \frac{(e^{-\theta u} - 1)(e^{-\theta v} - 1)}{e^{-\theta} - 1}\right\}$ & $(-\infty, \infty)\setminus\{0\}$ & - & $\eta$ & no closed form\\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+Local likelihood estimation of the conditional copula parameter $\theta(x)$ uses Taylor expansions to approximate the calibration function $\eta(x)$ at an observed covariate value $X = x$ near a fixed point $X = x_0$, i.e.,
+$$
+\eta(x)\approx \eta(x_0) + \eta^{(1)}(x_0) (x - x_0) + \ldots + \dfrac{\eta^{(p)}(x_0)}{p!} (x - x_0)^{p}.
+$$
+One then estimates $\beta_k = \eta^{(k)}(x_0)/k!$ for $k = 0,\ldots,p$ using a kernel-weighted local likelihood function
+\begin{equation}
+\ell(\boldsymbol{\beta}) = \sum_{i=1}^n \log\left\{ c\left(u_i, v_i \mid g^{-1}( \boldsymbol{x}_{i}^T \boldsymbol{\beta}), \nu \right)\right\} K_h\left(\dfrac{x_i-x_0}{h}\right),
+(\#eq:locallik)
+\end{equation}
+where $(u_i, v_i, x_i)$ is the data for observation $i$, $\boldsymbol{x}_i = (1, x_i - x_0, (x_i - x_0)^2, \ldots, (x_i - x_0)^p)$, $\boldsymbol{\beta}= (\beta_0, \beta_1, \ldots, \beta_p)$, and $K_h(z)$ is a kernel function with bandwidth parameter $h > 0$.  Having maximized $\ell(\boldsymbol{\beta})$ in \@ref(eq:locallik), one estimates $\eta(x_0)$ by $\hat \eta(x_0) = \hat \beta_0$.  Usually, a linear fit with $p=1$ suffices to obtain a good estimate in practice.
+
+# Usage
+
+**LocalCop** is available on [CRAN]() and [GitHub](https://github.com/mlysy/LocalCop).  The two main package functions are:
+
+- `CondiCopLocFit()`: For estimating the calibration function at a sequence of values $\boldsymbol{x}_0 = (x_{01}, \ldots, x_{0m})$.
+
+- `CondiCopSelect()`: For selecting a copula family and bandwidth parameter using leave-one-out cross-validation (LOO-CV) with subsampling as described in @ACL2019.
+
+In the following example, we illustrate the model selection/tuning and fitting steps for data generated from a Clayton copula with conditional Kendall $\tau$ displayed in Figure \@ref(fig:copcomp).  The CV metric for each combination of family and bandwidth are displayed in Figure \@ref(fig:select1-plot).
+
+
+```r
+library(LocalCop)   # local likelihood estimation
+library(VineCopula) # simulate copula data
+```
+
+
+```r
+set.seed(2024)
+
+# simulation setting
+family <- 3                    # Clayton Copula
+n_obs <- 300                   # number of observations
+eta_fun <- function(x) {       # calibration function
+  sin(5*pi*x) + cos(8*pi*x^2)
+}
+```
+
+```r
+# simulate covariate values
+x <- sort(runif(n_obs))
+
+# simulate response data
+eta_true <- eta_fun(x)                     # calibration parameter eta(x)
+par_true <- BiCopEta2Par(family = family,  # copula parameter theta(x)
+                         eta = eta_true)
+udata <- VineCopula::BiCopSim(n_obs, family = family, par = par_true)
+```
+
+```r
+# model selection and tuning
+bandset <- c(.02, .05, .1, .2) # set of bandwidth parameters
+famset <- c(1, 2, 3, 4, 5)     # set of copula families
+kernel <- KernGaus             # kernel function
+degree <- 1                    # degree of local polynomial
+n_loo <- 100                   # number of LOO-CV observations
+                               # (can be much smaller than n_obs)
+```
+
+```r
+# calculate cv for each combination of family and bandwidth
+cvselect <- CondiCopSelect(u1= udata[,1], u2 = udata[,2],
+                           x = x, xind = n_loo,
+                           kernel = kernel, degree = degree,
+                           family = famset, band = bandset)
+```
+
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{paper_files/figure-latex/select1-plot-1} \caption{Cross-validation metric for each combination of family and bandwidth.}(\#fig:select1-plot)
+\end{figure}
+
+
+```r
+# extract the selected family and bandwidth from cvselect
+cv_res <- cvselect$cv
+i_opt <- which.max(cv_res$cv)
+fam_opt <- cv_res[i_opt,]$family
+band_opt <- cv_res[i_opt,]$band
+
+# calculate eta(x) on a grid of values
+x0 <- seq(0, 1, by = 0.01)
+copfit <- CondiCopLocFit(u1 = udata[,1], u2 = udata[,2],
+                         x = x, x0 = x0,
+                         kernel = kernel, degree = degree,
+                         family = fam_opt, band = band_opt)
+# convert eta to Kendall tau
+tau_loc <- BiCopEta2Tau(copfit$eta, family= fam_opt)
+```
+
+
+
+
+
+```r
+# simulate covariate values
+x <- sort(runif(n_obs))
+
+# simulate response data
+eta_true <- eta_fun(x)                     # calibration parameter eta(x)
+par_true <- BiCopEta2Par(family = family,  # copula parameter theta(x)
+                         eta = eta_true)
+udata <- VineCopula::BiCopSim(n_obs, family = family, par = par_true)
+```
+
+```r
+# model selection and tuning
+bandset <- c(.02, .05, .1, .2) # set of bandwidth parameters
+famset <- c(1, 2, 3, 4, 5)     # set of copula families
+kernel <- KernGaus             # kernel function
+degree <- 1                    # degree of local polynomial
+n_loo <- 100                   # number of LOO-CV observations
+                               # (can be much smaller than n_obs)
+```
+
+```r
+# calculate cv for each combination of family and bandwidth
+cvselect <- CondiCopSelect(u1= udata[,1], u2 = udata[,2],
+                           x = x, xind = n_loo,
+                           kernel = kernel, degree = degree,
+                           family = famset, band = bandset)
+```
+
+
+
+```r
+# extract the selected family and bandwidth from cvselect
+cv_res <- cvselect$cv
+i_opt <- which.max(cv_res$cv)
+fam_opt <- cv_res[i_opt,]$family
+band_opt <- cv_res[i_opt,]$band
+
+# calculate eta(x) on a grid of values
+x0 <- seq(0, 1, by = 0.01)
+copfit <- CondiCopLocFit(u1 = udata[,1], u2 = udata[,2],
+                         x = x, x0 = x0,
+                         kernel = kernel, degree = degree,
+                         family = fam_opt, band = band_opt)
+# convert eta to Kendall tau
+tau_loc <- BiCopEta2Tau(copfit$eta, family= fam_opt)
+```
+
+
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{paper_files/figure-latex/copcomp-1} \caption{True vs estimated conditional Kendall $\tau$ using various methods.}(\#fig:copcomp)
+\end{figure}
+
+In Figure \@ref(fig:copcomp), we compare the true conditional Kendall $\tau$ to estimates using each of the three conditional copula fitting packages **LocalCop**, **gamCopula**, and **CondCopulas**, for sample sizes $n = 300$ and $n = 1000$.  In **gamCopula**, selection of the copula family smoothing splines is done using the generalized CV framework provided by the \R package **mgcv** [@wood17].  In **CondCopulas**, selection of the bandwidth parameter is done using LOO-CV.  In this particular example, the sample size of $n = 300$ is not large enough for **gamCopula** to pick a sufficiently flexible spline basis, and **CondCopulas** picks a large bandwidth which oversmooths the data.  For the larger sample size $n = 1000$, the three methods exhibit similar accuracy.
+
+# Acknowledgements
+
+We acknowledge funding support from the Natural Sciences and Engineering Research Council of Canada Discovery Grants RGPIN-2020-06753 (Acar) and RGPIN-2020-04364 (Lysy).
+
+# References

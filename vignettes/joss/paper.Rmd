@@ -33,7 +33,7 @@ output:
   bookdown::pdf_book:
     base_format: rticles::joss_article
     toc: false
-    keep_md: false
+    keep_md: true
 csl: apa.csl
 journal: JOSS
 link-citations: true
