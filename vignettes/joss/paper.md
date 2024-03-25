@@ -30,9 +30,12 @@ date: 11 March 2024
 year: 2024
 bibliography: references.bib
 output:
-  bookdown::pdf_book:
-    base_format: rticles::joss_article
-    toc: false
+  # Note: bookdown cross-links incompatible with joss md processor
+  # bookdown::pdf_book:
+  #   base_format: rticles::joss_article
+  #   toc: false
+  #   keep_md: true
+  rticles::joss_article:
     keep_md: true
 header-includes:
   # to use kableExtra
@@ -61,6 +64,8 @@ link-citations: true
 
 **Update:** The bug has now been fixed on the development version of [**rticles**](https://github.com/rstudio/rticles).  In order to compile the manuscript, it now suffices to have this version installed: `remotes::install_github('rstudio/rticles', upgrade = TRUE)`.
 
+**Update 2:** Turns out that **bookdown** cross-links (e.g., `\@ref(eq:xyz)` are not processed by `keep_md: true` and therefore incompatible with the joss md processor.  So, the bookdown extensions have been disabled altogether.
+
 -->
 
 
@@ -86,25 +91,25 @@ Local likelihood methods typically involve solving a large number of low-dimensi
 For any bivariate response vector $(Y_1, Y_2)$, the conditional joint distribution given a covariate $X$ is given by 
 \begin{equation}
 F_X(y_1, y_2 \mid x) = C_X (F_{1\mid X} (y_1 \mid x),F_{2\mid X} (y_2 \mid x) \mid x ),
-(\#eq:fullmodel)
+\label{eq:fullmodel}
 \end{equation}
 where $F_{1\mid X}(y_1 \mid x)$ and $F_{2\mid X}(y_2 \mid x)$ are the conditional marginal distributions of $Y_1$ and $Y_2$ given $X$, and $C_X(u, v \mid x)$ is a conditional copula function.  That is, for given $X = x$, the function $C_X(u, v \mid x)$ is a bivariate CDF with uniform margins. 
 
 The focus of **LocalCop** is on estimating the conditional copula function, which is modelled semi-parametrically as 
 \begin{equation}
 C_X(u, v \mid x) = \mathcal{C}(u, v\mid \theta(x), \nu),
-(\#eq:copmod)
+\label{eq:copmod}
 \end{equation}
-where $\mathcal{C}(u, v \mid \theta, \nu)$ is one of the parametric copula families listed in Table \@ref(tab:calib), the copula dependence parameter $\theta \in \Theta$ is an arbitrary function of $X$, and $\nu \in \Upsilon$ is an additional copula parameter present in some models. Since most parametric copula families have a restricted range $\Theta \subsetneq \mathbb{R}$, we describe the data generating model (DGM) in terms of the calibration function $\eta(x)$, such that
+where $\mathcal{C}(u, v \mid \theta, \nu)$ is one of the parametric copula families listed in \autoref{tab:calib}, the copula dependence parameter $\theta \in \Theta$ is an arbitrary function of $X$, and $\nu \in \Upsilon$ is an additional copula parameter present in some models. Since most parametric copula families have a restricted range $\Theta \subsetneq \mathbb{R}$, we describe the data generating model (DGM) in terms of the calibration function $\eta(x)$, such that
 \begin{equation}
 \theta(x) = g^{-1}(\eta(x)),
 \end{equation}
-where $g^{-1}: \mathbb{R} \to \Theta$ an inverse-link function which ensures that the copula parameter has the correct range. The choice of $g^{-1}(\eta)$ is not unique and depends on the copula family. Table \@ref(tab:calib) displays the copula function $\mathcal{C}(u, v \mid \theta, \nu)$ for each of the copula families provided by **LocalCop**, along with other relevant information including the canonical choice of the inverse link function $g^{-1}(\eta)$.  In Table \@ref(tab:calib), $\Phi^{-1}(p)$ denotes the inverse CDF of the standard normal; $t_{\nu}^{-1}(p)$ denotes the inverse CDF of the Student-t with $\nu$ degrees of freedom; $\Phi_{\theta}(z_1, z_2)$ denotes the CDF of a bivariate normal with mean $(0, 0)$ and variance $\left[\begin{smallmatrix}1 & \theta \\ \theta & 1\end{smallmatrix}\right]$; and $t_{\theta,\nu}(z_1, z_2)$ denotes the CDF of a bivariate Student-t with location $(0, 0)$, scale $\left[\begin{smallmatrix}1 & \theta \\ \theta & 1\end{smallmatrix}\right]$, and degrees of freedom $\nu$.
+where $g^{-1}: \mathbb{R} \to \Theta$ an inverse-link function which ensures that the copula parameter has the correct range. The choice of $g^{-1}(\eta)$ is not unique and depends on the copula family. \autoref{tab:calib} displays the copula function $\mathcal{C}(u, v \mid \theta, \nu)$ for each of the copula families provided by **LocalCop**, along with other relevant information including the canonical choice of the inverse link function $g^{-1}(\eta)$.  In \autoref{tab:calib}, $\Phi^{-1}(p)$ denotes the inverse CDF of the standard normal; $t_{\nu}^{-1}(p)$ denotes the inverse CDF of the Student-t with $\nu$ degrees of freedom; $\Phi_{\theta}(z_1, z_2)$ denotes the CDF of a bivariate normal with mean $(0, 0)$ and variance $\left[\begin{smallmatrix}1 & \theta \\ \theta & 1\end{smallmatrix}\right]$; and $t_{\theta,\nu}(z_1, z_2)$ denotes the CDF of a bivariate Student-t with location $(0, 0)$, scale $\left[\begin{smallmatrix}1 & \theta \\ \theta & 1\end{smallmatrix}\right]$, and degrees of freedom $\nu$.
 
 
 \begin{table}
 \centering
-\caption{(\#tab:calib)Copula families implemented in \textbf{LocalCop}.}
+\caption{\label{tab:calib}Copula families implemented in \textbf{LocalCop}.}
 \centering
 \resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
 \begin{tabular}[t]{llllll}
@@ -127,9 +132,9 @@ $$
 One then estimates $\beta_k = \eta^{(k)}(x_0)/k!$ for $k = 0,\ldots,p$ using a kernel-weighted local likelihood function
 \begin{equation}
 \ell(\boldsymbol{\beta}) = \sum_{i=1}^n \log\left\{ c\left(u_i, v_i \mid g^{-1}( \boldsymbol{x}_{i}^T \boldsymbol{\beta}), \nu \right)\right\} K_h\left(\dfrac{x_i-x_0}{h}\right),
-(\#eq:locallik)
+\label{eq:locallik}
 \end{equation}
-where $(u_i, v_i, x_i)$ is the data for observation $i$, $\boldsymbol{x}_i = (1, x_i - x_0, (x_i - x_0)^2, \ldots, (x_i - x_0)^p)$, $\boldsymbol{\beta}= (\beta_0, \beta_1, \ldots, \beta_p)$, and $K_h(z)$ is a kernel function with bandwidth parameter $h > 0$.  Having maximized $\ell(\boldsymbol{\beta})$ in \@ref(eq:locallik), one estimates $\eta(x_0)$ by $\hat \eta(x_0) = \hat \beta_0$.  Usually, a linear fit with $p=1$ suffices to obtain a good estimate in practice.
+where $(u_i, v_i, x_i)$ is the data for observation $i$, $\boldsymbol{x}_i = (1, x_i - x_0, (x_i - x_0)^2, \ldots, (x_i - x_0)^p)$, $\boldsymbol{\beta}= (\beta_0, \beta_1, \ldots, \beta_p)$, and $K_h(z)$ is a kernel function with bandwidth parameter $h > 0$.  Having maximized $\ell(\boldsymbol{\beta})$ in \autoref{eq:locallik}, one estimates $\eta(x_0)$ by $\hat \eta(x_0) = \hat \beta_0$.  Usually, a linear fit with $p=1$ suffices to obtain a good estimate in practice.
 
 # Usage
 
@@ -139,7 +144,7 @@ where $(u_i, v_i, x_i)$ is the data for observation $i$, $\boldsymbol{x}_i = (1,
 
 - `CondiCopSelect()`: For selecting a copula family and bandwidth parameter using leave-one-out cross-validation (LOO-CV) with subsampling as described in @ACL2019.
 
-In the following example, we illustrate the model selection/tuning and fitting steps for data generated from a Clayton copula with conditional Kendall $\tau$ displayed in Figure \@ref(fig:copcomp).  The CV metric for each combination of family and bandwidth are displayed in Figure \@ref(fig:select1-plot).
+In the following example, we illustrate the model selection/tuning and fitting steps for data generated from a Clayton copula with conditional Kendall $\tau$ displayed in \autoref{fig:copcomp}.  The CV metric for each combination of family and bandwidth are displayed in \autoref{fig:select1-plot}.
 
 
 ```r
@@ -190,7 +195,7 @@ cvselect <- CondiCopSelect(u1= udata[,1], u2 = udata[,2],
 
 
 \begin{figure}
-\includegraphics[width=1\linewidth]{paper_files/figure-latex/select1-plot-1} \caption{Cross-validation metric for each combination of family and bandwidth.}(\#fig:select1-plot)
+\includegraphics[width=1\linewidth]{paper_files/figure-latex/select1-plot-1} \caption{Cross-validation metric for each combination of family and bandwidth.}\label{fig:select1-plot}
 \end{figure}
 
 
@@ -266,10 +271,10 @@ tau_loc <- BiCopEta2Tau(copfit$eta, family= fam_opt)
 
 
 \begin{figure}
-\includegraphics[width=1\linewidth]{paper_files/figure-latex/copcomp-1} \caption{True vs estimated conditional Kendall $\tau$ using various methods.}(\#fig:copcomp)
+\includegraphics[width=1\linewidth]{paper_files/figure-latex/copcomp-1} \caption{True vs estimated conditional Kendall $\tau$ using various methods.}\label{fig:copcomp}
 \end{figure}
 
-In Figure \@ref(fig:copcomp), we compare the true conditional Kendall $\tau$ to estimates using each of the three conditional copula fitting packages **LocalCop**, **gamCopula**, and **CondCopulas**, for sample sizes $n = 300$ and $n = 1000$.  In **gamCopula**, selection of the copula family smoothing splines is done using the generalized CV framework provided by the \R package **mgcv** [@wood17].  In **CondCopulas**, selection of the bandwidth parameter is done using LOO-CV.  In this particular example, the sample size of $n = 300$ is not large enough for **gamCopula** to pick a sufficiently flexible spline basis, and **CondCopulas** picks a large bandwidth which oversmooths the data.  For the larger sample size $n = 1000$, the three methods exhibit similar accuracy.
+In \autoref{fig:copcomp}, we compare the true conditional Kendall $\tau$ to estimates using each of the three conditional copula fitting packages **LocalCop**, **gamCopula**, and **CondCopulas**, for sample sizes $n = 300$ and $n = 1000$.  In **gamCopula**, selection of the copula family smoothing splines is done using the generalized CV framework provided by the \R package **mgcv** [@wood17].  In **CondCopulas**, selection of the bandwidth parameter is done using LOO-CV.  In this particular example, the sample size of $n = 300$ is not large enough for **gamCopula** to pick a sufficiently flexible spline basis, and **CondCopulas** picks a large bandwidth which oversmooths the data.  For the larger sample size $n = 1000$, the three methods exhibit similar accuracy.
 
 # Acknowledgements
 
