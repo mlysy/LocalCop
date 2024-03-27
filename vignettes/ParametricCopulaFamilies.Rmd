@@ -30,7 +30,7 @@ library(LocalCop)
 ```
 
 
-This document will discuss the implementations of the copulae families seen in this package. That is, we will discuss the CDF, conditional CDF, and PDF of each of the families implemented. For the conditional CDF, most of the copulae implemented are symmetric in $u$ and $v$, so it is sufficient to provide one conditional CDF, and a simple swap of the variables will provide the other conditional CDF. Where this is not the case, both conditional CDF's will be provided. The document will offer both the original-scale and the logarithm-scale version of each formula where applicable. It should also be noted that the implementation utilizes the logarithm-scale version where possible to increase accuracy.
+This document will discuss the implementations of the copula families seen in this package. That is, we will discuss the CDF, conditional CDF, and PDF of each of the families implemented. For the conditional CDF, most of the copula implemented are symmetric in $u$ and $v$, so it is sufficient to provide one conditional CDF, and a simple swap of the variables will provide the other conditional CDF. Where this is not the case, both conditional CDF's will be provided. The document will offer both the original-scale and the logarithm-scale version of each formula where applicable. It should also be noted that the implementation utilizes the logarithm-scale version where possible to increase accuracy.
 
 ## Gaussian
 
