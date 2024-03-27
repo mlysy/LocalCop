@@ -10,13 +10,12 @@ tags:
   - covariate effect
 authors:
   - name: Elif Fidan Acar
-    orcid: 
+    orcid: 0000-0003-2908-7691
     affiliation: "1, 2" # (Multiple affiliations must be quoted)
   - name: Martin Lysy
-    orcid: 
+    orcid: 0000-0001-9974-1121
     affiliation: 3
   - name: Alan Kuchinsky
-    orcid: 
     affiliation: 1
 affiliations:
  - name: University of Manitoba
@@ -26,7 +25,7 @@ affiliations:
  - name: University of Waterloo
    index: 3
 citation_author: Acar et. al.
-date: 11 March 2024
+date: 26 March 2024
 year: 2024
 bibliography: references.bib
 output:
@@ -58,7 +57,7 @@ journal: JOSS
 link-citations: true
 ---
 
-<!-- !!! ---- WARNING ---- !!!
+<!-- 
 
 ~~In order to compile this file, you must run `source("joss_article2.R")` first, due to a bug in `rticles::joss_article()`.~~
 
@@ -108,10 +107,10 @@ where $g^{-1}: \mathbb{R} \to \Theta$ an inverse-link function which ensures tha
 
 
 \begin{table}
-\centering
+
 \caption{\label{tab:calib}Copula families implemented in \textbf{LocalCop}.}
 \centering
-\resizebox{\ifdim\width>\linewidth\linewidth\else\width\fi}{!}{
+\resizebox{\linewidth}{!}{
 \begin{tabular}[t]{llllll}
 \toprule
 Family & $\mathcal{C}(u, v \mid \theta,\nu)$ & $\theta \in \Theta$ & $\nu \in \Upsilon$ & $g^{-1}(\eta)$ & $\tau(\theta)$\\
@@ -138,7 +137,7 @@ where $(u_i, v_i, x_i)$ is the data for observation $i$, $\boldsymbol{x}_i = (1,
 
 # Usage
 
-**LocalCop** is available on [CRAN]() and [GitHub](https://github.com/mlysy/LocalCop).  The two main package functions are:
+**LocalCop** is available on [CRAN](https://CRAN.R-project.org/package=LocalCop) and [GitHub](https://github.com/mlysy/LocalCop).  The two main package functions are:
 
 - `CondiCopLocFit()`: For estimating the calibration function at a sequence of values $\boldsymbol{x}_0 = (x_{01}, \ldots, x_{0m})$.
 
