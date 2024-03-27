@@ -75,7 +75,7 @@ link-citations: true
 
 # Summary
 
-Conditional copulas models allow the dependence structure between multiple response variables to be modelled as a function of covariates.  **LocalCop** is an \R/\cpp package for computationally efficient semiparametric conditional copula modelling using a local likelihood inference framework developed in @ACY2011, @ACY2013 and @ACL2019.
+Conditional copulas models allow the dependence structure between multiple response variables to be modelled as a function of covariates.  **LocalCop** [@localcop] is an \R/\cpp package for computationally efficient semiparametric conditional copula modelling using a local likelihood inference framework developed in @ACY2011, @ACY2013 and @ACL2019.
 
 # Statement of Need
 
