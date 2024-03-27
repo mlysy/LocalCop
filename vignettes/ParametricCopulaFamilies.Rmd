@@ -1,10 +1,21 @@
 ---
-title: "Copulae"
-output: rmarkdown::html_vignette
+title: "Parametric Copula Families and Their Functions"
+params:
+  do_calc: FALSE
+output:
+  bookdown::html_vignette2:
+    toc: true
+author: "Alan, Elif, Martin"
+date: 2024-03-26
+bibliography: copulaReferences.bib
+link-citations: true
 vignette: >
-  %\VignetteIndexEntry{Copulae}
+  %\VignetteIndexEntry{Parametric Copula Families and Their Functions}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+header-includes:
+  - \setmathfont{STIXTwoMath-Regular.otf}
+  - \usepackage{xcolor}
 ---
 
 ```{r, include = FALSE}
@@ -19,7 +30,7 @@ library(LocalCop)
 ```
 
 
-This document will discuss the implementations of the copulae families seen in this package. That is, we will discuss the CDF, conditional CDF, and PDF of each of the families implemented. For the conditional CDF, most of the copulae implemented are symmetric in $u$ and $v$, so it is sufficient to provide one conditional CDF, and a simple swap of the variables will provide the other conditional CDF. Where this is not the case, both conditional CDF's will be provided. The document will offer both the exponential-scale and the logarithm-scale version of each formula where applicable. It should also be noted that the implementation utilizes the logarithm-scale version where possible to increase accuracy.
+This document will discuss the implementations of the copulae families seen in this package. That is, we will discuss the CDF, conditional CDF, and PDF of each of the families implemented. For the conditional CDF, most of the copulae implemented are symmetric in $u$ and $v$, so it is sufficient to provide one conditional CDF, and a simple swap of the variables will provide the other conditional CDF. Where this is not the case, both conditional CDF's will be provided. The document will offer both the original-scale and the logarithm-scale version of each formula where applicable. It should also be noted that the implementation utilizes the logarithm-scale version where possible to increase accuracy.
 
 ## Gaussian
 
@@ -70,13 +81,13 @@ $$c(u, v; \rho, \nu) = \frac{\Gamma\left(\frac{\nu + 2}{2}\right)\Gamma\left(\fr
 
 The Frank copula family is a single parameter family with the parameter $\theta \in \mathbb{R} \setminus \{0\}$. 
 
-Its exponential-scale CDF is:
+Its original-scale CDF is:
 
 $$C(u, v; \theta) = -\theta^{-1}\ln\left(\frac{1 - \exp(-\theta) - (1 - \exp(-u\theta))(1 - \exp(-v\theta))}{1 - \exp(-\theta)}\right)$$
 
-Note the logarithm-scale CDF is nearly unsimplifiable, and, in fact, simplifying it results in positive values of theta making the expression undefined. Thus, we use only the exponential-scale version of the formula and took the logarithm of the result as needed.
+Note the logarithm-scale CDF is nearly unsimplifiable, and, in fact, simplifying it results in positive values of theta making the expression undefined. Thus, we use only the original-scale version of the formula and took the logarithm of the result as needed.
 
-Its exponential-scale conditional CDF is:
+Its original-scale conditional CDF is:
 
 $$C(v \mid u; \theta) = \frac{\exp(-u\theta)}{\frac{1 - \exp(-\theta)}{1 - \exp(-v\theta)} - (1 - \exp(-u\theta))}$$
 
@@ -84,7 +95,7 @@ And its subsequent logarithm-scale conditional CDF is:
 
 $$\mathcal{C}(v \mid u; \theta) = -u\theta - \ln\left(\frac{1 - \exp(-\theta)}{1 - \exp(-v\theta)} - (1 - \exp(-u\theta))\right)$$
 
-The exponential-scale PDF is:
+The original-scale PDF is:
 
 $$c(u, v; \theta) = \frac{\theta(1 - \exp(-\theta))\exp(-\theta(u + v))}{(1 - \exp(-\theta) - (1 - \exp(-u\theta))(1 - \exp(-v\theta)))^2}$$
 
