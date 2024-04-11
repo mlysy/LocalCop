@@ -4,29 +4,39 @@
 \alias{KernWeight}
 \title{Calculate local likelihood kernel weights.}
 \usage{
-KernWeight(X, x, band, kernel = KernEpa, band_type = "constant")
+KernWeight(x, x0, band, kernel = KernEpa, band_type = "constant")
 }
 \arguments{
-\item{X}{Vector of observed covariate values.}
+\item{x}{Vector of observed covariate values.}
 
-\item{x}{Scalar covariate value at which local likelihood estimation is performed.}
+\item{x0}{Scalar covariate value at which local likelihood estimation is performed.}
 
 \item{band}{Kernel bandwidth parameter (positive scalar).  See \strong{Details.}}
 
-\item{kernel}{Kernel function to use.  Should accept a numeric vector parameter and return a non-negative numeric vector of the same length.  See \code{\link{KernFun}}.}
+\item{kernel}{Kernel function to use.  Should accept a numeric vector parameter and return a non-negative numeric vector of the same length.  See \code{\link[=KernFun]{KernFun()}}.}
 
 \item{band_type}{A character string specifying the type of bandwidth: either "constant" or "variable".  See \strong{Details}.}
+}
+\value{
+A vector of nonnegative kernel weights of the same length as \code{x}.
 }
 \description{
 Calculate local likelihood kernel weights.
 }
 \details{
 For the constant bandwidth of size \code{band = h}, the weights are calculated as
-\preformatted{
-wgt = kernel((X-x) / h) / h
-}
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{wgt = kernel((x-x0) / h) / h
+}\if{html}{\out{</div>}}
+
 where \code{kernel} is the kernel function.  For bandwidth type "variable", a fixed fraction \code{band} of observations is used, i.e,
-\preformatted{
-h = sort( abs(X-x) )[ floor(band*length(X)) ]
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{h = sort( abs(x-x0) )[ floor(band*length(x)) ]
+}\if{html}{\out{</div>}}
 }
+\examples{
+x <- sort(runif(20))
+x0 <- runif(1, min = min(x), max= max(x))
+KernWeight(x, x0, band=0.3, kernel = KernEpa, band_type = "constant")
+KernWeight(x, x0, band=0.3, kernel = KernEpa, band_type = "variable")
 }

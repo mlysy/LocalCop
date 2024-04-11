@@ -4,18 +4,31 @@
 \alias{CondiCopSelect}
 \title{Local likelihood bandwidth and/or family selection.}
 \usage{
-CondiCopSelect(u1, u2, family, X, xind = 100, degree = 1, nu,
-  kernel = KernEpa, band, nband = 6, optim_fun, cv_all = FALSE,
-  full_out = TRUE, cl = NA)
+CondiCopSelect(
+  u1,
+  u2,
+  family,
+  x,
+  xind = 100,
+  degree = 1,
+  nu,
+  kernel = KernEpa,
+  band,
+  nband = 6,
+  optim_fun,
+  cv_all = FALSE,
+  full_out = TRUE,
+  cl = NA
+)
 }
 \arguments{
 \item{u1}{Vector of first uniform response.}
 
 \item{u2}{Vector of second uniform response.}
 
-\item{family}{Vector of integers specifying the family set.  See \code{\link{ConvertPar}}.}
+\item{family}{Vector of integers specifying the family set.  See \code{\link[=ConvertPar]{ConvertPar()}}.}
 
-\item{X}{Vector of observed covariate values.}
+\item{x}{Vector of observed covariate values.}
 
 \item{xind}{Specification of \code{xind} for each bandwidth.  Can be a scalar integer, a vector of \code{nband} integers, or a list of \code{nband} vectors of integers.}
 
@@ -23,35 +36,36 @@ CondiCopSelect(u1, u2, family, X, xind = 100, degree = 1, nu,
 
 \item{nu}{Optional vector of fixed \code{nu} parameter for each family.  If missing or \code{NA} get estimated from the data (if required)}
 
-\item{kernel, optim_fun, cl}{See \code{\link{CondiCopLocFit}}.}
+\item{kernel, optim_fun, cl}{See \code{\link[=CondiCopLocFit]{CondiCopLocFit()}}.}
 
 \item{band}{Vector of positive numbers specifying the bandwidth value set.}
 
-\item{nband}{If \code{band} is missing, automatically choose \code{nband} bandwidth values spanning the range of \code{X}.}
+\item{nband}{If \code{band} is missing, automatically choose \code{nband} bandwidth values spanning the range of \code{x}.}
 
-\item{cv_all}{If \code{FALSE}, evaluate the CV likelihood at only the leave-one-out observations specified by \code{xind}.  Otherwise, interpolate the leave-one-out estimates of eta to all values in \code{X}, and evaluate the CV likelihood at all observations.}
+\item{cv_all}{If \code{FALSE}, evaluate the CV likelihood at only the leave-one-out observations specified by \code{xind}.  Otherwise, interpolate the leave-one-out estimates of eta to all values in \code{x}, and evaluate the CV likelihood at all observations.}
 
 \item{full_out}{Logical; whether or not to output all fitted models or just the selected family/bandwidth combination.  See \strong{Value}.}
 }
 \value{
 If \code{full_out = FALSE}, a list with elements \code{family} and \code{bandwidth} containing the selected value of each.  Otherwise, a list with the following elements:
 \describe{
-  \item{\code{cv}}{A data frame with \code{nBF = length(band) x length(family)} rows and columns named \code{family}, \code{band}, and \code{cv} containing the cross-validated likelihood evaluated at each combination of bandwidth and family values.}
-  \item{\code{x}}{The sorted values of \code{X}.}
-  \item{\code{eta}}{A \code{length(X) x nBF} matrix of eta estimates, the columns of which are in the same order as the rows of \code{cv}.}
-  \item{\code{nu}}{A vector of length \code{nBF} second copula parameters, with zero if they don't exist.}
+\item{\code{cv}}{A data frame with \verb{nBF = length(band) x length(family)} rows and columns named \code{family}, \code{band}, and \code{cv} containing the cross-validated likelihood evaluated at each combination of bandwidth and family values.}
+\item{\code{x}}{The sorted values of \code{x}.}
+\item{\code{eta}}{A \verb{length(x) x nBF} matrix of eta estimates, the columns of which are in the same order as the rows of \code{cv}.}
+\item{\code{nu}}{A vector of length \code{nBF} second copula parameters, with zero if they don't exist.}
 }
 }
 \description{
-Selects among a set of bandwidths and/or copula families the one which maximizes the cross-validated local likelihood.  See \code{\link{CondiCopLikCV}} for details.
+Selects among a set of bandwidths and/or copula families the one which maximizes the cross-validated local likelihood.  See \code{\link[=CondiCopLikCV]{CondiCopLikCV()}} for details.
 }
 \examples{
 # simulate data
+set.seed(123)
 family <- 5 # Frank copula
-n <- 2000
-X <- runif(n) # covariate values
+n <- 1000
+x <- runif(n) # covariate values
 eta_fun <- function(x) 2*cos(12*pi*x) # copula dependence parameter
-eta_true <- eta_fun(X)
+eta_true <- eta_fun(x)
 par_true <- BiCopEta2Par(family, eta = eta_true)
 udata <- VineCopula::BiCopSim(n, family=family,
                               par = par_true$par)
@@ -59,11 +73,11 @@ udata <- VineCopula::BiCopSim(n, family=family,
 # bandwidth and family selection
 bandset <- c(.01, .04, .1) # bandwidth set
 famset <- c(2, 5) # family set
-xind <- 200 # number of leave-one-out observations in CV likelihood calculation
+n_loo <- 100 # number of leave-one-out observations in CV likelihood calculation
 system.time({
   cvsel <- CondiCopSelect(u1= udata[,1], u2 = udata[,2],
-                          X = X, family = famset, band = bandset,
-                          xind = xind)
+                          x = x, family = famset, band = bandset,
+                          xind = n_loo)
 })
 
 # compare estimates to true value
@@ -96,7 +110,8 @@ plot_fun <- function(fam) {
                          " = ", signif(cvsel$cv$cv[famind], 3)))
 }
 
-par(mfrow = c(1,2))
+oldpar <- par(mfrow = c(1,2))
 plot_fun(2)
 plot_fun(5)
+par(oldpar)
 }

@@ -1,17 +1,18 @@
-/// @file LocalLikelihood.cpp
+/// @file LocalLikelihood.hpp
 ///
 /// Local Likelihood functions.
 
-#define TMB_LIB_INIT R_init_tsVine
-#include <TMB.hpp> 
-#include "FrankCopula.h"
-#include "GaussCopula.h"
-#include "GumbelCopula.h"
-#include "StudentCopula.h"
-#include "ClaytonCopula.h"
+#include "LocalCop/deprecated/FrankCopula.hpp"
+#include "LocalCop/deprecated/GaussCopula.hpp"
+#include "LocalCop/deprecated/GumbelCopula.hpp"
+#include "LocalCop/deprecated/StudentCopula.hpp"
+#include "LocalCop/deprecated/ClaytonCopula.hpp"
+
+#undef TMB_OBJECTIVE_PTR
+#define TMB_OBJECTIVE_PTR obj
 
 template<class Type>
-Type objective_function<Type>::operator() () {
+Type LocalLikelihood(objective_function<Type> *obj) {
   DATA_VECTOR(y1); // first response vector
   DATA_VECTOR(y2); // second response vector
   DATA_VECTOR(wgt); // weights
