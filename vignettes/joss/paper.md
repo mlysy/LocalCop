@@ -99,30 +99,11 @@ The focus of **LocalCop** is on estimating the conditional copula function, whic
 C_X(u, v \mid x) = \mathcal{C}(u, v\mid \theta(x), \nu),
 \label{eq:copmod}
 \end{equation}
-where $\mathcal{C}(u, v \mid \theta, \nu)$ is one of the parametric copula families listed in \autoref{tab:calib}, the copula dependence parameter $\theta \in \Theta$ is an arbitrary function of $X$, and $\nu \in \Upsilon$ is an additional copula parameter present in some models. Since most parametric copula families have a restricted range $\Theta \subsetneq \mathbb{R}$, we describe the data generating model (DGM) in terms of the calibration function $\eta(x)$, such that
+where $\mathcal{C}(u, v \mid \theta, \nu)$ is a parametric copula family, the copula dependence parameter $\theta \in \Theta$ is an arbitrary function of $X$, and $\nu \in \Upsilon$ is an additional copula parameter present in some models. Since most parametric copula families have a restricted range $\Theta \subsetneq \mathbb{R}$, we describe the data generating model (DGM) in terms of the calibration function $\eta(x)$, such that
 \begin{equation}
 \theta(x) = g^{-1}(\eta(x)),
 \end{equation}
-where $g^{-1}: \mathbb{R} \to \Theta$ an inverse-link function which ensures that the copula parameter has the correct range. The choice of $g^{-1}(\eta)$ is not unique and depends on the copula family. \autoref{tab:calib} displays the copula function $\mathcal{C}(u, v \mid \theta, \nu)$ for each of the copula families provided by **LocalCop**, along with other relevant information including the canonical choice of the inverse link function $g^{-1}(\eta)$.  In \autoref{tab:calib}, $\Phi^{-1}(p)$ denotes the inverse CDF of the standard normal; $t_{\nu}^{-1}(p)$ denotes the inverse CDF of the Student-t with $\nu$ degrees of freedom; $\Phi_{\theta}(z_1, z_2)$ denotes the CDF of a bivariate normal with mean $(0, 0)$ and variance $\left[\begin{smallmatrix}1 & \theta \\ \theta & 1\end{smallmatrix}\right]$; and $t_{\theta,\nu}(z_1, z_2)$ denotes the CDF of a bivariate Student-t with location $(0, 0)$, scale $\left[\begin{smallmatrix}1 & \theta \\ \theta & 1\end{smallmatrix}\right]$, and degrees of freedom $\nu$.
-
-
-\begin{table}
-
-\caption{\label{tab:calib}Copula families implemented in \textbf{LocalCop}.}
-\centering
-\resizebox{\linewidth}{!}{
-\begin{tabular}[t]{llllll}
-\toprule
-Family & $\mathcal{C}(u, v \mid \theta,\nu)$ & $\theta \in \Theta$ & $\nu \in \Upsilon$ & $g^{-1}(\eta)$ & $\tau(\theta)$\\
-\midrule
-Gaussian & $\Phi_\theta ( \Phi^{-1}(u), \Phi^{-1}(v))$ & $(-1,1)$ & - & $\dfrac{e^{\eta} - e^{-\eta}}{e^{\eta} + e^{-\eta}}$ & $\frac{2}{\pi}\arcsin(\theta)$\\
-Student-t & $t_{\theta,\nu} ( t_\nu^{-1}(u), t_\nu^{-1}(v))$ & $(-1,1)$ & $(0, \infty)$ & $\dfrac{e^{\eta} - e^{-\eta}}{e^{\eta} + e^{-\eta}}$ & $\frac{2}{\pi}\arcsin(\theta)$\\
-Clayton & $\displaystyle (u^{-\theta} + v^{-\theta} -1)^{-\frac{1}{\theta}}$ & $(0, \infty)$ & - & $e^\eta$ & $\frac{\theta}{\theta + 2}$\\
-Gumbel & $\displaystyle  \exp\left[ - \{  (-\log u)^\theta + (-\log v)^\theta\}^{\frac{1}{\theta}} \right]$ & $[1, \infty)$ & - & $e^\eta + 1$ & $1 - \frac{1}{\theta}$\\
-Frank & $-\frac{1}{\theta}\log \left\{ 1 + \frac{(e^{-\theta u} - 1)(e^{-\theta v} - 1)}{e^{-\theta} - 1}\right\}$ & $(-\infty, \infty)\setminus\{0\}$ & - & $\eta$ & no closed form\\
-\bottomrule
-\end{tabular}}
-\end{table}
+where $g^{-1}: \mathbb{R} \to \Theta$ an inverse-link function which ensures that the copula parameter has the correct range. The choice of $g^{-1}(\eta)$ is not unique and depends on the copula family.
 
 Local likelihood estimation of the conditional copula parameter $\theta(x)$ uses Taylor expansions to approximate the calibration function $\eta(x)$ at an observed covariate value $X = x$ near a fixed point $X = x_0$, i.e.,
 $$
