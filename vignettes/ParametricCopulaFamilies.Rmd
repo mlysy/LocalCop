@@ -1,0 +1,163 @@
+---
+title: "Parametric Copula Families and Their Functions"
+params:
+  do_calc: FALSE
+output:
+  bookdown::html_vignette2:
+    toc: true
+author: "Alan Kuchinsky, Elif F. Acar, Martin Lysy"
+date: 2024-03-26
+bibliography: copulaReferences.bib
+link-citations: true
+vignette: >
+  %\VignetteIndexEntry{Parametric Copula Families and Their Functions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+header-includes:
+  - \setmathfont{STIXTwoMath-Regular.otf}
+  - \usepackage{xcolor}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = FALSE}
+library(LocalCop)
+```
+
+
+This document will discuss the implementations of the copula families seen in this package. That is, we will discuss the CDF, conditional CDF, also known as the h-functions in uniform scale, and PDF of each of the families implemented. For the conditional CDF, most of the copula implemented are symmetric in $u$ and $v$, so it is sufficient to provide one conditional CDF, and a simple swap of the variables will provide the other conditional CDF. Where this is not the case, both conditional CDF's will be provided. The document will offer both the original-scale and the logarithm-scale version of each formula where applicable. It should also be noted that the implementation utilizes the logarithm-scale version where possible to increase accuracy.
+
+## Gaussian Copula
+
+The Gaussian copula family has a single parameter, which is the correlation between the two normal variables, $\rho \in (-1, 1)$. That is, the correlation matrix is:
+
+$\Sigma =\begin{bmatrix}
+1 & \rho\\
+\rho & 1\\
+\end{bmatrix}$
+
+With determinant $1 - \rho^2$. It should also be noted that the Gaussian CDF has no closed-form CDF, as it is built around normal CDF's. However, using $\Phi_2$ as the bivariate normal CDF with the correlation matrix above and $\Phi^{-1}$ as the quantile function of the standard univariate normal distribution, we can write the CDF as follows:
+
+$$C(u, v; \rho) = \Phi_2 ( \Phi^{-1}(u), \Phi^{-1}(v) ; \rho)$$
+
+As such, the logarithm-scale is unsimplifiable and therefore omitted. The conditional CDF is:
+
+$$C(u \mid v; \rho) = \Phi\left(\dfrac{ \Phi^{-1}(u)-\rho \Phi^{1}(v) }{\sqrt{1-\rho^2} } \right)$$
+
+With $\Phi$ as the univariate standard normal cdf. Likewise, we note that the logarithm-scale version of the equation is unsimplifiable, so we omit it. This leaves us with the PDF:
+
+$$c(u, v; \rho) = \frac{1}{\sqrt{1-\rho^2}} \exp \left\{ \frac{-1}{2} \frac{\rho^2  (\Phi^{-1}(u))^2 - 2 \rho \Phi^{-1}(u) \Phi^{-1}(v) + \rho^2 (\Phi^{-1}(v))^2 } {1-\rho^2}\right\}$$
+
+Whose logarithm-scale is simplifiable and is presented below:
+
+$$\mathcal{c}(u, v; \rho) = -\frac{1}{2}\ln(1 - \rho^2) - \frac{1}{2} \frac{\rho^2  (\Phi^{-1}(u))^2 - 2 \rho \Phi^{-1}(u) \Phi^{-1}(v) + \rho^2 (\Phi^{-1}(v))^2 } {1-\rho^2}$$
+
+
+## Student Copula
+
+The Student copula family has two parameters, the correlation between the two t-distributed variables, $\rho \in [-1, 1]$, and the degrees of freedom of both t-distributions, $\nu \in \mathbb{R}$, $\nu > 0$.
+
+Similar to the Gaussian copula, the Student CDF requires the use of the bivariate t distribution CDF $T_2$ with correlation matrix $\Sigma =\begin{bmatrix}
+1 & \rho\\
+\rho & 1\\
+\end{bmatrix}$ with determinant $1 - \rho^2$ and $\nu$ degrees of freedom for both t variables, and $T^{-1}$ is the univariate t distribution quantile function:
+
+$$C(u, v; \rho, \nu) = T_2(T^{-1}(u; \nu), T^{-1}(v; \nu); \rho, \nu)$$
+
+The logarithm-scale CDF is unsimplifiable and thus is omitted. Here, we also use $T$ as the univariate t distribution CDF with $\nu$ degrees of freedom. The conditional CDF is:
+
+$$C(v | u; \rho, \nu) = T(\frac{T^{-1}(v; \nu) - \rho T^{-1}(u; \nu)}{\sqrt{(1 - \rho^2)\frac{\nu + T^{-1}(u; \nu)^2}{\nu + 1}}}; \nu)$$
+
+Similar to the CDF, the logarithm-scale is unsimplifiable, so it is omitted. The PDF is:
+
+$$c(u, v; \rho, \nu) = \frac{\Gamma\left(\frac{\nu + 2}{2}\right)\Gamma\left(\frac{\nu}{2}\right)\left(1 + \frac{T^{-1}(u)^2 + T^{-1}(v)^2 - 2\rho T^{-1}(u)T^{-1}(v)}{\nu(1 - \rho^2)}\right)^{-\frac{\nu + 2}{2}}}{\sqrt{1 - \rho^2}\Gamma\left(\frac{\nu + 1}{2}\right)^2\left(1 + \frac{T^{-1}(u)^2}{\nu}\right)^{-\frac{\nu + 1}{2}}\left(1 + \frac{T^{-1}(v)^2}{\nu}\right)^{-\frac{\nu + 1}{2}}}$$
+
+
+## Clayton Copula
+
+The Clayton copula family has a single parameter $\theta \in [0, \infty)$.
+
+The CDF is:
+
+$$C(u, v; \theta) = \left(u^{-\theta} + v^{-\theta} - 1\right)^{-\frac{1}{\theta}}$$
+
+With logarithm-scale CDF:
+
+$$\mathcal{C}(u, v; \theta) = -\frac{1}{\theta} \ln\left(u^{-\theta} + v^{-\theta} - 1\right)$$
+
+The conditional CDF is:
+
+$$C(v \mid u; \theta) = \left(1 + u^\theta(v^{-\theta} - 1)\right)^{-\frac{1}{\theta} - 1}$$
+
+With logarithm-scale conditional CDF:
+
+$$\mathcal{C}(v \mid u; \theta) = \left(-\frac{1}{\theta} - 1\right)\ln\left(1 + u^\theta(v^{-\theta} - 1)\right)$$
+
+The PDF is then:
+
+$$c(u, v; \theta) = (1 + \theta) (uv)^{-\theta - 1} \left(u^{-\theta} + v^{-\theta} - 1\right)^{-\frac{1}{\theta} - 2}$$
+
+With logarithm-scale PDF:
+
+$$\mathcal{c}(u, v; \theta) = \ln(1 + \theta) - (\theta + 1) \ln(uv) - (\frac{1}{\theta} + 2) \ln\left(u^{-\theta} + v^{-\theta} - 1\right)$$
+
+
+## Gumbel Copula
+
+The Gumbel copula family is also a single parameter family with parameter $\theta \in [1, \infty)$.
+
+The CDF of the copula family is:
+
+$$C(u, v; \theta) = \exp\left(-\left((-\ln(u)^\theta) + (-\ln(v)^\theta)\right)^{\frac{1}{\theta}}\right)$$
+
+And the logarithm-scale CDF is therefore:
+
+$$\mathcal{C}(u, v; \theta) = -\left((-\ln(u)^\theta) + (-\ln(v)^\theta)\right)^{\frac{1}{\theta}}$$
+
+The conditional CDF is:
+
+$$C(v \mid u; \theta) = u^{-1}\exp(-((-\ln(u))^\theta + (-\ln(v))^\theta)^\frac{1}{\theta})\left(1 + \left(\frac{\ln(v)}{\ln(u)}\right)^\theta\right)^{\frac{1}{\theta} - 1}$$
+
+With logarithm-scale conditional CDF:
+
+$$\mathcal{C}(v \mid u; \theta) = -\ln(u) -((-\ln(u))^\theta + (-\ln(v))^\theta)^\frac{1}{\theta} + (\frac{1}{\theta} - 1)\ln\left(1 + \left(\frac{\ln(v)}{\ln(u)}\right)^\theta\right)$$
+
+Finally, the PDF is:
+
+$$c(u, v; \theta) = \exp\left(-\left((-\ln(u))^\theta + (-\ln(v))^\theta\right)^\frac{1}{theta}\right) \left(\left((-\ln(u))^\theta + (-\ln(v))^\theta\right)^\frac{1}{\theta} + \theta - 1\right) \left((-\ln(u))^\theta + (-\ln(v))^\theta\right)^{\frac{1}{\theta} - 2} \frac{\ln(u)\ln(v)}{uv}$$
+
+And the logarithm-scale PDF is:
+
+$$\mathcal{c}(u, v; \theta) = -\left((-\ln(u))^\theta + (-\ln(v))^\theta\right)^\frac{1}{\theta} + \ln\left(\left((-\ln(u))^\theta + (-\ln(v))^\theta\right)^\frac{1}{\theta} + \theta - 1\right) + (\frac{1}{\theta} - 2)\ln\left((-\ln(u))^\theta + (-\ln(v))^\theta\right) + \ln(\ln(u)\ln(v)) - \ln(uv)$$
+
+
+## Frank Copula
+
+The Frank copula family is a single parameter family with the parameter $\theta \in \mathbb{R} \setminus \{0\}$. 
+
+Its original-scale CDF is:
+
+$$C(u, v; \theta) = -\theta^{-1}\ln\left(\frac{1 - \exp(-\theta) - (1 - \exp(-u\theta))(1 - \exp(-v\theta))}{1 - \exp(-\theta)}\right)$$
+
+Note the logarithm-scale CDF is nearly unsimplifiable, and, in fact, simplifying it results in positive values of theta making the expression undefined. Thus, we use only the original-scale version of the formula and took the logarithm of the result as needed.
+
+Its original-scale conditional CDF is:
+
+$$C(v \mid u; \theta) = \frac{\exp(-u\theta)}{\frac{1 - \exp(-\theta)}{1 - \exp(-v\theta)} - (1 - \exp(-u\theta))}$$
+
+And its subsequent logarithm-scale conditional CDF is:
+
+$$\mathcal{C}(v \mid u; \theta) = -u\theta - \ln\left(\frac{1 - \exp(-\theta)}{1 - \exp(-v\theta)} - (1 - \exp(-u\theta))\right)$$
+
+The original-scale PDF is:
+
+$$c(u, v; \theta) = \frac{\theta(1 - \exp(-\theta))\exp(-\theta(u + v))}{(1 - \exp(-\theta) - (1 - \exp(-u\theta))(1 - \exp(-v\theta)))^2}$$
+
+And its logarithm-scale PDF is:
+
+$$\mathcal{c}(u, v; \theta) = \ln(\theta) + \ln(1 - \exp(-\theta)) - \theta(u + v) - 2\ln(1 - \exp(-\theta) - (1 - \exp(-u\theta))(1 - \exp(-v\theta)))$$

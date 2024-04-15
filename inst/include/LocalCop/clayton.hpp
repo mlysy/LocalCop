@@ -12,7 +12,7 @@ namespace LocalCop {
   ///
   /// @param[in] u1 First uniform variable.
   /// @param[in] u2 Second uniform variable.
-  /// @param[in] theta Parameter of the Clayton copula with the range $[0,\infty]$.
+  /// @param[in] theta Parameter of the Clayton copula with the range $[0,\infty)$.
   /// @param give_log Whether or not to return on the log scale.
   ///
   /// @return Value of the copula CDF.
@@ -28,7 +28,7 @@ namespace LocalCop {
   ///
   /// @param[in] u1 First uniform variable.
   /// @param[in] u2 Second uniform variable.
-  /// @param[in] theta Parameter of the Clayton copula with the range $[0,\infty]$.
+  /// @param[in] theta Parameter of the Clayton copula with the range $[0,\infty)$.
   /// @param give_log Whether or not to return on the log scale.
   ///
   /// @return Value of the h-function.
@@ -44,7 +44,7 @@ namespace LocalCop {
   ///
   /// @param[in] u1 First uniform variable.
   /// @param[in] u2 Second uniform variable.
-  /// @param[in] theta Parameter of the Clayton copula with the range $[0,\infty]$.
+  /// @param[in] theta Parameter of the Clayton copula with the range $[0,\infty)$.
   /// @param give_log Whether or not to return on the log scale.
   ///
   /// @return Value of the copula PDF.
