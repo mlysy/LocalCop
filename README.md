@@ -26,3 +26,7 @@ devtools::install_github("mlysy/LocalCop")
 ### Usage
 
 Please see package vignette: `vignette("LocalCop-vignette")`.
+
+### Contributing
+
+Contributions in the form of bug reports, fixes, extensions, improvements, etc. are most welcome.  Please file an [issue](https://github.com/mlysy/LocalCop/issues) before submitting a PR.
