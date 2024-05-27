@@ -18,14 +18,22 @@ To install the CRAN version (0.0.1):
 install.packages("LocalCop")
 ```
 
-To install the latest development version: first install the [**`devtools`**](https://CRAN.R-project.org/package=devtools) package, then:
+To install the latest development version: first install the [**devtools**](https://CRAN.R-project.org/package=devtools) package, then:
 ```{r}
-devtools::install_github("mlysy/LocalCop")
+devtools::install_github("mlysy/LocalCop", INSTALL_opts = "--install-tests")
 ```
 
 ### Usage
 
 Please see package vignette: `vignette("LocalCop-vignette")`.
+
+### Unit Tests
+
+To verify that the package has been installed correctly, you can run its unit tests.  First install the [**testthat**](https://CRAN.R-project.org/package=testthat) package, then:
+
+```{r}
+testthat::test_package("LocalCop", reporter = "progress")
+```
 
 ### Contributing
 
