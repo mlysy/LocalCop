@@ -31,14 +31,10 @@ library(readr)
 
 ## Overview
 
-This vignette shows how to use the **LocalCop** package to conduct local likelihood inference for the dependence parameters in conditional copula models, based on the works @ACY2011, @ACY2013 and @ACL2019.
+This vignette shows how to use the **LocalCop** package to conduct local likelihood inference for the dependence parameters in conditional copula models, based on the works @ACY2011, @ACY2013 and @ACL2019. 
 
-For any bivariate response vector $(Y_1, Y_2)$, the conditional joint distribution given a covariate $X$ is given by 
-\begin{equation}
-F_X(y_1, y_2 \mid x) = C_X (F_{1\mid X} (y_1 \mid x),F_{2\mid X} (y_2 \mid x) \mid x ),
-(\#eq:fullmodel)
-\end{equation}
-where $F_{1\mid X}(y_1 \mid x)$ and $F_{2\mid X}(y_2 \mid x)$ are the conditional marginal distributions of $Y_1$ and $Y_2$ given $X$, and $C_X(u, v \mid x)$ is a conditional copula function.  That is, for given $X = x$, the function $C_X(u, v \mid x)$ is a bivariate CDF with uniform margins. 
+**LocalCop** is primarily intended for users who want to apply conditional copula models to real-world data with an interest to infer covariate effects on the conditional dependence between two response variables. This is done semiparametrically using kernel smoothing within the likelihood framework as detailed below. 
+
 
 ```{r libs, message=FALSE}
 # load required packages
@@ -50,6 +46,14 @@ library(ggplot2)    # plotting
 ```
 
 ## Data generating model
+
+For any bivariate response vector $(Y_1, Y_2)$, the conditional joint distribution given a covariate $X$ is given by 
+\begin{equation}
+F_X(y_1, y_2 \mid x) = C_X (F_{1\mid X} (y_1 \mid x),F_{2\mid X} (y_2 \mid x) \mid x ),
+(\#eq:fullmodel)
+\end{equation}
+where $F_{1\mid X}(y_1 \mid x)$ and $F_{2\mid X}(y_2 \mid x)$ are the conditional marginal distributions of $Y_1$ and $Y_2$ given $X$, and $C_X(u, v \mid x)$ is a conditional copula function.  That is, for given $X = x$, the function $C_X(u, v \mid x)$ is a bivariate CDF with uniform margins. 
+
 
 If the true conditional marginal distrutions are known, we may compute the marginally uniform variables $U = F_{1|X}(Y_1 \mid X)$ and $V = F_{2|X}(Y_2 \mid X)$.  In practice these distributions are unknown, such that $\hat U = \hat F_{1|X}(Y_1 \mid X)$ and $\hat V = \hat F_{1|X}(Y_2 \mid X)$ are pseudo-uniform variables estimated using parametric or nonparametric techniques -- see @ACL2019 for an application using ARMA-GARCH models.  Either way, the focus of **LocalCop** is on estimating the conditional copula function, which is given the semi-parametric model 
 \begin{equation}
