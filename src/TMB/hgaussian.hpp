@@ -1,4 +1,4 @@
-#include "LocalCop/gaussian.hpp"
+#include "../../inst/include/LocalCop/gaussian.hpp"
 
 #undef TMB_OBJECTIVE_PTR
 #define TMB_OBJECTIVE_PTR obj
@@ -8,7 +8,7 @@ Type hgaussian(objective_function<Type> *obj) {
   // R inputs
   DATA_VECTOR(u1);
   DATA_VECTOR(u2);
-  DATA_VECTOR(weights)
+  DATA_VECTOR(weights);
   PARAMETER_VECTOR(theta);
   // output
   vector<Type> lpart = LocalCop::hgaussian(u1, u2, theta, 1);

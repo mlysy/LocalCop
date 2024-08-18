@@ -2,11 +2,11 @@
 ///
 /// @brief Local Likelihood calculations for the five major families.
 
-#include "LocalCop/frank.hpp"
-#include "LocalCop/gaussian.hpp"
-#include "LocalCop/gumbel.hpp"
-#include "LocalCop/student.hpp"
-#include "LocalCop/clayton.hpp"
+#include "../../inst/include/LocalCop/frank.hpp"
+#include "../../inst/include/LocalCop/gaussian.hpp"
+#include "../../inst/include/LocalCop/gumbel.hpp"
+#include "../../inst/include/LocalCop/student.hpp"
+#include "../../inst/include/LocalCop/clayton.hpp"
 
 #undef TMB_OBJECTIVE_PTR
 #define TMB_OBJECTIVE_PTR obj
