@@ -58,7 +58,7 @@ test_that("Copula density is same in VineCopula and TMB", {
 
 test_that("Copula cdf is same in VineCopula and TMB", {
   nreps <- 20
-  test_descr <- expand.grid(family = c(3, 4, 5), # add copula families
+  test_descr <- expand.grid(family = c(1, 2, 3, 4, 5), # add copula families
                             stringsAsFactors = FALSE)
   n_test <- nrow(test_descr)
   for(ii in 1:n_test) {
@@ -98,7 +98,7 @@ test_that("Copula cdf is same in VineCopula and TMB", {
 
 test_that("Copula partial derivative is same in VineCopula and TMB", {
   nreps <- 20
-  test_descr <- expand.grid(family = c(1, 3, 4, 5), # add copula families
+  test_descr <- expand.grid(family = c(1, 2, 3, 4, 5), # add copula families
                             stringsAsFactors = FALSE)
   n_test <- nrow(test_descr)
   for(ii in 1:n_test) {

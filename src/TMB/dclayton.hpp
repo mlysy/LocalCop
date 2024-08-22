@@ -8,7 +8,7 @@ Type dclayton(objective_function<Type> *obj) {
   // R inputs
   DATA_VECTOR(u1);
   DATA_VECTOR(u2);
-  DATA_VECTOR(weights)
+  DATA_VECTOR(weights);
   PARAMETER_VECTOR(theta);
   // output
   vector<Type> lpdf = LocalCop::dclayton(u1, u2, theta, 1);

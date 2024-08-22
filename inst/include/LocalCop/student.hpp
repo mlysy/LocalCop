@@ -12,7 +12,6 @@
 #endif
 
 namespace LocalCop {
-
   /// Distribution function of the Student-t distribution.
   ///
   /// This implementation is defined in terms of the incomplete beta function: <https://en.wikipedia.org/wiki/Student%27s_t-distribution#Cumulative_distribution_function>.
@@ -48,6 +47,39 @@ namespace LocalCop {
     return CppAD::CondExpGe(p, Type(0.5), res, -res);
   }
   VECTORIZE2_tt(qt)
+
+  template<class Float>
+  struct studentIntegrate {
+    typedef Float Scalar;
+    Float theta, nu;
+    Float u1, u2;
+
+    Float operator() () {
+      return dstudent(u1, u2, theta, nu, 0);
+    }
+
+    Float integrate(Float x1, Float x2) {
+      using gauss_kronrod::mvIntegrate;
+      return mvIntegrate(*this).wrt(u1, -INFINITY, x1).wrt(u2, -INFINITY, x2) ();
+    }
+  };
+
+  /// Calculate Student copula CDF.
+  ///
+  /// @param[in] u1 First uniform variable.
+  /// @param[in] u2 Second uniform variable. 
+  /// @param[in] theta Correlation parameter of the Student-t copula with the range $(-1, 1)$.
+  /// @param[in] nu Degrees of freedom parameter.
+  /// @param give_log Whether or not to return on the log scale. 
+  ///
+  /// @return Value of the p-function.  
+  template <class Type>
+  Type pstudent(Type u1, Type u2, Type theta, Type nu, int give_log=0) {
+    studentIntegrate<Type> si;
+    si.theta = theta;
+    si.nu = nu;
+    return si.integrate(qt(u1, nu), qt(u2, nu));
+  }
 
   /// Calculate Student-t copula PDF.
   //
