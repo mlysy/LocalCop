@@ -1,5 +1,5 @@
 tmb_name <- "LocalCop_TMBExports"
-tmb_flags <- "-I\"../../inst/include\" -ffunction-sections -fdata-sections -Wa,-mbig-obj" #commandArgs(trailingOnly = TRUE)
+tmb_flags <- commandArgs(trailingOnly = TRUE)
 
 if(file.exists(paste0(tmb_name, ".cpp"))) {
   if(length(tmb_flags) == 0) tmb_flags <- ""

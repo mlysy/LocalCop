@@ -1,4 +1,4 @@
-#include "../../inst/include/LocalCop/clayton.hpp"
+#include "LocalCop/clayton.hpp"
 
 #undef TMB_OBJECTIVE_PTR
 #define TMB_OBJECTIVE_PTR obj

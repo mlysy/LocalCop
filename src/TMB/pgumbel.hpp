@@ -1,4 +1,4 @@
-#include "../../inst/include/LocalCop/gumbel.hpp"
+#include "LocalCop/gumbel.hpp"
 
 #undef TMB_OBJECTIVE_PTR
 #define TMB_OBJECTIVE_PTR obj

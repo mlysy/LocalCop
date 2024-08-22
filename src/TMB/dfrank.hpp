@@ -1,4 +1,4 @@
-#include "../../inst/include/LocalCop/frank.hpp"
+#include "LocalCop/frank.hpp"
 
 #undef TMB_OBJECTIVE_PTR
 #define TMB_OBJECTIVE_PTR obj
