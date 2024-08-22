@@ -1,4 +1,4 @@
-#include "=LocalCop/student.hpp"
+#include "LocalCop/student.hpp"
 
 #undef TMB_OBJECTIVE_PTR
 #define TMB_OBJECTIVE_PTR obj
