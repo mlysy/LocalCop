@@ -1,3 +1,16 @@
+# LocalCop 0.0.2
+
+## Minor Changes
+
+- Added rotated copula families 13, 14, 23, 24, 33, 34.
+
+## Bug fixes
+
+- Streamlined family and degree checks.
+
+- Added missing semicolons after TMB macros.
+
+
 # LocalCop 0.0.1
 
 - Initial CRAN submission.
@@ -21,6 +34,7 @@
 - Fixed seed in `CondiCopSelect()` example.
 
 - Fixed plot in `CondiCopLocFit()` example.
+
 
 # LocalCop 0.0.0.9000
 
