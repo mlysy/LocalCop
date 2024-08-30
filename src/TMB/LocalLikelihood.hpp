@@ -24,18 +24,18 @@ Type LocalLikelihood(objective_function<Type> *obj) {
   vector<Type> u1 = y1;
   vector<Type> u2 = y2;
   int fam = family;
-  if(family == 13 | family == 14) {
+  if((family == 13) | (family == 14)) {
     // 180 degree rotation
     u1 = Type(1.0) - u1;
     u2 = Type(1.0) - u2;
     fam = family - 10;
   }
-  if(family == 23 | family == 24) {
+  if((family == 23) | (family == 24)) {
     // 90 degree rotation
     u1 = Type(1.0) - u1;
     fam = family - 20;
   }
-  if(family == 33 | family == 34) {
+  if((family == 33) | (family == 34)) {
     // 270 degree rotation
     u2 = Type(1.0) - u2;
     fam = family - 30;
