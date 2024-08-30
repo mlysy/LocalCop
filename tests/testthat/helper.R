@@ -29,9 +29,19 @@ data_sim <- function(family) {
     # for family == 4 need epar < 16.9
     eta <- rnorm(2)/2  # evaluation parameter
     epar <- BiCopEta2Par(family = family, eta = eta[1] + eta[2] * (x-x0))$par
-    if((!family %in% c("3", "4")) ||
-       ((family == "3") && (max(epar) < 27.9)) ||
-       ((family == "4") && (max(epar) < 16.9))) {
+    if(family %in% c("1", "2", "5")) {
+      break
+    } else if((family %in% c("3", "13")) &&
+              (max(epar) < 27.9)) {
+      break
+    } else if((family %in% c("4", "14")) &&
+              (max(epar) < 16.9)) {
+      break
+    } else if((family %in% c("23", "33")) &&
+              (min(epar) > -27.9)) {
+      break
+    } else if((family %in% c("4", "14")) &&
+              (min(epar) > -16.9)) {
       break
     }
   }

@@ -23,6 +23,12 @@
 #'   \item{3}{Clayton copula.}
 #'   \item{4}{Gumbel copula.}
 #'   \item{5}{Frank copula.}
+#'   \item{13}{Clayton copula -- rotated 180 degrees.}
+#'   \item{14}{Gumbel copula -- rotated 180 degrees.}
+#'   \item{23}{Clayton copula -- rotated 90 degrees.}
+#'   \item{24}{Gumbel copula -- rotated 90 degrees.}
+#'   \item{33}{Clayton copula -- rotated 270 degrees.}
+#'   \item{34}{Gumbel copula -- rotated 270 degrees.}
 #' }
 #' @return Vector of converted parameters.
 
@@ -34,6 +40,7 @@
 #' @rdname ConvertPar
 #' @export
 BiCopEta2Par <- function(family, eta, eta2=0) {
+  .check_family(family)
   if(family==1 || family==2) {
     par <- (exp(eta)-exp(-eta))/(exp(eta)+exp(-eta)) # [-1,1]
     ## par2 <- eta2
@@ -76,8 +83,6 @@ BiCopEta2Par <- function(family, eta, eta2=0) {
   } else if(family==124 || family==134 || family==224 || family==234) {
     par <- -(exp(eta)+1) # [-infty,-1]
     ## par2 <- eta2
-  } else {
-    stop("Unknown copula family.")
   }
   par2 <- eta2
   return(list(par=par, par2=par2))
@@ -91,6 +96,7 @@ BiCopEta2Par <- function(family, eta, eta2=0) {
 #' @rdname ConvertPar
 #' @export
 BiCopPar2Eta <- function(family, par, par2=0) {
+  .check_family(family)
   if(family==1 || family==2) {
     eta <- 0.5*log((1+par)/(1-par))
     ## eta2 <-par2
@@ -133,8 +139,6 @@ BiCopPar2Eta <- function(family, par, par2=0) {
   } else if(family==124 || family==134 || family==224 || family==234) {
     eta <- log(-(par-1))
     ## eta2 <-par2
-  } else {
-    stop("Unknown copula family.")
   }
   eta2 <- par2
   return(list(eta = eta, eta2 = eta2))
@@ -149,6 +153,7 @@ BiCopPar2Eta <- function(family, par, par2=0) {
 #' @rdname ConvertPar
 #' @export
 BiCopEta2Tau <- function(family, eta, eta2=0) {
+  .check_family(family)
   pars <- BiCopEta2Par(family, eta, eta2)
   tau  <- VineCopula::BiCopPar2Tau(family, pars$par, pars$par2)
   return(tau)
@@ -163,10 +168,13 @@ BiCopEta2Tau <- function(family, eta, eta2=0) {
 #' @rdname ConvertPar
 #' @export
 BiCopTau2Eta <- function(family, tau) {
+  .check_family(family)
   par <- VineCopula::BiCopTau2Par(family,tau)
   etas <- BiCopPar2Eta(family, par, par2 = 0)
   return(etas$eta)
 }
+
+.FamilySet_supported <- c(1:5, 13:14, 23:24, 33:34)
 
 .FamilySet <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
                 13, 14, 16, 17, 18, 19, 20, 23,
