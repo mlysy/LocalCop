@@ -10,10 +10,13 @@
   # empirical tau on non-overlapping periods
   etau <- .get_tau(u1, u2, nper)
   if(all(etau > 0)) {
-    family  <- 1:5   # case with only positive dependence
+    family  <- c(1:5, 13:14) # only +ve dependence
+  } else if(all(etau < 0)) {
+    family <- c(1,2,5, 23:24, 33:34) # only -ve dependence
   } else {
-    family <- c(1,2,5) # cases with both positive and negative dependence
+    family <- c(1,2,5) # +ve and -ve dependence
   }
+  family
 }
 
 #' Kendall's tau on non-overlaping sets.
@@ -97,8 +100,10 @@
   pareval
 }
 
-# convert degree to integer
-.format_degree <- function(degree) {
+#' Check that degree is valid.
+#'
+#' @noRd
+.check_degree <- function(degree) {
   if(!degree %in% 0:1) stop("degree must be 0 or 1.")
   ## degree <- match.arg(degree)
   ## return(as.numeric(degree == "linear"))
@@ -118,3 +123,16 @@
 ##                method = "BFGS")
 ##   return(list(eta = as.numeric(opt$par), loglik = -opt$value))
 ## }
+
+#' Check whether copula family is known and/or supported.
+#'
+#' @noRd
+.check_family <- function(family) {
+  if(length(family) != 1) stop("family must be a single integer.  See `ConvertPar` for list of supported families.")
+  if((family %in% .FamilySet) &&
+     !(family %in% .FamilySet_supported)) {
+    stop("Unsupported copula family.  See `?ConvertPar` for list of supported families.")
+  } else if(!family %in% .FamilySet) {
+    stop("Unknown copula family.  See `?ConvertPar` for list of supported families.")
+  }
+}

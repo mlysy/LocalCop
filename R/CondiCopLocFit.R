@@ -38,8 +38,8 @@ CondiCopLocFit <- function(u1, u2, family, x, x0, nx = 100,
   }
   nx <- length(x0)
   # initialize eta and nu
-  if(!degree %in% 0:1) stop("degree must be 0 or 1.")
-  ## degree <- match.arg(degree)
+  .check_family(family)
+  .check_degree(degree)
   etaNu <- .get_etaNu(u1 = u1, u2 = u2, family = family,
                       degree = degree, eta = eta, nu = nu)
   ieta <- etaNu$eta

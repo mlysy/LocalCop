@@ -17,9 +17,8 @@
 CondiCopLocFun <- function(u1, u2, family,
                            x, x0, wgt, degree = 1,
                            eta, nu) {
-  if(!family %in% 1:5) {
-    stop("Unsupported copula family (must be integer between 1-5).")
-  }
+  .check_family(family)
+  .check_degree(degree)
   wpos <- wgt > 0 # index of positive weights
   # create TMB function
   # format nu
@@ -35,8 +34,6 @@ CondiCopLocFun <- function(u1, u2, family,
                family = family, nu = nu[wpos])
   parameters <- list(beta = eta)
   # convert degree to TMB::map
-  ## degree <- .format_degree(degree)
-  if(!degree %in% 0:1) stop("degree must be 0 or 1.")
   map <- list(beta = factor(c(1, 2)))
   if(degree == 0) {
     parameters$beta[2] <- 0

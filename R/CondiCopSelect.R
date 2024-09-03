@@ -28,11 +28,13 @@ CondiCopSelect <- function(u1, u2, family, x, xind = 100,
                            kernel = KernEpa, band, nband = 6,
                            optim_fun, cv_all = FALSE,
                            full_out = TRUE, cl = NA) {
-  ## degree <- match.arg(degree)
-  ## n <- length(u1)
   # family set
-  if(missing(family)) family <- .get_family(u1, u2, nper = 10)
+  if(missing(family)) {
+    family <- .get_family(u1, u2, nper = 10)
+  }
+  sapply(family, .check_family)
   nfam <- length(family)
+  .check_degree(degree)
   # initial parameters
   if(missing(nu)) nu <- rep(NA, nfam)
   nu <- sapply(1:nfam, function(ii) {
@@ -75,13 +77,17 @@ CondiCopSelect <- function(u1, u2, family, x, xind = 100,
     cvLIK <- sapply(1:nrow(gridVal), fun)
   } else {
     # run in parallel
-    parallel::clusterExport(cl,
-                            varlist = c("fun", "u1", "u2", "family", "x",
-                                        "band", "kernel", "optim_fun",
-                                        "gridVal", "xind", "cv_all",
-                                        "full_out"),
-                            envir = environment())
-    cvLIK <- parallel::parSapply(cl, X = 1:nrow(gridVal), FUN = fun)
+    parallel::clusterExport(
+      cl = cl,
+      varlist = c("fun", "u1", "u2", "family", "x",
+                  "band", "kernel", "optim_fun",
+                  "gridVal", "xind", "cv_all",
+                  "full_out"),
+      envir = environment()
+    )
+    cvLIK <- parallel::parSapply(cl,
+                                 X = 1:nrow(gridVal),
+                                 FUN = fun)
   }
   if(!full_out) {
     isel <- which.max(cvLIK)

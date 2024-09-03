@@ -39,5 +39,11 @@ The copula family integer codes are identical to those of the \pkg{VineCopula} p
 \item{3}{Clayton copula.}
 \item{4}{Gumbel copula.}
 \item{5}{Frank copula.}
+\item{13}{Clayton copula -- rotated 180 degrees.}
+\item{14}{Gumbel copula -- rotated 180 degrees.}
+\item{23}{Clayton copula -- rotated 90 degrees.}
+\item{24}{Gumbel copula -- rotated 90 degrees.}
+\item{33}{Clayton copula -- rotated 270 degrees.}
+\item{34}{Gumbel copula -- rotated 270 degrees.}
 }
 }

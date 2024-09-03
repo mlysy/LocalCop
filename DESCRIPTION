@@ -1,7 +1,7 @@
 Package: LocalCop
 Title: Local Likelihood Inference for Conditional Copula Models
-Version: 0.0.1
-Date: 2024-03-18
+Version: 0.0.2
+Date: 2024-08-30
 Authors@R: 
     c(person(given = "Elif",
              family = "Acar",
