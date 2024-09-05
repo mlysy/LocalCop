@@ -4,7 +4,7 @@
 
 - Added rotated copula families 13, 14, 23, 24, 33, 34.
 
-## Bug fixes
+## Bug Fixes
 
 - Streamlined family and degree checks.
 
