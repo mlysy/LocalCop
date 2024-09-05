@@ -1,0 +1,10 @@
+development:
+  mode: release
+template:
+  bootstrap: 5
+  bootswatch: zephyr
+  # bootstrap: 3
+  # params:
+  #   bootswatch: readable
+pkgdown:
+  as_is: true

@@ -15,7 +15,7 @@ Authors@R:
              family = "Kuchinsky",
 	     role = "ctb"))
 Description: Implements a local likelihood estimator for the dependence parameter in bivariate conditional copula models.  Copula family and local likelihood bandwidth parameters are selected by leave-one-out cross-validation.  The models are implemented in 'TMB', meaning that the local score function is efficiently calculated via automated differentiation (AD), such that quasi-Newton algorithms may be used for parameter estimation.
-URL: https://github.com/mlysy/LocalCop
+URL: https://github.com/mlysy/LocalCop, https://mlysy.github.io/LocalCop/
 BugReports: https://github.com/mlysy/LocalCop/issues
 License: GPL-3
 Encoding: UTF-8
