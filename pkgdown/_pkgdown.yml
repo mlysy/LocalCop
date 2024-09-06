@@ -1,10 +1,10 @@
 development:
   mode: release
+url: https://mlysy.github.io/LocalCop/
 template:
-  bootstrap: 5
-  bootswatch: zephyr
-  # bootstrap: 3
-  # params:
-  #   bootswatch: readable
-pkgdown:
-  as_is: true
+  # bootstrap: 5
+  # bootswatch: zephyr
+  # math-rendering: mathjax
+  bootstrap: 3
+  params:
+    bootswatch: readable
