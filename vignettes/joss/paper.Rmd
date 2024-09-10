@@ -16,16 +16,18 @@ authors:
     orcid: 0000-0001-9974-1121
     affiliation: 3
   - name: Alan Kuchinsky
-    affiliation: 1
+    affiliation: 4
 affiliations:
- - name: University of Manitoba
+ - name: University of Guelph
    index: 1
  - name: Hospital for Sick Children
    index: 2
  - name: University of Waterloo
    index: 3
+ - name: University of Manitoba
+   index: 4
 citation_author: Acar et. al.
-date: 26 March 2024
+date: 9 September 2024
 year: 2024
 bibliography: references.bib
 output:
