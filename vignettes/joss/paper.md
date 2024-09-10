@@ -127,13 +127,13 @@ where $(u_i, v_i, x_i)$ is the data for observation $i$, $\boldsymbol{x}_i = (1,
 In the following example, we illustrate the model selection/tuning and fitting steps for data generated from a Clayton copula with conditional Kendall $\tau$ displayed in \autoref{fig:copcomp}.  The CV metric for each combination of family and bandwidth are displayed in \autoref{fig:select1-plot}.
 
 
-```r
+``` r
 library(LocalCop)   # local likelihood estimation
 library(VineCopula) # simulate copula data
 ```
 
 
-```r
+``` r
 set.seed(2024)
 
 # simulation setting
@@ -144,7 +144,7 @@ eta_fun <- function(x) {       # calibration function
 }
 ```
 
-```r
+``` r
 # simulate covariate values
 x <- sort(runif(n_obs))
 
@@ -155,7 +155,7 @@ par_true <- BiCopEta2Par(family = family,  # copula parameter theta(x)
 udata <- VineCopula::BiCopSim(n_obs, family = family, par = par_true)
 ```
 
-```r
+``` r
 # model selection and tuning
 bandset <- c(.02, .05, .1, .2) # set of bandwidth parameters
 famset <- c(1, 2, 3, 4, 5)     # set of copula families
@@ -165,7 +165,7 @@ n_loo <- 100                   # number of LOO-CV observations
                                # (can be much smaller than n_obs)
 ```
 
-```r
+``` r
 # calculate cv for each combination of family and bandwidth
 cvselect <- CondiCopSelect(u1= udata[,1], u2 = udata[,2],
                            x = x, xind = n_loo,
@@ -179,7 +179,7 @@ cvselect <- CondiCopSelect(u1= udata[,1], u2 = udata[,2],
 \end{figure}
 
 
-```r
+``` r
 # extract the selected family and bandwidth from cvselect
 cv_res <- cvselect$cv
 i_opt <- which.max(cv_res$cv)
@@ -200,7 +200,7 @@ tau_loc <- BiCopEta2Tau(copfit$eta, family= fam_opt)
 
 
 
-```r
+``` r
 # simulate covariate values
 x <- sort(runif(n_obs))
 
@@ -211,7 +211,7 @@ par_true <- BiCopEta2Par(family = family,  # copula parameter theta(x)
 udata <- VineCopula::BiCopSim(n_obs, family = family, par = par_true)
 ```
 
-```r
+``` r
 # model selection and tuning
 bandset <- c(.02, .05, .1, .2) # set of bandwidth parameters
 famset <- c(1, 2, 3, 4, 5)     # set of copula families
@@ -221,7 +221,7 @@ n_loo <- 100                   # number of LOO-CV observations
                                # (can be much smaller than n_obs)
 ```
 
-```r
+``` r
 # calculate cv for each combination of family and bandwidth
 cvselect <- CondiCopSelect(u1= udata[,1], u2 = udata[,2],
                            x = x, xind = n_loo,
@@ -231,7 +231,7 @@ cvselect <- CondiCopSelect(u1= udata[,1], u2 = udata[,2],
 
 
 
-```r
+``` r
 # extract the selected family and bandwidth from cvselect
 cv_res <- cvselect$cv
 i_opt <- which.max(cv_res$cv)
