@@ -1,4 +1,3 @@
 *.log
 *.pdf
-!joss_article2.R
-!calculations.R
+!*.R

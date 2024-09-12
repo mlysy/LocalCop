@@ -69,22 +69,7 @@ link-citations: true
 
 -->
 
-```{r setup, include = FALSE}
-knitr::read_chunk("calculations.R")
-library(LocalCop)
-library(VineCopula)  # for simulating copula data
-library(readr)       # for reading in the copula table
-options(
-  kableExtra.latex.load_packages = FALSE
-)                    # for styling the copula table
-library(kableExtra)  # add packages manually for joss submission
-library(tidyr)       # for data manipulations
-library(dplyr)       #
-library(ggplot2)     # for plots
-library(ggpubr)      # 
-library(gamCopula)   # other packages for fitting
-library(CondCopulas) # conditional copula models
-```
+
 
 <!-- latex macros -->
 \newcommand{\R}{{\textsf{R}}}
@@ -143,91 +128,133 @@ where $(u_i, v_i, x_i)$ is the data for observation $i$, $\boldsymbol{x}_i = (1,
 
 In the following example, we illustrate the model selection/tuning and fitting steps for data generated from a Clayton copula with conditional Kendall $\tau$ displayed in \autoref{fig:copcomp}.  The CV metric for each combination of family and bandwidth are displayed in \autoref{fig:select1-plot}.
 
-```{r libs}
+
+``` r
+library(LocalCop)   # local likelihood estimation
+library(VineCopula) # simulate copula data
 ```
 
-```{r dgm1-setup}
-```
-```{r dgm1}
-<<dgm>>
-```
-```{r select1-precalc}
-<<select-precalc>>
-```
-```{r select1-calc, eval = params$do_calc, warning = FALSE}
-<<select-calc>>
-```
-```{r select1-save, include = FALSE, eval = params$do_calc}
-saveRDS(cvselect, file = "cvselect1.rds")
-```
-```{r select1-load, include = FALSE, eval = !params$do_calc}
-cvselect <- readRDS("cvselect1.rds")
-```
-```{r select1-plot, echo = FALSE, fig.height = 2, fig.width = 9, out.width = "100%", fig.cap = "Cross-validation metric for each combination of family and bandwidth."}
-<<select-plot>>
+
+``` r
+set.seed(2024)
+
+# simulation setting
+family <- 3                    # Clayton Copula
+n_obs <- 300                   # number of observations
+eta_fun <- function(x) {       # calibration function
+  sin(5*pi*x) + cos(8*pi*x^2)
+}
 ```
 
-```{r locfit1}
-<<locfit>>
-```
-```{r gamfit1, include = FALSE}
-<<gamfit>>
-```
-```{r condfit1, include = FALSE}
-<<condfit>>
-```
-```{r sumfit1, include = FALSE}
-sumfit1 <- tibble(
-  x = x0,
-  True = BiCopEta2Tau(family = family, eta = eta_fun(x0)),
-  LocalCop = tau_loc,
-  gamCopula = tau_gam,
-  CondCopulas = tau_cond
-)
-```
-```{r dgm2-setup, include = FALSE}
-```
-```{r dgm2}
-<<dgm>>
-```
-```{r select2-precalc}
-<<select-precalc>>
-```
-```{r select2-calc, eval = params$do_calc, warning = FALSE}
-<<select-calc>>
-```
-```{r select2-save, include = FALSE, eval = params$do_calc}
-saveRDS(cvselect, file = "cvselect2.rds")
-```
-```{r select2-load, include = FALSE, eval = !params$do_calc}
-cvselect <- readRDS("cvselect2.rds")
-```
-```{r locfit2}
-<<locfit>>
-```
-```{r gamfit2, include = FALSE}
-<<gamfit>>
-```
-```{r condfit2, include = FALSE}
-<<condfit>>
-```
-```{r sumfit2, include = FALSE}
-sumfit2 <- tibble(
-  x = x0,
-  True = BiCopEta2Tau(family = family, eta = eta_fun(x0)),
-  LocalCop = tau_loc,
-  gamCopula = tau_gam,
-  CondCopulas = tau_cond
-)
-```
-```{r copcomp, echo = FALSE, fig.height = 4.5, fig.width = 9, out.width = "100%", fig.cap = "True vs estimated conditional Kendall $\\tau$ using various methods."}
-<<plotfit>>
+``` r
+# simulate covariate values
+x <- sort(runif(n_obs))
 
-plot1 <- plotfit(sumfit1) + ggtitle("(a) n = 300")
-plot2 <- plotfit(sumfit2) + ggtitle("(b) n = 1000")
-
-ggarrange(plot1, plot2, nrow = 2, common.legend = TRUE)
+# simulate response data
+eta_true <- eta_fun(x)                     # calibration parameter eta(x)
+par_true <- BiCopEta2Par(family = family,  # copula parameter theta(x)
+                         eta = eta_true)
+udata <- VineCopula::BiCopSim(n_obs, family = family, par = par_true)
 ```
+
+``` r
+# model selection and tuning
+bandset <- c(.02, .05, .1, .2) # set of bandwidth parameters
+famset <- c(1, 2, 3, 4, 5)     # set of copula families
+kernel <- KernGaus             # kernel function
+degree <- 1                    # degree of local polynomial
+n_loo <- 100                   # number of LOO-CV observations
+                               # (can be much smaller than n_obs)
+```
+
+``` r
+# calculate cv for each combination of family and bandwidth
+cvselect <- CondiCopSelect(u1= udata[,1], u2 = udata[,2],
+                           x = x, xind = n_loo,
+                           kernel = kernel, degree = degree,
+                           family = famset, band = bandset)
+```
+
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{paper_files/figure-latex/select1-plot-1} \caption{Cross-validation metric for each combination of family and bandwidth.}\label{fig:select1-plot}
+\end{figure}
+
+
+``` r
+# extract the selected family and bandwidth from cvselect
+cv_res <- cvselect$cv
+i_opt <- which.max(cv_res$cv)
+fam_opt <- cv_res[i_opt,]$family
+band_opt <- cv_res[i_opt,]$band
+
+# calculate eta(x) on a grid of values
+x0 <- seq(0, 1, by = 0.01)
+copfit <- CondiCopLocFit(u1 = udata[,1], u2 = udata[,2],
+                         x = x, x0 = x0,
+                         kernel = kernel, degree = degree,
+                         family = fam_opt, band = band_opt)
+# convert eta to Kendall tau
+tau_loc <- BiCopEta2Tau(copfit$eta, family= fam_opt)
+```
+
+
+
+
+
+``` r
+# simulate covariate values
+x <- sort(runif(n_obs))
+
+# simulate response data
+eta_true <- eta_fun(x)                     # calibration parameter eta(x)
+par_true <- BiCopEta2Par(family = family,  # copula parameter theta(x)
+                         eta = eta_true)
+udata <- VineCopula::BiCopSim(n_obs, family = family, par = par_true)
+```
+
+``` r
+# model selection and tuning
+bandset <- c(.02, .05, .1, .2) # set of bandwidth parameters
+famset <- c(1, 2, 3, 4, 5)     # set of copula families
+kernel <- KernGaus             # kernel function
+degree <- 1                    # degree of local polynomial
+n_loo <- 100                   # number of LOO-CV observations
+                               # (can be much smaller than n_obs)
+```
+
+``` r
+# calculate cv for each combination of family and bandwidth
+cvselect <- CondiCopSelect(u1= udata[,1], u2 = udata[,2],
+                           x = x, xind = n_loo,
+                           kernel = kernel, degree = degree,
+                           family = famset, band = bandset)
+```
+
+
+
+``` r
+# extract the selected family and bandwidth from cvselect
+cv_res <- cvselect$cv
+i_opt <- which.max(cv_res$cv)
+fam_opt <- cv_res[i_opt,]$family
+band_opt <- cv_res[i_opt,]$band
+
+# calculate eta(x) on a grid of values
+x0 <- seq(0, 1, by = 0.01)
+copfit <- CondiCopLocFit(u1 = udata[,1], u2 = udata[,2],
+                         x = x, x0 = x0,
+                         kernel = kernel, degree = degree,
+                         family = fam_opt, band = band_opt)
+# convert eta to Kendall tau
+tau_loc <- BiCopEta2Tau(copfit$eta, family= fam_opt)
+```
+
+
+
+\begin{figure}
+\includegraphics[width=1\linewidth]{paper_files/figure-latex/copcomp-1} \caption{True vs estimated conditional Kendall $\tau$ using various methods.}\label{fig:copcomp}
+\end{figure}
 
 In \autoref{fig:copcomp}, we compare the true conditional Kendall $\tau$ to estimates using each of the three conditional copula fitting packages **LocalCop**, **gamCopula**, and **CondCopulas**, for sample sizes $n = 300$ and $n = 1000$.  In **gamCopula**, selection of the copula family smoothing splines is done using the generalized CV framework provided by the \R package **mgcv** [@wood17].  In **CondCopulas**, selection of the bandwidth parameter is done using LOO-CV.  In this particular example, the sample size of $n = 300$ is not large enough for **gamCopula** to pick a sufficiently flexible spline basis, and **CondCopulas** picks a large bandwidth which oversmooths the data.  For the larger sample size $n = 1000$, the three methods exhibit similar accuracy.
 
