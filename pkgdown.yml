@@ -3,7 +3,7 @@ pkgdown: 2.1.0
 pkgdown_sha: ~
 articles:
   LocalCop: LocalCop.html
-last_built: 2024-09-06T01:20Z
+last_built: 2024-09-12T15:17Z
 urls:
   reference: https://mlysy.github.io/LocalCop/reference
   article: https://mlysy.github.io/LocalCop/articles
