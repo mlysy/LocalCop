@@ -8,3 +8,7 @@
 ^doc$
 ^Meta$
 ^vignettes/joss$
+^README\.Rmd$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

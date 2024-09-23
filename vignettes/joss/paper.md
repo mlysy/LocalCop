@@ -109,11 +109,11 @@ where $g^{-1}: \mathbb{R} \to \Theta$ an inverse-link function which ensures tha
 
 Local likelihood estimation of the conditional copula parameter $\theta(x)$ uses Taylor expansions to approximate the calibration function $\eta(x)$ at an observed covariate value $X = x$ near a fixed point $X = x_0$, i.e.,
 $$
-\eta(x)\approx \eta(x_0) + \eta^{(1)}(x_0) (x - x_0) + \ldots + \dfrac{\eta^{(p)}(x_0)}{p!} (x - x_0)^{p}.
+\eta(x)\approx \eta(x_0) + \eta^{(1)}(x_0) (x - x_0) + \ldots + \frac{\eta^{(p)}(x_0)}{p!} (x - x_0)^{p}.
 $$
 One then estimates $\beta_k = \eta^{(k)}(x_0)/k!$ for $k = 0,\ldots,p$ using a kernel-weighted local likelihood function
 \begin{equation}
-\ell(\boldsymbol{\beta}) = \sum_{i=1}^n \log\left\{ c\left(u_i, v_i \mid g^{-1}( \boldsymbol{x}_{i}^T \boldsymbol{\beta}), \nu \right)\right\} K_h\left(\dfrac{x_i-x_0}{h}\right),
+\ell(\boldsymbol{\beta}) = \sum_{i=1}^n \log\left\{ c\left(u_i, v_i \mid g^{-1}( \boldsymbol{x}_{i}^T \boldsymbol{\beta}), \nu \right)\right\} K_h\left(\frac{x_i-x_0}{h}\right),
 \label{eq:locallik}
 \end{equation}
 where $(u_i, v_i, x_i)$ is the data for observation $i$, $\boldsymbol{x}_i = (1, x_i - x_0, (x_i - x_0)^2, \ldots, (x_i - x_0)^p)$, $\boldsymbol{\beta}= (\beta_0, \beta_1, \ldots, \beta_p)$, and $K_h(z)$ is a kernel function with bandwidth parameter $h > 0$.  Having maximized $\ell(\boldsymbol{\beta})$ in \autoref{eq:locallik}, one estimates $\eta(x_0)$ by $\hat \eta(x_0) = \hat \beta_0$.  Usually, a linear fit with $p=1$ suffices to obtain a good estimate in practice.

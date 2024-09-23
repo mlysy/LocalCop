@@ -2,6 +2,8 @@
 title: "LocalCop: Local likelihood inference for conditional copulas"
 params:
   do_calc: FALSE
+pkgdown:
+  as_is: true
 output: 
   bookdown::html_vignette2:
     toc: true

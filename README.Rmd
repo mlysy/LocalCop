@@ -1,0 +1,139 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+library(desc)
+
+#' Parse and format author list.
+#'
+#' @details Only those with roles "aut" and "cre" are included.
+get_authors <- function() {
+  authors_full <- eval(parse(text = desc_get("Authors@R")))
+  is_aut <- sapply(authors_full,
+                   function(x) any(x$role %in% c("aut", "cre")))
+  authors <- format(authors_full[is_aut],
+                    include = c("given", "family"))
+  paste0(authors, collapse = ", ")
+}
+
+#' Format description.
+#'
+#' @details Converts TMB package names to hyperlink.
+get_description <- function() {
+  desc_text <- desc_get("Description")
+  desc_text <- gsub("'TMB'",
+                    replacement = "[**TMB**](https://github.com/kaskr/adcomp)",
+                    x = desc_text)
+  desc_text
+}
+
+#' Create the CRAN installation instructions.
+#'
+#' @details If package is found on CRAN, provide [install.packages()] command and version number.  Otherwise do nothing.
+cran_install <- function() {
+  pkg_name <- desc_get("Package")
+  # check if cran version exists
+  cran_pkgs <- available.packages(filter = "CRAN")
+  if(pkg_name %in% cran_pkgs[,"Package"]) {
+    pkg_info <- cran_pkgs[pkg_name,]
+    cat(
+      paste0("To install the CRAN version (", pkg_info["Version"], "):"),
+      "",
+      "```r",
+      paste0('install.packages("', pkg_name,
+             '", INSTALL_opts = "--install-tests")'),
+      "```",
+      "",
+      sep = "\n"
+    )
+  }
+}
+
+#' Create the GitHub install command.
+github_install <- function() {
+  pkg_name <- desc_get("Package")
+  cat(
+    "```r",
+    paste0('devtools::install_github("mlysy/', pkg_name,
+           '", INSTALL_opts = "--install-tests")'),
+    "```",
+    sep = "\n"
+  )
+}
+
+#' Create call to package vignette.
+get_vignette <- function(name) {
+  if(missing(name)) name <- desc_get("Package")
+  paste0('`vignette("', name, '")`')
+}
+
+#' Create call to run testthat.
+get_tests <- function() {
+  pkg_name <- desc_get("Package")
+  cat(
+    "```r",
+    paste0('testthat::test_package("', pkg_name,
+           '", reporter = "progress")'),
+    "```",
+    sep = "\n"
+  )
+}
+
+#' Create issue link.
+get_issue <- function() {
+  pkg_name <- desc_get("Package")
+  paste0("[issue](https://github.com/mlysy/", pkg_name, "/issues)")
+}
+```
+
+# `r desc_get("Package")`: `r desc_get("Title")`
+
+*`r get_authors()`*
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/mlysy/LocalCop/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mlysy/LocalCop/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
+---
+
+### Description
+
+`r get_description()`
+
+
+### Installation
+
+```{r cran-install, echo = FALSE, results = "asis"}
+cran_install()
+```
+
+To install the latest development version: first install the [**devtools**](https://CRAN.R-project.org/package=devtools) package, then:
+
+```{r github-install, echo = FALSE, results = "asis"}
+github_install()
+```
+
+### Usage
+
+Please see package vignette: `r get_vignette("LocalCop-vignette")`.
+
+### Unit Tests
+
+To verify that the package has been installed correctly, you can run its unit tests.  First install the [**testthat**](https://CRAN.R-project.org/package=testthat) package, then:
+
+```{r unit-tests, echo = FALSE, results = "asis"}
+get_tests()
+```
+
+### Contributing
+
+Contributions in the form of bug reports, fixes, extensions, improvements, etc. are most welcome.  Please file an `r get_issue()` before submitting a PR.
