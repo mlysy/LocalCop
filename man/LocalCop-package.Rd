@@ -69,6 +69,7 @@ par(oldpar)
 Useful links:
 \itemize{
   \item \url{https://github.com/mlysy/LocalCop}
+  \item \url{https://mlysy.github.io/LocalCop/}
   \item Report bugs at \url{https://github.com/mlysy/LocalCop/issues}
 }
 
@@ -78,7 +79,7 @@ Useful links:
 
 Authors:
 \itemize{
-  \item Elif Acar \email{elif.acar@umanitoba.ca}
+  \item Elif Fidan Acar \email{eacar@uoguelph.ca}
 }
 
 Other contributors:

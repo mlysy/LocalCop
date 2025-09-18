@@ -13,8 +13,10 @@
 #include "hgumbel.hpp"
 #include "hstudent.hpp"
 #include "LocalLikelihood.hpp"
+#include "pbvn.hpp"
 #include "pclayton.hpp"
 #include "pfrank.hpp"
+#include "pgaussian.hpp"
 #include "pgumbel.hpp"
 #include "pt.hpp"
 #include "qt.hpp"
@@ -44,10 +46,14 @@ Type objective_function<Type>::operator() () {
     return hstudent(this);
   } else if(model == "LocalLikelihood") {
     return LocalLikelihood(this);
+  } else if(model == "pbvn") {
+    return pbvn(this);
   } else if(model == "pclayton") {
     return pclayton(this);
   } else if(model == "pfrank") {
     return pfrank(this);
+  } else if(model == "pgaussian") {
+    return pgaussian(this);
   } else if(model == "pgumbel") {
     return pgumbel(this);
   } else if(model == "pt") {

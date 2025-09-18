@@ -38,6 +38,7 @@ Suggests:
     dplyr,
     readr,
     tidyr,
-    ggplot2
+    ggplot2,
+    mvtnorm
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr

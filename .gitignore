@@ -17,3 +17,6 @@ inst/doc
 /doc/
 /Meta/
 docs
+
+# VSCode Files
+.vscode

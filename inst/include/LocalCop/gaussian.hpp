@@ -5,6 +5,7 @@
 
 // this is where RefVector_t etc. is defined
 #include "config.hpp"
+#include "LocalCop/pbvn.hpp"
 
 #ifndef M_LN_SQRT_2PI
 #define M_LN_SQRT_2PI  0.918938533204672741780329736406
@@ -13,6 +14,22 @@
 #endif
 
 namespace LocalCop {
+  /// Calculate Gaussian copula CDF.
+  ///
+  /// @param[in] u1 First uniform variable.
+  /// @param[in] u2 Second uniform variable. 
+  /// @param[in] theta Parameter of the Gaussian copula with the range $(-1, 1)$.
+  /// @param give_log Whether or not to return on the log scale. 
+  ///
+  /// @return Value of the copula CDF.  
+  template <class Type>
+  Type pgaussian(Type u1, Type u2, Type theta, int give_log=0) {
+    Type z1 = qnorm(u1);
+    Type z2 = qnorm(u2);
+    Type ans = LocalCop::pbvn(z1, z2, theta);
+    if(give_log) return log(ans); else return ans;
+  }
+  VECTORIZE4_ttti(pgaussian)
 
   /// Calculate Gaussian copula partial derivative with respect to u1.
   ///
